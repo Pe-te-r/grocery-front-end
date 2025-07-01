@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form'
 import { motion } from 'framer-motion'
 import { User, Mail, Phone, Lock, ArrowRight, MapPin } from 'lucide-react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(auth)/register')({
   component: RegisterPage,
@@ -410,7 +410,7 @@ function RegisterPage() {
                       className={`flex w-full justify-center items-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 ${isSubmitting
                         ? 'bg-green-700'
                         : 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 hover:shadow-md'
-                        } focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600`}
+                        } focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600`}
                     >
                       {isSubmitting ? (
                         <span className="flex items-center">
@@ -440,9 +440,9 @@ function RegisterPage() {
             >
               <p>
                 Already have an account?{' '}
-                <a href="/login" className="font-medium text-green-600 hover:text-green-500">
+                <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
                   Sign in
-                </a>
+                </Link>
               </p>
             </motion.div>
           </div>

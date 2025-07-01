@@ -61,10 +61,10 @@ const GroceryStoreHeader = () => {
           <div className="flex items-center space-x-4">
             {!isLoggedIn ? (
               <>
-                <button className="flex flex-col items-center text-gray-700 hover:text-green-600">
+                <Link to='/login' className="flex flex-col items-center text-gray-700 hover:text-green-600">
                   <User className="mb-1" size={20} />
                   <span className="text-xs">Sign In</span>
-                </button>
+                </Link>
                 <button className="flex flex-col items-center text-gray-700 hover:text-green-600">
                   <Phone className="mb-1" size={20} />
                   <span className="text-xs">Contact</span>

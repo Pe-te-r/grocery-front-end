@@ -15,8 +15,8 @@ import bev2 from '../../assets/home/category/bevarages/img2.jpeg'
 import veg1 from '../../assets/home/category/vegetables/img1.jpeg'
 import veg2 from '../../assets/home/category/vegetables/img2.jpeg'
 // dairy
-import dairy1 from '../../assets/home/category/vegetables/img1.jpeg'
-import dairy2 from '../../assets/home/category/vegetables/img2.jpeg'
+import dairy1 from '../../assets/home/category/dairy/img1.jpeg'
+import dairy2 from '../../assets/home/category/dairy/img2.jpeg'
 // pastary
 import pastry1 from '../../assets/home/category/dairy/img1.jpeg'
 import pastry2 from '../../assets/home/category/dairy/img2.jpeg'
