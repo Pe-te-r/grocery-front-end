@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { ShoppingCart, User, Phone, MapPin, Search } from 'lucide-react';
 
 const GroceryStoreHeader = () => {
@@ -15,14 +16,14 @@ const GroceryStoreHeader = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           {/* Logo and Name */}
-          <div className="flex items-center space-x-2">
+          <Link to='/' className="flex items-center space-x-2">
             <div className="bg-green-600 text-white p-2 rounded-lg">
               <ShoppingCart size={28} />
             </div>
             <h1 className="text-2xl font-bold text-green-700">
               Grocery<span className="text-green-500">Store</span>
             </h1>
-          </div>
+          </Link>
 
           {/* Location Selector */}
           <div className="flex-1 max-w-md">
