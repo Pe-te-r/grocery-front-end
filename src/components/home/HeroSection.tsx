@@ -1,11 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import image1 from '../../assets/home/hero1.jpeg'
-import image2 from '../../assets/home/hero2.jpeg'
-import image3 from '../../assets/home/hero3.jpeg'
-import image4 from '../../assets/home/hero4.jpeg'
-import image5 from '../../assets/home/hero5.jpeg'
+import image1 from '../../assets/home/hero/hero1.jpeg'
+import image2 from '../../assets/home/hero/hero2.jpeg'
+import image3 from '../../assets/home/hero/hero3.jpeg'
+import image4 from '../../assets/home/hero/hero4.jpeg'
+import image5 from '../../assets/home/hero/hero5.jpeg'
 import { AuthForm } from '../AuthForm'
 
 const heroImages = [
