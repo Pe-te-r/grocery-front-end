@@ -12,7 +12,20 @@ import bakery3 from '../../assets/home/category/bakery/img3.jpeg'
 import bev1 from '../../assets/home/category/bevarages/img1.jpeg'
 import bev2 from '../../assets/home/category/bevarages/img2.jpeg'
 // vegetables
-
+import veg1 from '../../assets/home/category/vegetables/img1.jpeg'
+import veg2 from '../../assets/home/category/vegetables/img2.jpeg'
+// dairy
+import dairy1 from '../../assets/home/category/vegetables/img1.jpeg'
+import dairy2 from '../../assets/home/category/vegetables/img2.jpeg'
+// pastary
+import pastry1 from '../../assets/home/category/dairy/img1.jpeg'
+import pastry2 from '../../assets/home/category/dairy/img2.jpeg'
+// Snacks
+import snacks1 from '../../assets/home/category/snacks/img1.jpeg'
+import snacks2 from '../../assets/home/category/snacks/img2.jpeg'
+// Household
+import house1 from '../../assets/home/category/house/img1.jpeg'
+import house2 from '../../assets/home/category/house/img2.jpeg'
 
 
 
@@ -21,16 +34,15 @@ export const CategorySection = () => {
     {
       name: "Fruits & Vegetables",
       images: [
-        "/images/fruits-veg1.jpg",
-        "/images/fruits-veg2.jpg",
-        "/images/fruits-veg3.jpg"
+        veg1,
+        veg2
       ]
     },
     {
       name: "Dairy & Eggs",
       images: [
-        "/images/dairy1.jpg",
-        "/images/dairy2.jpg"
+        dairy1,
+        dairy2
       ]
     },
     // Add more categories with multiple images
@@ -52,8 +64,8 @@ export const CategorySection = () => {
     {
       name: "Pantry Staples",
       images: [
-        "/images/pantry1.jpg",
-        "/images/pantry2.jpg"
+        pastry1,
+        pastry2
       ]
     },
     {
@@ -66,15 +78,15 @@ export const CategorySection = () => {
     {
       name: "Snacks",
       images: [
-        "/images/snacks1.jpg",
-        "/images/snacks2.jpg"
+        snacks1,
+        snacks2
       ]
     },
     {
       name: "Household",
       images: [
-        "/images/household1.jpg",
-        "/images/household2.jpg"
+        house1,
+        house2
       ]
     }
   ];
