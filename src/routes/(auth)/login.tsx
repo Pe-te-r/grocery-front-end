@@ -45,10 +45,10 @@ function LoginPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="mt-8 mx-auto w-full sm:w-[100%] lg:w-[70%] max-w-2xl"
+          className="mt-8 mx-auto w-full sm:w-[100%] lg:w-[70%] max-w-3xl"
         >
 
-          <div className="bg-white py-8 px-6  shadow-lg rounded-2xl sm:px-10 border-2 border-green-100">
+          <div className="bg-white py-8 px-6 shadow-lg rounded-2xl sm:px-10 border-2 border-black-100 w-[100%] mx-auto">
             {/* Main Auth Form */}
             <AuthForm
               mode="page"

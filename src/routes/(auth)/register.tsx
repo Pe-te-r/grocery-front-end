@@ -100,14 +100,14 @@ function RegisterPage() {
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
+                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
                             ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
                             : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
                             }`}
                           placeholder="John"
                         />
                       </div>
-                      {field.state.meta.errors && (
+                      {field.state.meta.errors?.length>0 && (
                         <p className="mt-1 text-sm text-red-600 animate-pulse">
                           {field.state.meta.errors.join(', ')}
                         </p>
@@ -182,14 +182,14 @@ function RegisterPage() {
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
+                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
                             ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
                             : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
                             }`}
                           placeholder="you@example.com"
                         />
                       </div>
-                      {field.state.meta.errors && (
+                      {field.state.meta.errors?.length>0 && (
                         <p className="mt-1 text-sm text-red-600 animate-pulse">
                           {field.state.meta.errors.join(', ')}
                         </p>
@@ -228,14 +228,14 @@ function RegisterPage() {
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
+                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
                             ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
                             : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
                             }`}
                           placeholder="0712345678"
                         />
                       </div>
-                      {field.state.meta.errors && (
+                      {field.state.meta.errors?.length>0 && (
                         <p className="mt-1 text-sm text-red-600 animate-pulse">
                           {field.state.meta.errors.join(', ')}
                         </p>
@@ -273,7 +273,7 @@ function RegisterPage() {
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
+                        className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
                           ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
                           : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
                           }`}
@@ -286,7 +286,7 @@ function RegisterPage() {
                         <option value="eldoret">Eldoret</option>
                       </select>
                     </div>
-                    {field.state.meta.errors && (
+                    {field.state.meta.errors?.length>0 && (
                       <p className="mt-1 text-sm text-red-600 animate-pulse">
                         {field.state.meta.errors.join(', ')}
                       </p>
@@ -327,14 +327,14 @@ function RegisterPage() {
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
+                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
                             ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
                             : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
                             }`}
                           placeholder="••••••••"
                         />
                       </div>
-                      {field.state.meta.errors ? (
+                      {field.state.meta.errors?.length>0 ? (
                         <p className="mt-1 text-sm text-red-600 animate-pulse">
                           {field.state.meta.errors.join(', ')}
                         </p>
@@ -377,14 +377,14 @@ function RegisterPage() {
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
+                          className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
                             ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
                             : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
                             }`}
                           placeholder="••••••••"
                         />
                       </div>
-                      {field.state.meta.errors && (
+                      {field.state.meta.errors?.length>0 && (
                         <p className="mt-1 text-sm text-red-600 animate-pulse">
                           {field.state.meta.errors.join(', ')}
                         </p>
