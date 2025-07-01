@@ -29,7 +29,7 @@ function LoginPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="sm:mx-auto sm:w-full sm:max-w-md text-center"
+          className="sm:mx-auto sm:w-full md:w-full sm:max-w-md text-center"
         >
           <ShoppingBag className="mx-auto h-16 w-16 text-green-600" />
           <h2 className="mt-4 text-center text-3xl font-bold tracking-tight text-gray-900">
@@ -45,9 +45,10 @@ function LoginPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="mt-8 sm:mx-auto sm:w-full sm:max-w-md"
+          className="mt-8 mx-auto w-full sm:w-[100%] lg:w-[70%] max-w-2xl"
         >
-          <div className="bg-white py-8 px-6 shadow-lg rounded-2xl sm:px-10 border border-green-100">
+
+          <div className="bg-white py-8 px-6  shadow-lg rounded-2xl sm:px-10 border-2 border-green-100">
             {/* Main Auth Form */}
             <AuthForm
               mode="page"
