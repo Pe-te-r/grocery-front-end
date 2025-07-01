@@ -1,31 +1,69 @@
-interface CategoryItem {
-  name: string;
-  image: string;
-}
+import type { CategoryItem } from "@/util/types";
+import { CategoryCard } from "./CategoryCard";
 
-const CategoryCard = ({ name, image }: CategoryItem) => (
-  <div className="relative group overflow-hidden rounded-lg shadow-md hover:shadow-lg transition cursor-pointer">
-    <img
-      src={image}
-      alt={name}
-      className="w-full h-48 object-cover transition-transform group-hover:scale-105"
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4">
-      <h3 className="text-white font-bold text-lg">{name}</h3>
-    </div>
-  </div>
-);
+
 
 export const CategorySection = () => {
   const categories: CategoryItem[] = [
-    { name: "Fruits & Vegetables", image: "/images/fruits-veg.jpg" },
-    { name: "Dairy & Eggs", image: "/images/dairy.jpg" },
-    { name: "Meat & Fish", image: "/images/meat.jpg" },
-    { name: "Bakery", image: "/images/bakery.jpg" },
-    { name: "Pantry Staples", image: "/images/pantry.jpg" },
-    { name: "Beverages", image: "/images/beverages.jpg" },
-    { name: "Snacks", image: "/images/snacks.jpg" },
-    { name: "Household", image: "/images/household.jpg" }
+    {
+      name: "Fruits & Vegetables",
+      images: [
+        "/images/fruits-veg1.jpg",
+        "/images/fruits-veg2.jpg",
+        "/images/fruits-veg3.jpg"
+      ]
+    },
+    {
+      name: "Dairy & Eggs",
+      images: [
+        "/images/dairy1.jpg",
+        "/images/dairy2.jpg"
+      ]
+    },
+    // Add more categories with multiple images
+    {
+      name: "Meat & Fish",
+      images: [
+        "/images/meat1.jpg",
+        "/images/meat2.jpg",
+        "/images/meat3.jpg"
+      ]
+    },
+    {
+      name: "Bakery",
+      images: [
+        "/images/bakery1.jpg",
+        "/images/bakery2.jpg"
+      ]
+    },
+    {
+      name: "Pantry Staples",
+      images: [
+        "/images/pantry1.jpg",
+        "/images/pantry2.jpg"
+      ]
+    },
+    {
+      name: "Beverages",
+      images: [
+        "/images/beverages1.jpg",
+        "/images/beverages2.jpg"
+      ]
+    },
+    {
+      name: "Snacks",
+      images: [
+        "/images/snacks1.jpg",
+        "/images/snacks2.jpg"
+      ]
+    },
+    {
+      name: "Household",
+      images: [
+        "/images/household1.jpg",
+        "/images/household2.jpg"
+      ]
+    }
   ];
 
   return (
