@@ -1,6 +1,19 @@
 import type { CategoryItem } from "@/util/types";
 import { CategoryCard } from "./CategoryCard";
 
+// meat and fish part
+import fish1 from '../../assets/home/category/fish/img1.jpeg'
+import fish2 from '../../assets/home/category/fish/img2.jpeg'
+// bakery
+import bakery1 from '../../assets/home/category/bakery/img1.jpeg'
+import bakery2 from '../../assets/home/category/bakery/img2.jpeg'
+import bakery3 from '../../assets/home/category/bakery/img3.jpeg'
+// bevarages
+import bev1 from '../../assets/home/category/bevarages/img1.jpeg'
+import bev2 from '../../assets/home/category/bevarages/img2.jpeg'
+// vegetables
+
+
 
 
 export const CategorySection = () => {
@@ -24,16 +37,16 @@ export const CategorySection = () => {
     {
       name: "Meat & Fish",
       images: [
-        "/images/meat1.jpg",
-        "/images/meat2.jpg",
-        "/images/meat3.jpg"
+        fish1,
+        fish2,
       ]
     },
     {
       name: "Bakery",
       images: [
-        "/images/bakery1.jpg",
-        "/images/bakery2.jpg"
+        bakery1,
+        bakery2,
+        bakery3,
       ]
     },
     {
@@ -46,8 +59,8 @@ export const CategorySection = () => {
     {
       name: "Beverages",
       images: [
-        "/images/beverages1.jpg",
-        "/images/beverages2.jpg"
+        bev1,
+        bev2
       ]
     },
     {
