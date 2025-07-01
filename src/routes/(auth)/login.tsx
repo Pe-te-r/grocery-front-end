@@ -1,15 +1,20 @@
 import { AuthForm } from '@/components/AuthForm';
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ShoppingBag, Leaf } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useLoginHook } from '@/hooks/authHook';
 
 export const Route = createFileRoute('/(auth)/login')({
   component: LoginPage,
 })
 
 function LoginPage() {
+  const navigate = useNavigate()
+  const mutate = useLoginHook()
   const handleSubmit = async (values: { email: string; password: string }) => {
     console.log('Logging in with:', values)
+    mutate.mutate(values)
+    navigate({to:'/dashboard'})
     // await loginUser(values)
   }
 
@@ -53,7 +58,6 @@ function LoginPage() {
             <AuthForm
               mode="page"
               onSubmit={handleSubmit}
-              onSuccess={() => window.location.href = '/'}
             />
 
             {/* App Download CTA */}
