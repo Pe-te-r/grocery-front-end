@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Leaf, Store, HeartHandshake, Users, Phone, Mail, MapPin } from 'lucide-react';
 
 export const Route = createFileRoute('/about')({
@@ -91,12 +91,12 @@ function AboutUsPage(){
         <h2 className="text-2xl md:text-3xl font-bold mb-4">Experience the GroceryStore Difference</h2>
         <p className="max-w-2xl mx-auto mb-6">Join thousands of happy customers who shop with confidence knowing they're supporting local businesses.</p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <a href="#" className="bg-white text-green-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition">
+          <Link to="/" className="bg-white text-green-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition">
             Visit Our Store
-          </a>
-          <a href="#" className="border border-white px-6 py-3 rounded-lg font-medium hover:bg-green-600 transition">
+          </Link>
+          <Link to="/contact" className="border border-white px-6 py-3 rounded-lg font-medium hover:bg-green-600 transition">
             Contact Us
-          </a>
+          </Link>
         </div>
       </section>
 

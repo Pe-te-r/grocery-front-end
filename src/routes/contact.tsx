@@ -7,9 +7,9 @@ export const Route = createFileRoute('/contact')({
 
 import { useForm } from '@tanstack/react-form'
 import { useState } from 'react'
-import { Mail, User, MessageSquare, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Mail, User, MessageSquare, AlertTriangle, CheckCircle, ChevronDown } from 'lucide-react'
 
-function ContactPage(){
+function ContactPage() {
   const [formStatus, setFormStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const form = useForm({
@@ -21,19 +21,33 @@ function ContactPage(){
     },
     onSubmit: async ({ value }) => {
       try {
-        console.log('Form submitted:', value) // Log form data
-        // Simulate API call
+        console.log('Form submitted:', value)
         await new Promise(resolve => setTimeout(resolve, 1000))
         setFormStatus('success')
+        form.reset()
       } catch (error) {
         setFormStatus('error')
       }
     }
   })
 
-  const validateEmail = (email: string) => {
+  const validateName = ({ value }: { value: string }) => {
+    if (!value) return 'Name is required'
+    if (value.length < 2) return 'Name too short'
+    return null
+  }
+
+  const validateEmail = ({ value }: { value: string }) => {
+    if (!value) return 'Email is required'
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return re.test(email)
+    if (!re.test(value)) return 'Invalid email format'
+    return null
+  }
+
+  const validateMessage = ({ value }: { value: string }) => {
+    if (!value) return 'Message is required'
+    if (value.length < 10) return 'Message too short (min 10 chars)'
+    return null
   }
 
   return (
@@ -84,29 +98,33 @@ function ContactPage(){
               </div>
             ) : null}
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  void form.handleSubmit()
-                }}
-                className="space-y-5"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                void form.handleSubmit()
+              }}
+              className="space-y-5"
+            >
+              {/* First Name */}
+              <form.Field
+                name="firstName"
+                validators={{ onChange: validateName }}
               >
-                {/* First Name */}
-                <form.Field
-                  name="firstName"
-                  validators={{
-                    onChange: ({ value }) => !value ? 'First name is required' : undefined
-                  }}
-                >
-                  {(field) => (
-                    <div>
-                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                {(field) => {
+                  const hasErrors = field.state.meta.errors?.length > 0
+                  const isTouched = field.state.meta.isTouched
+                  const isValid = !hasErrors && isTouched
+                  return (
+                    <div className="space-y-1.5">
+                      <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
                         First Name
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <User className="h-5 w-5 text-gray-400" />
+                          <User className={`h-5 w-5 ${field.state.meta.errors?.length>0 ? 'text-red-500' :
+                            isValid ? 'text-green-500' : 'text-gray-400'
+                            }`} />
                         </div>
                         <input
                           id="firstName"
@@ -114,36 +132,48 @@ function ContactPage(){
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`pl-10 block w-full rounded-md border ${field.state.meta.errors ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-green-500 focus:ring-green-500`}
+                          className={`pl-10 pr-4 py-2 block w-full rounded-lg border-2 ${field.state.meta.errors?.length>0 ? 'border-red-400 focus:border-red-500' :
+                            isValid ? 'border-green-400 focus:border-green-500' :
+                              'border-gray-200 focus:border-green-500'
+                            } shadow-sm transition-all duration-200 focus:ring-2 ${isValid ? 'focus:ring-green-200' : 'focus:ring-gray-200'
+                            } outline-none`}
                         />
+                        {isValid && (
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          </div>
+                        )}
                       </div>
-                      {field.state.meta.errors ? (
-                        <p className="mt-1 text-sm text-red-600">{field.state.meta.errors.join(', ')}</p>
-                      ) : null}
+                      {field.state.meta.errors?.length>0 && (
+                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4" />
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
                     </div>
-                  )}
-                </form.Field>
+                  )
+                }}
+              </form.Field>
 
-                {/* Email */}
-                <form.Field
-                  name="email"
-                  validators={{
-                    onChange: ({ value }) =>
-                      !value
-                        ? 'Email is required'
-                        : !validateEmail(value)
-                          ? 'Please enter a valid email'
-                          : undefined
-                  }}
-                >
-                  {(field) => (
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              {/* Email */}
+              <form.Field
+                name="email"
+                validators={{ onChange: validateEmail }}
+              >
+                {(field) => {
+                  const hasErrors = field.state.meta.errors?.length > 0
+                  const isTouched = field.state.meta.isTouched
+                  const isValid = !hasErrors && isTouched
+                  return (
+                    <div className="space-y-1.5">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                         Email Address
                       </label>
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Mail className="h-5 w-5 text-gray-400" />
+                          <Mail className={`h-5 w-5 ${field.state.meta.errors?.length>0 ? 'text-red-500' :
+                            isValid ? 'text-green-500' : 'text-gray-400'
+                            }`} />
                         </div>
                         <input
                           id="email"
@@ -151,28 +181,42 @@ function ContactPage(){
                           value={field.state.value}
                           onBlur={field.handleBlur}
                           onChange={(e) => field.handleChange(e.target.value)}
-                          className={`pl-10 block w-full rounded-md border ${field.state.meta.errors ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-green-500 focus:ring-green-500`}
+                          className={`pl-10 pr-4 py-2 block w-full rounded-lg border-2 ${field.state.meta.errors?.length>0 ? 'border-red-400 focus:border-red-500' :
+                            isValid ? 'border-green-400 focus:border-green-500' :
+                              'border-gray-200 focus:border-green-500'
+                            } shadow-sm transition-all duration-200 focus:ring-2 ${isValid ? 'focus:ring-green-200' : 'focus:ring-gray-200'
+                            } outline-none`}
                         />
+                        {isValid && (
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          </div>
+                        )}
                       </div>
-                      {field.state.meta.errors ? (
-                        <p className="mt-1 text-sm text-red-600">{field.state.meta.errors.join(', ')}</p>
-                      ) : null}
+                      {field.state.meta.errors?.length>0 && (
+                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4" />
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
                     </div>
-                  )}
-                </form.Field>
+                  )
+                }}
+              </form.Field>
 
-                {/* Category */}
-                <form.Field name="category">
-                  {(field) => (
-                    <div>
-                      <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                        What's this about?
-                      </label>
+              {/* Category */}
+              <form.Field name="category">
+                {(field) => (
+                  <div className="space-y-1.5">
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                      What's this about?
+                    </label>
+                    <div className="relative">
                       <select
                         id="category"
                         value={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
+                        className="block w-full py-2 pl-3 pr-10 rounded-lg border-2 border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none transition-colors duration-200 appearance-none bg-white"
                       >
                         <option value="general">General Inquiry</option>
                         <option value="delivery">Delivery Issue</option>
@@ -180,20 +224,26 @@ function ContactPage(){
                         <option value="feedback">Feedback/Suggestion</option>
                         <option value="other">Other</option>
                       </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <ChevronDown className="h-5 w-5 text-gray-400" />
+                      </div>
                     </div>
-                  )}
-                </form.Field>
+                  </div>
+                )}
+              </form.Field>
 
-                {/* Message */}
-                <form.Field
-                  name="message"
-                  validators={{
-                    onChange: ({ value }) => !value ? 'Message is required' : value.length < 10 ? 'Message must be at least 10 characters' : undefined
-                  }}
-                >
-                  {(field) => (
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+              {/* Message */}
+              <form.Field
+                name="message"
+                validators={{ onChange: validateMessage }}
+              >
+                {(field) => {
+                  const hasErrors = field.state.meta.errors?.length > 0
+                  const isTouched = field.state.meta.isTouched
+                  const isValid = !hasErrors && isTouched
+                  return (
+                    <div className="space-y-1.5 relative">
+                      <label htmlFor="message" className="block text-sm font-medium text-gray-700">
                         Your Message
                       </label>
                       <textarea
@@ -202,33 +252,47 @@ function ContactPage(){
                         value={field.state.value}
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
-                        className={`block w-full rounded-md border ${field.state.meta.errors ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-green-500 focus:ring-green-500`}
+                        className={`px-4 py-2 block w-full rounded-lg border-2 ${field.state.meta.errors?.length>0 ? 'border-red-400 focus:border-red-500' :
+                          isValid ? 'border-green-400 focus:border-green-500' :
+                            'border-gray-200 focus:border-green-500'
+                          } shadow-sm transition-all duration-200 focus:ring-2 ${isValid ? 'focus:ring-green-200' : 'focus:ring-gray-200'
+                          } outline-none`}
                       />
-                      {field.state.meta.errors ? (
-                        <p className="mt-1 text-sm text-red-600">{field.state.meta.errors.join(', ')}</p>
-                      ) : null}
+                      {isValid && (
+                        <div className="absolute right-3 top-9">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        </div>
+                      )}
+                      {field.state.meta.errors?.length>0 && (
+                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                          <AlertTriangle className="h-4 w-4" />
+                          {field.state.meta.errors.join(', ')}
+                        </p>
+                      )}
                     </div>
-                  )}
-                </form.Field>
+                  )
+                }}
+              </form.Field>
 
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={form.state.isSubmitting}
-                    className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {form.state.isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending...
-                      </>
-                    ) : 'Send Message'}
-                  </button>
-                </div>
-              </form>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={form.state.isSubmitting}
+                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {form.state.isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </>
+                  ) : 'Send Message'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

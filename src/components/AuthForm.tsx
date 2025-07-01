@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
-import { ArrowRight, Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from '@tanstack/react-router'
 
@@ -12,6 +12,13 @@ type AuthFormProps = {
 
 export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
+  const [backgroundImages] = useState([
+    'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1550583724-b2692b85b150?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1560743641-3914f2c45636?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+  ])
+  const [currentBgImage, setCurrentBgImage] = useState(0)
+
   const form = useForm({
     defaultValues: {
       email: '',
@@ -27,12 +34,22 @@ export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) 
     },
   })
 
+  // Rotate background images
+  useEffect(() => {
+    if (mode === 'page') {
+      const interval = setInterval(() => {
+        setCurrentBgImage((prev) => (prev + 1) % backgroundImages.length)
+      }, 5000)
+      return () => clearInterval(interval)
+    }
+  },[mode])
+
   return (
     <div className={`${mode === 'page' ? 'w-full' : 'max-w-4xl mx-auto'}`}>
-      <div className="flex  flex-col md:flex-row gap-8">
+      <div className={`${mode === 'page' ? 'flex flex-col md:flex-row gap-8' : ''}`}>
         {/* Left Column - Form */}
-        <div className="w-full md:w-1/2">
-          <div className="text-center md:text-left">
+        <div className={`${mode === 'page' ? 'w-full md:w-1/2' : 'w-full'}`}>
+        <div className="text-center md:text-left">
             <motion.h2
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -70,36 +87,50 @@ export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) 
                 },
               }}
             >
-              {(field) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="space-y-1"
-                >
-                  <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
-                    Email address
-                  </label>
-                  <input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    type="email"
-                    className={`block w-full rounded-lg border-0 py-2 px-3 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors
-                        ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
-                        : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
-                      }`}
-                    placeholder="you@example.com"
-                  />
-                  {field.state.meta.errors && (
-                    <p className="mt-1 text-sm text-red-600 animate-pulse">
-                      {field.state.meta.errors.join(', ')}
-                    </p>
-                  )}
-                </motion.div>
-              )}
+              {(field) => {
+                const hasErrors = field.state.meta.errors?.length > 0
+                const isTouched = field.state.meta.isTouched
+                const isValid = !hasErrors && isTouched
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="space-y-1"
+                  >
+                    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                      Email address
+                    </label>
+                    <div className="relative">
+                      <input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        type="email"
+                        className={`block w-full rounded-lg border-2 py-2 px-3 shadow-sm focus:ring-2 focus:ring-inset ${hasErrors
+                            ? 'border-red-400 focus:border-red-500 focus:ring-red-100 bg-red-50'
+                            : isValid
+                              ? 'border-green-400 focus:border-green-500 focus:ring-green-100'
+                              : 'border-gray-200 focus:border-green-500 focus:ring-green-100'
+                          } transition-colors duration-200`}
+                        placeholder="you@example.com"
+                      />
+                      {isValid && (
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        </div>
+                      )}
+                    </div>
+                    {hasErrors && (
+                      <p className="mt-1 text-sm text-red-600 animate-pulse">
+                        {field.state.meta.errors.join(', ')}
+                      </p>
+                    )}
+                  </motion.div>
+                )
+              }}
             </form.Field>
 
             {/* Password Field */}
@@ -113,51 +144,63 @@ export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) 
                 },
               }}
             >
-              {(field) => (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="space-y-1"
-                >
-                  <div className="flex items-center justify-between">
-                    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
-                      Password
-                    </label>
-                  </div>
-                  <div className="relative">
-                    <input
-                      id={field.name}
-                      name={field.name}
-                      type={showPassword ? 'text' : 'password'}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      className={`block w-full rounded-lg border-0 py-2 px-3 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset pr-10 ${field.state.meta.errors
-                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
-                          : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
-                        }`}
-                      placeholder="••••••••"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5" aria-hidden="true" />
-                      ) : (
-                        <Eye className="h-5 w-5" aria-hidden="true" />
+              {(field) => {
+                const hasErrors = field.state.meta.errors?.length > 0
+                const isTouched = field.state.meta.isTouched
+                const isValid = !hasErrors && isTouched
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="space-y-1"
+                  >
+                    <div className="flex items-center justify-between">
+                      <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
+                        Password
+                      </label>
+                    </div>
+                    <div className="relative">
+                      <input
+                        id={field.name}
+                        name={field.name}
+                        type={showPassword ? 'text' : 'password'}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        className={`block w-full rounded-lg border-2 py-2 px-3 shadow-sm focus:ring-2 focus:ring-inset pr-10 ${hasErrors
+                            ? 'border-red-400 focus:border-red-500 focus:ring-red-100 bg-red-50'
+                            : isValid
+                              ? 'border-green-400 focus:border-green-500 focus:ring-green-100'
+                              : 'border-gray-200 focus:border-green-500 focus:ring-green-100'
+                          } transition-colors duration-200`}
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-500"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" aria-hidden="true" />
+                        ) : (
+                          <Eye className="h-5 w-5" aria-hidden="true" />
+                        )}
+                      </button>
+                      {isValid && (
+                        <div className="absolute inset-y-0 right-8 pr-3 flex items-center">
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        </div>
                       )}
-                    </button>
-                  </div>
-                  {field.state.meta.errors && (
-                    <p className="mt-1 text-sm text-red-600 animate-pulse">
-                      {field.state.meta.errors.join(', ')}
-                    </p>
-                  )}
-                </motion.div>
-              )}
+                    </div>
+                    {hasErrors && (
+                      <p className="mt-1 text-sm text-red-600 animate-pulse">
+                        {field.state.meta.errors.join(', ')}
+                      </p>
+                    )}
+                  </motion.div>
+                )
+              }}
             </form.Field>
 
             {/* Submit Button */}
@@ -223,6 +266,7 @@ export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) 
           </form>
 
           {/* Social Login */}
+          
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -263,26 +307,55 @@ export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) 
         </div>
 
         {/* Right Column - Additional Info */}
-        <div className="hidden md:flex md:w-1/2 flex-col justify-center bg-green-50 rounded-lg p-8">
-          <div className="text-center">
-            <div className="mx-auto h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
+        {mode === 'page' && (
+          <div className="hidden md:flex md:w-1/2 flex-col justify-center rounded-lg p-8 relative overflow-hidden">
+            {/* Background images with transition */}
+            <div className="absolute inset-0 z-0">
+              {backgroundImages.map((img, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${index === currentBgImage ? 'opacity-100' : 'opacity-0'}`}
+                  style={{ backgroundImage: `url(${img})` }}
+                />
+              ))}
+              <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">New to GroceryStore?</h3>
-            <p className="text-gray-600 mb-6">
-              Create an account to enjoy faster checkout, save your shopping lists, and track your orders.
-            </p>
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-4 py-2 text-sm font-medium text-green-600 shadow-sm ring-1 ring-inset ring-green-300 hover:bg-green-50 transition-colors"
-            >
-              Create account
-            </Link>
+
+            {/* Content on top of the background */}
+            <div className="relative z-10 text-center text-white">
+              <div className="mx-auto h-16 w-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
+                <svg className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">New to GroceryStore?</h3>
+              <p className="mb-6 opacity-90">
+                Create an account to enjoy faster checkout, save your shopping lists, and track your orders.
+              </p>
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-lg bg-white bg-opacity-90 px-4 py-2 text-sm font-medium text-green-600 shadow-sm ring-1 ring-inset ring-white ring-opacity-20 hover:bg-opacity-100 transition-all"
+              >
+                Create account
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
 }
+
+// Contact page route implementation
+// import { createFileRoute } from '@tanstack/react-router'
+
+// export const Route = createFileRoute('/login')({
+//   component: () => (
+//     <div className="max-w-7xl mx-auto px-4 py-12">
+//       <AuthForm mode="page" onSubmit={async (values) => {
+//         console.log('Login submitted:', values)
+//         await new Promise(resolve => setTimeout(resolve, 1000))
+//       }} />
+//     </div>
+//   ),
+// })
