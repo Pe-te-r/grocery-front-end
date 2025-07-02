@@ -85,21 +85,21 @@ export const SidebarDashboard = () => {
     {
       name: "Products",
       icon: Package,
-      path: "/products",
+      path: "/dashboard/products",
       subItems: [
-        { name: "All Products", path: "/products" },
-        { name: "Categories", path: "/products/categories" },
-        { name: "Inventory", path: "/products/inventory" },
+        { name: "All Products", path: "/dashboard/products" },
+        { name: "Categories", path: "/dashboard/products/categories" },
+        { name: "Inventory", path: "/dashboard/products/inventory" },
       ],
     },
     {
       name: "Orders",
       icon: ShoppingCart,
-      path: "/orders",
+      path: "/dashboard/orders",
       subItems: [
-        { name: "All Orders", path: "/orders" },
-        { name: "Pending", path: "/orders/pending" },
-        { name: "Completed", path: "/orders/completed" },
+        { name: "All Orders", path: "/dashboard/orders" },
+        { name: "Pending", path: "/dashboard/orders/pending" },
+        { name: "Completed", path: "/dashboard/orders/completed" },
       ],
     },
     {
@@ -107,15 +107,15 @@ export const SidebarDashboard = () => {
       icon: Users,
       path: "/users",
       subItems: [
-        { name: "Admins", path: "/users/admins" },
-        { name: "Customers", path: "/users/customers" },
-        { name: "Staff", path: "/users/staff" },
+        { name: "Admins", path: "/dashboard/users/admins" },
+        { name: "Customers", path: "/dashboard/users/customers" },
+        { name: "Staff", path: "/dashboard/users/staff" },
       ],
     },
     {
       name: "Settings",
       icon: Settings,
-      path: "/settings",
+      path: "/dashboard/settings",
     },
   ];
 

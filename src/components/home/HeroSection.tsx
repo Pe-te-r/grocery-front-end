@@ -21,9 +21,15 @@ const heroImages = [
 export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isAutoScrolling, setIsAutoScrolling] = useState(true)
-  const isVerified = authStore.state.isVerified
+  const [isVerified, setIsVerified] = useState(false)
   const mutate = useLoginHook()
-  const navigate=useNavigate()
+  const navigate = useNavigate()
+  
+  //
+  useEffect(() => {
+    const isVerified = authStore.state.isVerified
+    setIsVerified(isVerified)
+  },[authStore.state])
 
   // Auto-scroll every 5 seconds
   useEffect(() => {

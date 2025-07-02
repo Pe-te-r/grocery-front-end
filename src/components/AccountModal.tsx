@@ -2,6 +2,7 @@ import { userByIdHook } from '@/hooks/userHook';
 import { authActions, authStore } from '@/store/authStore';
 import { X, LogOut, Shield, ShieldOff, Edit } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Loading } from './Loading';
 
 interface AccountModalProps {
   isOpen: boolean;
@@ -10,8 +11,8 @@ interface AccountModalProps {
 
 export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
   const userId = authStore.state.user.user.id
-  const { data,isSuccess } = userByIdHook(userId, { account_modal :true})
-  const [userData,setUser] = useState({
+  const { data, isSuccess, isLoading } = userByIdHook(userId, { account_modal: true })
+  const [userData, setUser] = useState({
     profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
     firstName: '',
     lastName: '',
@@ -27,10 +28,10 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
     setUser(
       {
         ...data?.data,
-      profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
+        profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
       }
     )
-  },[isSuccess,data])
+  }, [isSuccess, data])
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -64,106 +65,113 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
           </div>
 
           {/* Modal content - scrollable on mobile */}
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto max-h-[calc(100vh-200px)] sm:max-h-none">
-            <div className="flex flex-col sm:flex-row gap-6">
+          {isLoading ? 
+            <div className="flex items-center justify-center h-100 w-100">
+            <Loading/>
+            </div>
+          : <>
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto max-h-[calc(100vh-200px)] sm:max-h-none">
+                <div className="flex flex-col sm:flex-row gap-6">
 
-              {/* Profile image section */}
-              <div className="flex flex-col items-center">
-                <img
-                  src={userData.profileImage}
-                  alt="Profile"
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-green-100"
-                />
-                <button className="mt-3 text-sm text-green-600 hover:text-green-800 flex items-center">
-                  <Edit className="w-4 h-4 mr-1" />
-                  Change Photo
-                </button>
-              </div>
+                  {/* Profile image section */}
+                  <div className="flex flex-col items-center">
+                    <img
+                      src={userData.profileImage}
+                      alt="Profile"
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-green-100"
+                    />
+                    <button className="mt-3 text-sm text-green-600 hover:text-green-800 flex items-center">
+                      <Edit className="w-4 h-4 mr-1" />
+                      Change Photo
+                    </button>
+                  </div>
 
-              {/* User details - single column on mobile */}
-              <div className="flex-1 w-full">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">First Name</p>
-                    <p className="mt-1 text-sm text-gray-900">{userData.firstName}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Last Name</p>
-                    <p className="mt-1 text-sm text-gray-900">{userData.lastName}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Email</p>
-                    <p className="mt-1 text-sm text-gray-900 break-all">{userData.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Phone</p>
-                    <p className="mt-1 text-sm text-gray-900">{userData.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">2FA Status</p>
-                    <div className="mt-1 flex items-center">
-                      {userData.isTwoFactorEnabled ? (
-                        <>
-                          <Shield className="w-4 h-4 text-green-600 mr-1" />
-                          <span className="text-sm text-gray-900">Enabled</span>
-                        </>
-                      ) : (
-                        <>
-                          <ShieldOff className="w-4 h-4 text-gray-400 mr-1" />
-                          <span className="text-sm text-gray-900">Disabled</span>
-                        </>
-                      )}
+                  {/* User details - single column on mobile */}
+                  <div className="flex-1 w-full">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">First Name</p>
+                        <p className="mt-1 text-sm text-gray-900">{userData.firstName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Last Name</p>
+                        <p className="mt-1 text-sm text-gray-900">{userData.lastName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Email</p>
+                        <p className="mt-1 text-sm text-gray-900 break-all">{userData.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Phone</p>
+                        <p className="mt-1 text-sm text-gray-900">{userData.phone}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">2FA Status</p>
+                        <div className="mt-1 flex items-center">
+                          {userData.isTwoFactorEnabled ? (
+                            <>
+                              <Shield className="w-4 h-4 text-green-600 mr-1" />
+                              <span className="text-sm text-gray-900">Enabled</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShieldOff className="w-4 h-4 text-gray-400 mr-1" />
+                              <span className="text-sm text-gray-900">Disabled</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Role</p>
+                        <p className="mt-1 text-sm text-gray-900">{userData.role}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Joined At</p>
+                        <p className="mt-1 text-sm text-gray-900">{formatDate(userData.joinedAt)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Last Login</p>
+                        <p className="mt-1 text-sm text-gray-900">{formatDate(userData.lastLogin)}</p>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <p className="text-xs sm:text-sm font-medium text-gray-500">Status</p>
+                        <p className="mt-1 text-sm text-gray-900">
+                          <span className={`px-2 py-1 rounded-full text-xs ${userData.status === 'Active'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                            }`}>
+                            {userData.status}
+                          </span>
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Role</p>
-                    <p className="mt-1 text-sm text-gray-900">{userData.role}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Joined At</p>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(userData.joinedAt)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Last Login</p>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(userData.lastLogin)}</p>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <p className="text-xs sm:text-sm font-medium text-gray-500">Status</p>
-                    <p className="mt-1 text-sm text-gray-900">
-                      <span className={`px-2 py-1 rounded-full text-xs ${userData.status === 'Active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                        }`}>
-                        {userData.status}
-                      </span>
-                    </p>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Modal footer - stacked buttons on mobile */}
-          <div className="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col-reverse sm:flex-row  gap-2">
-            <button
-              type="button"
-              className="w-full sm:w-auto justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none"
-              onClick={() => {
-                authActions.deleteUser();
-                onClose();
-              }}
-            >
-              <LogOut className="w-5 h-5 mr-2 inline" />
-              Logout
-            </button>
-            <button
-              type="button"
-              className="w-full sm:w-auto justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
-              onClick={onClose}
-            >
-              Close
-            </button>
-          </div>
+              {/* Modal footer - stacked buttons on mobile */}
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col-reverse sm:flex-row  gap-2">
+                <button
+                  type="button"
+                  className="w-full sm:w-auto justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none"
+                  onClick={() => {
+                    authActions.deleteUser();
+                    onClose();
+                  }}
+                >
+                  <LogOut className="w-5 h-5 mr-2 inline" />
+                  Logout
+                </button>
+                <button
+                  type="button"
+                  className="w-full sm:w-auto justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                  onClick={onClose}
+                >
+                  Close
+                </button>
+              </div>
+            </>
+          }
         </div>
       </div>
     </div>

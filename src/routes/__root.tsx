@@ -1,5 +1,6 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { Toaster } from 'react-hot-toast';
 
 import Header from '../components/Header'
 
@@ -31,6 +32,20 @@ function RouteComponent() {
 
       <TanStackQueryLayout />
       <AppFooter />
+      <Toaster
+        toastOptions={{
+          success: {
+            style: {
+              background: '#22c55e',
+            },
+          },
+          error: {
+            style: {
+              background: '#ef4444',
+            },
+          },
+        }}
+      />
     </>
   )
 }
