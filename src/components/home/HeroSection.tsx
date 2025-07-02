@@ -110,8 +110,8 @@ export default function HeroSection() {
           </div>
 
           {/* Image Carousel */}
-          <div className="md:w-1/2 flex justify-center relative">
-            <div className="relative w-full max-w-md h-96 md:h-[28rem] overflow-hidden rounded-xl shadow-2xl">
+          <div className="md:w-1/2 w-full flex justify-center relative">
+            <div className="relative w-full max-w-md h-96 md:h-[28rem] overflow-hidden  rounded-xl shadow-2xl">
               {/* Images with sliding animation */}
               {heroImages.map((image, index) => (
                 <img
@@ -199,6 +199,7 @@ export default function HeroSection() {
             </div>
           </div>
         )}
+       
       </>
     </>
   )

@@ -28,10 +28,10 @@ export const authActions = {
     authStore.setState(intialDataStore)
     localStorage.removeItem('auth')
   },
-  intializeUser: () => {
+  intializeUser:async () => {
     const userData = localStorage.getItem('auth')
     if (userData) {
-      const userJson: authStoreType = JSON.parse(userData)
+      const userJson: authStoreType =await JSON.parse(userData)
       console.log('data from localstorage',userJson)
       authStore.setState(userJson)
       console.log('store data',authStore.state)

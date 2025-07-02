@@ -1,7 +1,8 @@
-import {  authStore } from '@/store/authStore';
+import { authActions, authStore } from '@/store/authStore';
 import { Link } from '@tanstack/react-router';
 import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { AccountModal } from './AccountModal';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -9,11 +10,12 @@ const GroceryStoreHeader = () => {
   const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAccountModal, setIsAccountModal] = useState(false);
   const isVerified = authStore.state.isVerified
 
   useEffect(() => {
     setIsLoggedIn(isVerified)
-  }, [])
+  }, [authStore.state])
 
   // Array of announcements
   const announcements = [
@@ -51,7 +53,9 @@ const GroceryStoreHeader = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
-
+  const logOut = () => {
+    authActions.deleteUser()
+  }
   return (
     <>
       {/* Top Announcement Bar */}
@@ -156,14 +160,14 @@ const GroceryStoreHeader = () => {
               ) : (
                 // Would show user profile and other options if logged in
                 <>
-                  <div className="flex flex-col items-center text-gray-700">
+                    <button onClick={() => setIsAccountModal(true)} className="flex flex-col cursor-pointer items-center text-gray-700">
                     <User className="mb-1" size={20} />
                     <span className="text-xs">Account</span>
-                  </div>
-                  <div  className="flex cursor-pointer flex-col items-center text-gray-700">
+                  </button>
+                    <button onClick={logOut} className="flex cursor-pointer flex-col items-center text-gray-700">
                     <LogOut className="mb-1" size={20} />
                     <span className="text-xs">Logout</span>
-                  </div>
+                  </button>
                 </>
               )}
 
@@ -257,6 +261,12 @@ const GroceryStoreHeader = () => {
           )}
         </div>
       </header>
+      {isAccountModal && (
+        <AccountModal
+          isOpen={isAccountModal}
+          onClose={() => setIsAccountModal(false)}
+        />
+      )}
     </>
   );
 };
