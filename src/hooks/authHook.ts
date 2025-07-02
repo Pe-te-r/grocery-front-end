@@ -10,7 +10,7 @@ export const useLoginHook = () => {
     onSuccess: (data: LoginResponseType) => {
       console.log('login data reponse', data);
       const userData = data?.data
-      authActions.setUser({user:{ ...userData},isVerified: true })
+      authActions.setUser({user:userData,isVerified: true })
     },
     onError: (error) => {
       console.error('error occured', error);

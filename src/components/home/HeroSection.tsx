@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import image1 from '../../assets/home/hero/hero1.jpeg'
@@ -7,6 +7,8 @@ import image3 from '../../assets/home/hero/hero3.jpeg'
 import image4 from '../../assets/home/hero/hero4.jpeg'
 import image5 from '../../assets/home/hero/hero5.jpeg'
 import { AuthForm } from '../AuthForm'
+import { useLoginHook } from '@/hooks/authHook'
+import { authStore } from '@/store/authStore'
 
 const heroImages = [
   image1,
@@ -19,6 +21,9 @@ const heroImages = [
 export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isAutoScrolling, setIsAutoScrolling] = useState(true)
+  const isVerified = authStore.state.isVerified
+  const mutate = useLoginHook()
+  const navigate=useNavigate()
 
   // Auto-scroll every 5 seconds
   useEffect(() => {
@@ -36,6 +41,9 @@ export default function HeroSection() {
   const handleSubmit = async (values: { email: string; password: string }) => {
     // Your login API call
     console.log('Logging in with:', values)
+    mutate.mutate(values)
+    navigate({ to: '/' })
+    setIsOpen(false)
     // await loginUser(values)
   }
 
@@ -70,22 +78,34 @@ export default function HeroSection() {
               >
                 Shop Now <ArrowRight className="ml-2" size={18} />
               </Link>
-
-              {/* Sign Up Button */}
-              <Link
-                to='/register'
-                className="bg-transparent border-2 border-white hover:bg-white hover:text-green-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition hover:scale-105 transform"
-              >
-                Sign Up
-              </Link>
-
-              {/* Login Button */}
-              <button
-                onClick={() => setIsOpen(true)}
-                className="bg-transparent cursor-pointer border-2 border-white hover:bg-white hover:text-green-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition hover:scale-105 transform"
-              >
-                Login
-              </button>
+              {
+                isVerified ? 
+                  <>
+                    <Link
+                      to='/dashboard'
+                      className="bg-transparent border-2 border-white hover:bg-white hover:text-green-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition hover:scale-105 transform"
+                    >
+                      Dashboard
+                    </Link>
+                  </>
+                :
+                  <>
+                    {/* Sign Up Button */}
+                    <Link
+                      to='/register'
+                      className="bg-transparent border-2 border-white hover:bg-white hover:text-green-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition hover:scale-105 transform"
+                    >
+                      Sign Up
+                    </Link>
+                    {/* Login Button */}
+                    <button
+                      onClick={() => setIsOpen(true)}
+                      className="bg-transparent cursor-pointer border-2 border-white hover:bg-white hover:text-green-700 font-bold py-3 px-6 rounded-lg flex items-center justify-center transition hover:scale-105 transform"
+                    >
+                      Login
+                    </button>
+                  </>
+              }
             </div>
           </div>
 
@@ -164,7 +184,7 @@ export default function HeroSection() {
       <>
         {isOpen && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl w-max max-w-3/9 sm:max-w-full relative p-6">
+            <div className="bg-white rounded-lg shadow-xl lg:w-1/4 md:w-2/4 sm:w-full relative p-6">
               <button
                 onClick={() => setIsOpen(false)}
                 className="absolute cursor-pointer top-4 right-4 text-gray-500 hover:text-gray-700"

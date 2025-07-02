@@ -1,13 +1,19 @@
+import {  authStore } from '@/store/authStore';
 import { Link } from '@tanstack/react-router';
-import { ShoppingCart, User, Phone, MapPin, Search, Menu } from 'lucide-react';
+import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const GroceryStoreHeader = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isVerified = authStore.state.isVerified
+
+  useEffect(() => {
+    setIsLoggedIn(isVerified)
+  }, [])
 
   // Array of announcements
   const announcements = [
@@ -149,10 +155,16 @@ const GroceryStoreHeader = () => {
                 </>
               ) : (
                 // Would show user profile and other options if logged in
-                <div className="flex flex-col items-center text-gray-700">
-                  <User className="mb-1" size={20} />
-                  <span className="text-xs">Account</span>
-                </div>
+                <>
+                  <div className="flex flex-col items-center text-gray-700">
+                    <User className="mb-1" size={20} />
+                    <span className="text-xs">Account</span>
+                  </div>
+                  <div  className="flex cursor-pointer flex-col items-center text-gray-700">
+                    <LogOut className="mb-1" size={20} />
+                    <span className="text-xs">Logout</span>
+                  </div>
+                </>
               )}
 
               <button className="relative flex flex-col items-center text-gray-700 hover:text-green-600">

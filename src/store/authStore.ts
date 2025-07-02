@@ -16,7 +16,7 @@ const intialDataStore: authStoreType = {
   }
 }
 
-const authStore = new Store<authStoreType>(intialDataStore)
+export const authStore = new Store<authStoreType>(intialDataStore)
 
 
 export const authActions = {
@@ -32,7 +32,9 @@ export const authActions = {
     const userData = localStorage.getItem('auth')
     if (userData) {
       const userJson: authStoreType = JSON.parse(userData)
-      authActions.setUser(userJson)
+      console.log('data from localstorage',userJson)
+      authStore.setState(userJson)
+      console.log('store data',authStore.state)
     }
   }
 
