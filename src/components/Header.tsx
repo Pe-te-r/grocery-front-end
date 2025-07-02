@@ -228,9 +228,12 @@ const GroceryStoreHeader = () => {
                   ) : (
                     <li>
                       <button
-                        // to='/account'
                         className="flex items-center text-gray-700 hover:text-green-600 p-2 rounded-lg hover:bg-gray-100"
-                        onClick={() => setMobileMenuOpen(false)}
+                          onClick={() => {
+                            setMobileMenuOpen(false)
+                            setIsAccountModal(true)
+                          }
+                          }
                       >
                         <User className="mr-2" size={18} />
                         My Account
