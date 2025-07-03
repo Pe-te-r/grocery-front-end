@@ -42,3 +42,18 @@ export interface authStoreType{
   isVerified: boolean;
   user: UserData;
 }
+
+export interface RegisterDataTypeT{
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  password: string;
+}
+
+export interface RegisterResponseType{
+  status: 'error' | 'success';
+  message: string;
+  data: null;
+  
+}

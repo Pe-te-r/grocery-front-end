@@ -1,4 +1,4 @@
-import type { LoginDataType, RegisterDataType } from "@/util/types";
+import type { LoginDataType, RegisterDataTypeT } from "@/util/types";
 import { url } from "./url";
 
 export const loginFn = async (data: LoginDataType) => {
@@ -13,7 +13,7 @@ export const loginFn = async (data: LoginDataType) => {
   return json_data
 }
 
-export const registerFn = async (data: RegisterDataType) => {
+export const registerFn = async (data: RegisterDataTypeT) => {
   const response = await fetch(`${url}/auth/register`, {
     method: 'POST',
     headers: {

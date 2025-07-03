@@ -1,26 +1,32 @@
 import { useForm } from '@tanstack/react-form'
 import { motion } from 'framer-motion'
-import { User, Mail, Phone, Lock, ArrowRight, MapPin } from 'lucide-react'
+import { User, Mail, Phone, Lock, ArrowRight } from 'lucide-react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useRegisterHook } from '@/hooks/authHook'
 
 export const Route = createFileRoute('/(auth)/register')({
   component: RegisterPage,
 })
 
 function RegisterPage() {
+  const registerMutate = useRegisterHook()
   const form = useForm({
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
       phone: '',
-      location: '', // Added location field
       password: '',
       confirmPassword: ''
     },
     onSubmit: async ({ value }) => {
       console.log('Registration data:', value)
-      // await registerUser(value)
+      await registerMutate.mutate(value, {
+        onError: () => {
+          form.setFieldValue('password','')
+          form.setFieldValue('confirmPassword','')
+        }
+      })
     }
   })
 
@@ -244,56 +250,6 @@ function RegisterPage() {
                   )}
                 </form.Field>
               </div>
-
-              {/* Row 3: Location */}
-              <form.Field
-                name="location"
-                validators={{
-                  onChange: ({ value }) =>
-                    !value ? 'Location is required' : undefined
-                }}
-              >
-                {(field) => (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                    className="space-y-1"
-                  >
-                    <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">
-                      Your Location *
-                    </label>
-                    <div className="relative mt-1 rounded-md shadow-sm">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <MapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <select
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        className={`block w-full rounded-md border-0 py-2 pl-10 shadow-sm ring-1 ring-inset focus:ring-2 focus:ring-inset ${field.state.meta.errors?.length>0
-                          ? 'text-red-900 ring-red-300 placeholder:text-red-300 focus:ring-red-500 bg-red-50'
-                          : 'text-gray-900 ring-gray-300 placeholder:text-gray-400 focus:ring-green-600'
-                          }`}
-                      >
-                        <option value="">Select your area</option>
-                        <option value="nairobi">Nairobi</option>
-                        <option value="mombasa">Mombasa</option>
-                        <option value="kisumu">Kisumu</option>
-                        <option value="nakuru">Nakuru</option>
-                        <option value="eldoret">Eldoret</option>
-                      </select>
-                    </div>
-                    {field.state.meta.errors?.length>0 && (
-                      <p className="mt-1 text-sm text-red-600 animate-pulse">
-                        {field.state.meta.errors.join(', ')}
-                      </p>
-                    )}
-                  </motion.div>
-                )}
-              </form.Field>
 
               {/* Row 4: Password Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
