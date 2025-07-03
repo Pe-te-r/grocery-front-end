@@ -1,5 +1,5 @@
 import { AuthForm } from '@/components/AuthForm';
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { ShoppingBag, Leaf } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useLoginHook } from '@/hooks/authHook';
@@ -9,13 +9,20 @@ export const Route = createFileRoute('/(auth)/login')({
 })
 
 function LoginPage() {
-  const navigate = useNavigate()
   const mutate = useLoginHook()
-  const handleSubmit = async (values: { email: string; password: string }) => {
-    console.log('Logging in with:', values)
-    mutate.mutate(values)
-    navigate({to:'/dashboard'})
-    // await loginUser(values)
+  const handleSubmit = async (values: { email: string; password: string }, setFieldValue: (fieldName: string, value: string) => void) => {
+    mutate.mutate(values, {
+      onSuccess: (data) => {
+        if (data?.status == 'error') {
+          setFieldValue('password', '')
+        }
+      },
+      onError: (error) => {
+        console.log(error)
+        setFieldValue('password', '')
+        
+      }
+    })
   }
 
   return (

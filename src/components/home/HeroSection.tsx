@@ -47,10 +47,20 @@ export default function HeroSection() {
   const handleSubmit = async (values: { email: string; password: string }) => {
     // Your login API call
     console.log('Logging in with:', values)
-    mutate.mutate(values)
-    navigate({ to: '/' })
-    setIsOpen(false)
-    // await loginUser(values)
+    mutate.mutate(values, {
+      onSuccess: (data) => {
+        console.log('data from mutate',data)
+        if (data?.status === 'success') {
+          console.log('inside if')
+          navigate({ to: '/dashboard' })
+          setIsOpen(false)
+        }
+      },
+      onError: (error) => {
+        console.error(error)
+        setIsOpen(true)
+      }
+    })
   }
 
   const nextImage = () => {
@@ -200,7 +210,6 @@ export default function HeroSection() {
               <AuthForm
                 mode="modal"
                 onSubmit={handleSubmit}
-                onSuccess={() => setIsOpen(false)}
               />
             </div>
           </div>

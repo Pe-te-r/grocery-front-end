@@ -35,10 +35,10 @@ export interface UserData{
 export interface LoginResponseType{
   status: 'success' | 'error'
   message: string;
-  data:UserData
+  data: UserData;
 }
 
 export interface authStoreType{
-  isVerified: boolean
-  user:UserData
+  isVerified: boolean;
+  user: UserData;
 }

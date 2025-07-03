@@ -1,4 +1,4 @@
-import { useForm } from '@tanstack/react-form'
+import { FormApi, useForm } from '@tanstack/react-form'
 import { ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -6,11 +6,10 @@ import { Link } from '@tanstack/react-router'
 
 type AuthFormProps = {
   mode?: 'modal' | 'page'
-  onSubmit: (values: { email: string; password: string }) => Promise<void>
-  onSuccess?: () => void
+  onSubmit: (values: { email: string; password: string }, setFieldValue: (fieldName: string, value: string) => void) => Promise<void>
 }
 
-export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) => {
+export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [backgroundImages] = useState([
     'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
@@ -24,10 +23,15 @@ export const AuthForm = ({ mode = 'page', onSubmit, onSuccess }: AuthFormProps) 
       email: '',
       password: '',
     },
-    onSubmit: async ({ value }) => {
+    
+    onSubmit: async (
+      props: {
+        value: { email: string; password: string },
+        formApi: FormApi<{ email: string; password: string }>
+      }
+    ) => {
       try {
-        await onSubmit(value)
-        onSuccess?.()
+        await onSubmit(props.value, props.formApi.setFieldValue)
       } catch (error) {
         console.error('Login failed:', error)
       }
