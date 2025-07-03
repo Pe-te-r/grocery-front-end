@@ -20,6 +20,9 @@ import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
+import { Route as DashboardUsersDriversRouteImport } from './routes/dashboard/users/drivers'
+import { Route as DashboardUsersCustomersRouteImport } from './routes/dashboard/users/customers'
+import { Route as DashboardUsersAdminsRouteImport } from './routes/dashboard/users/admins'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -76,6 +79,21 @@ const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
   path: '/orders/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardUsersDriversRoute = DashboardUsersDriversRouteImport.update({
+  id: '/users/drivers',
+  path: '/users/drivers',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardUsersCustomersRoute = DashboardUsersCustomersRouteImport.update({
+  id: '/users/customers',
+  path: '/users/customers',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardUsersAdminsRoute = DashboardUsersAdminsRouteImport.update({
+  id: '/users/admins',
+  path: '/users/admins',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,6 +106,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
+  '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
+  '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -100,6 +121,9 @@ export interface FileRoutesByTo {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
+  '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
+  '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
 }
 export interface FileRoutesById {
@@ -114,6 +138,9 @@ export interface FileRoutesById {
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
+  '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
+  '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
 }
 export interface FileRouteTypes {
@@ -129,6 +156,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/'
     | '/products'
+    | '/dashboard/users/admins'
+    | '/dashboard/users/customers'
+    | '/dashboard/users/drivers'
     | '/dashboard/orders'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -141,6 +171,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard'
     | '/products'
+    | '/dashboard/users/admins'
+    | '/dashboard/users/customers'
+    | '/dashboard/users/drivers'
     | '/dashboard/orders'
   id:
     | '__root__'
@@ -154,6 +187,9 @@ export interface FileRouteTypes {
     | '/dashboard/settings'
     | '/dashboard/'
     | '/products/'
+    | '/dashboard/users/admins'
+    | '/dashboard/users/customers'
+    | '/dashboard/users/drivers'
     | '/dashboard/orders/'
   fileRoutesById: FileRoutesById
 }
@@ -247,18 +283,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrdersIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/users/drivers': {
+      id: '/dashboard/users/drivers'
+      path: '/users/drivers'
+      fullPath: '/dashboard/users/drivers'
+      preLoaderRoute: typeof DashboardUsersDriversRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/users/customers': {
+      id: '/dashboard/users/customers'
+      path: '/users/customers'
+      fullPath: '/dashboard/users/customers'
+      preLoaderRoute: typeof DashboardUsersCustomersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/users/admins': {
+      id: '/dashboard/users/admins'
+      path: '/users/admins'
+      fullPath: '/dashboard/users/admins'
+      preLoaderRoute: typeof DashboardUsersAdminsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardUsersAdminsRoute: typeof DashboardUsersAdminsRoute
+  DashboardUsersCustomersRoute: typeof DashboardUsersCustomersRoute
+  DashboardUsersDriversRoute: typeof DashboardUsersDriversRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardUsersAdminsRoute: DashboardUsersAdminsRoute,
+  DashboardUsersCustomersRoute: DashboardUsersCustomersRoute,
+  DashboardUsersDriversRoute: DashboardUsersDriversRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
 }
 

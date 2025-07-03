@@ -109,7 +109,7 @@ export const SidebarDashboard = () => {
       subItems: [
         { name: "Admins", path: "/dashboard/users/admins" },
         { name: "Customers", path: "/dashboard/users/customers" },
-        { name: "Staff", path: "/dashboard/users/staff" },
+        { name: "Driver", path: "/dashboard/users/drivers" },
       ],
     },
     {

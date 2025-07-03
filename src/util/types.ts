@@ -57,3 +57,37 @@ export interface RegisterResponseType{
   data: null;
   
 }
+
+export interface allUserQuery {
+  customers?: boolean
+  admin?: boolean
+  vendor?: boolean
+  superadmin?: boolean
+  driver?: boolean
+}
+
+// types/users.ts
+export enum AccountStatus {
+  ACTIVE = 'active',
+  DEACTIVATED = 'deactivated',
+  PENDING = 'pending',
+  SUSPENDED = 'suspended',
+  BANNED = 'banned',
+  DELETED = 'deleted',
+  LOCKED = 'locked',
+  INACTIVE = 'inactive',
+}
+
+export type User = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string
+  phone: string
+  is_verified: boolean
+  account_status: AccountStatus
+  created_at: string
+  role?: string 
+}
+
+export type UserRoleEnum = 'customers' | 'admins' | 'vendors' | 'drivers'
