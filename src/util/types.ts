@@ -91,3 +91,22 @@ export type User = {
 }
 
 export type UserRoleEnum = 'customers' | 'admins' | 'vendors' | 'drivers'
+
+
+// types/category.ts
+export type ApiResponse<T> = {
+  status: 'error' | 'success';
+  message: string;
+  data: T;
+};
+
+export type Category = {
+  id: string;
+  name: string;
+};
+
+export type Subcategory = {
+  id: string;
+  name: string;
+  categoryId: string;
+};

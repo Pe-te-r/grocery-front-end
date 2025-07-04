@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   ChevronLeft,
+  FileChartColumnIncreasingIcon,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -88,7 +89,8 @@ export const SidebarDashboard = () => {
       path: "/dashboard/products",
       subItems: [
         { name: "All Products", path: "/dashboard/products" },
-        { name: "Categories", path: "/dashboard/products/categories" },
+        { name: "Categories", path: "/dashboard/products/category" },
+        { name: "Sub Category", path: "/dashboard/products/subcategory" },
         { name: "Inventory", path: "/dashboard/products/inventory" },
       ],
     },
@@ -112,6 +114,7 @@ export const SidebarDashboard = () => {
         { name: "Driver", path: "/dashboard/users/drivers" },
       ],
     },
+
     {
       name: "Settings",
       icon: Settings,
