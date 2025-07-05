@@ -1,6 +1,6 @@
 import { getAuthTokens } from "@/lib/authHelper"
 import { url } from "./url"
-import type { allUserQuery } from "@/util/types"
+import type { allUserQuery, updateSettingProfileType } from "@/util/types"
 
 function buildQueryParams(params: Record<string, boolean>): string {
   const query = new URLSearchParams()
@@ -59,5 +59,27 @@ export const getUsersFn = async (params: allUserQuery = {}) => {
     },
   })
 
-  return await response.json()
+  const data =  await response.json()
+  return data
 }
+
+export const updateUserFn = async (data: updateSettingProfileType) => {
+  const token = getAuthTokens()?.accessToken;
+  const fullUrl = `${url}/users/${data.id}`;
+
+  const response = await fetch(fullUrl, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  // if (!response.ok) {
+  //   const error = await response.json();
+  //   throw new Error(error.message || 'Failed to update user');
+  // }
+
+  return await response.json();
+};

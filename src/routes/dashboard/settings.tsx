@@ -1,3 +1,4 @@
+import { Loading } from '@/components/Loading';
 import SettingsLayout from '@/components/settings/SecurityLayout';
 import { userByIdHook } from '@/hooks/userHook';
 import { getUserIdHelper } from '@/lib/authHelper';
@@ -10,7 +11,7 @@ export const Route = createFileRoute('/dashboard/settings')({
 });
 
 function SettingsRouteComponent() {
-  const { data, isSuccess, isLoading } = userByIdHook(getUserIdHelper() ?? '', { account_modal: true });
+  const { data, isSuccess, isLoading,refetch } = userByIdHook(getUserIdHelper() ?? '', { account_modal: true });
   const [userData, setUserData] = useState({
     firstName: '',
     lastName: '',
@@ -43,14 +44,14 @@ function SettingsRouteComponent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 py-8 flex justify-center items-center">
-        Loading user data...
+        <Loading/>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
-      <SettingsLayout userData={userData} />
+      <SettingsLayout userData={userData} refetch={refetch} />
     </div>
   );
 }

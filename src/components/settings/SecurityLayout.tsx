@@ -6,7 +6,7 @@ import ProfileSection from './ProfileSection';
 import NotificationsSection from './NotificationsSection';
 import SecuritySection from './SecuritySection';
 
-const SettingsLayout = ({ userData }: { userData: UserData }) => {
+const SettingsLayout = ({ userData, refetch }: { userData: UserData, refetch:()=> void }) => {
   const [activeSection, setActiveSection] = useState('profile');
 
   const sectionVariants = {
@@ -72,7 +72,7 @@ const SettingsLayout = ({ userData }: { userData: UserData }) => {
               className="mb-8"
             >
               {activeSection === 'profile' && (
-                <ProfileSection userData={userData} />
+                <ProfileSection userData={userData} refetch={refetch} />
               )}
               {activeSection === 'security' && (
                 <SecuritySection

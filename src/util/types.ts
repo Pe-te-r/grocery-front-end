@@ -146,3 +146,11 @@ export type AuthActions = {
 };
 
 export type AuthStoreType = AuthState & AuthActions;
+
+
+export interface updateSettingProfileType{
+  id:string
+  phone?: string;
+  first_name?: string;
+  last_name?: string;
+}
