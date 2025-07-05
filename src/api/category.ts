@@ -1,6 +1,6 @@
 import type { ApiResponse, Category, Subcategory } from "@/util/types";
 import { url } from "./url";
-import { authStore } from "@/store/authStore";
+import { getAuthTokens } from "@/lib/authHelper";
 
 export const getAllCategory = async (): Promise<ApiResponse<Category[]>> => {
   const response = await fetch(`${url}/category`, {
@@ -31,7 +31,7 @@ export const deleteCategory = async (id: string): Promise<ApiResponse<null>> => 
 }
 
 export const createCategory = async(data: { name: string }) => {
-  const token = authStore.state.user.tokens.accessToken
+  const token = getAuthTokens()?.accessToken
 
   const response = await fetch(`${url}/category`, {
     method: 'POST',
@@ -47,7 +47,7 @@ export const createCategory = async(data: { name: string }) => {
 
 
 export const editCategory = async (id:string,data: { name: string }) => {
-  const token = authStore.state.user.tokens.accessToken
+  const token = getAuthTokens()?.accessToken
 
   const response = await fetch(`${url}/category/${id}`, {
     method: 'PATCH',

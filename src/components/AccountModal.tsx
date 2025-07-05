@@ -1,8 +1,8 @@
 import { userByIdHook } from '@/hooks/userHook';
-import { authActions, authStore } from '@/store/authStore';
 import { X, LogOut, Shield, ShieldOff, Edit } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Loading } from './Loading';
+import {  getUserIdHelper, logoutUserHelper } from '@/lib/authHelper';
 
 interface AccountModalProps {
   isOpen: boolean;
@@ -10,7 +10,7 @@ interface AccountModalProps {
 }
 
 export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
-  const userId = authStore.state.user.user.id
+  const userId = getUserIdHelper() ?? ''
   const { data, isSuccess, isLoading } = userByIdHook(userId, { account_modal: true })
   const [userData, setUser] = useState({
     profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
@@ -155,7 +155,7 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
                   type="button"
                   className="w-full sm:w-auto justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none"
                   onClick={() => {
-                    authActions.deleteUser();
+                    logoutUserHelper()
                     onClose();
                   }}
                 >

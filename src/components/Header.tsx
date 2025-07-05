@@ -1,8 +1,8 @@
-import { authActions, authStore } from '@/store/authStore';
 import { Link } from '@tanstack/react-router';
 import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AccountModal } from './AccountModal';
+import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -11,11 +11,15 @@ const GroceryStoreHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountModal, setIsAccountModal] = useState(false);
-  const isVerified = authStore.state.isVerified
+
+  const logOut = () => {
+    logoutUserHelper()
+  }
 
   useEffect(() => {
-    setIsLoggedIn(isVerified)
-  }, [authStore.state])
+    console.log('use Effect',isAuthenticatedHelper())
+    setIsLoggedIn(isAuthenticatedHelper())
+  }, [logoutUserHelper, loginUserHelper, logOut, isAuthenticatedHelper])
 
   // Array of announcements
   const announcements = [
@@ -53,9 +57,7 @@ const GroceryStoreHeader = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
-  const logOut = () => {
-    authActions.deleteUser()
-  }
+ 
   return (
     <>
       {/* Top Announcement Bar */}

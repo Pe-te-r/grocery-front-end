@@ -110,3 +110,39 @@ export type Subcategory = {
   name: string;
   categoryId: string;
 };
+
+
+// types.ts
+export type Tokens = {
+  accessToken: string;
+  refreshToken: string;
+};
+
+export enum UserRole {
+  ADMIN = 'admin',
+  USER = 'user',
+  GUEST = 'guest'
+}
+
+export interface UserAuthType {
+  id: string;
+  email: string;
+  role: UserRole;
+}
+
+export type AuthState = {
+  tokens: Tokens | null;
+  user: UserAuthType | null;
+  isAuthenticated: boolean;
+};
+
+export type AuthActions = {
+  login: (tokens: Tokens, userData: UserAuthType) => void;
+  logout: () => void;
+  updateAccessToken: (newAccessToken: string) => void;
+  updateUser: (updatedUser: Partial<UserAuthType>) => void;
+  verifyUser: () => void;
+  reinitialize: () => void;
+};
+
+export type AuthStoreType = AuthState & AuthActions;

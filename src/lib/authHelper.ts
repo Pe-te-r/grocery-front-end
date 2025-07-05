@@ -1,9 +1,11 @@
-import useAuthStore, { type Tokens } from '@/store/authStore';
-import type { authStoreType, UserData } from '@/util/types';
+// authHelpers.ts
+
+import useAuthStore from "@/store/authStore";
+import type { Tokens,  UserAuthType,  UserRole } from "@/util/types";
 
 // === READ HELPERS ===
 
-export const getAuthUser = (): UserDatag | undefined  => useAuthStore().user?.user;
+// export const getAuthUser = (): UserAuthType | undefined => useAuthStore.getState().user;
 
 export const getAuthTokens = (): Tokens | null => useAuthStore.getState().tokens;
 
@@ -13,20 +15,25 @@ export const getAccessToken = (): string | null =>
 export const getRefreshToken = (): string | null =>
   useAuthStore.getState().tokens?.refreshToken || null;
 
-export const getUserId = (): string | null => useAuthStore.getState().user?.user.user.id || null;
+export const getUserId = (): string | null =>
+  useAuthStore.getState().user?.id || null;
 
-export const getUserEmail = (): string | null => useAuthStore.getState().user?.user.user.email || null;
+export const getUserEmail = (): string | null =>
+  useAuthStore.getState().user?.email || null;
 
-export const getUserRole = (): string | null => useAuthStore.getState().user?.user.user.role || null;
+export const getUserRole = (): UserRole | null =>
+  useAuthStore.getState().user?.role || null;
 
-export const isUserVerified = (): boolean => useAuthStore.getState().user?.isVerified ?? false;
+export const isUserVerified = (): string | null =>
+  useAuthStore.getState().user?.email ?? null;
 
-export const isAuthenticated = (): boolean | undefined => useAuthStore.getState().user?.isVerified;
+export const isAuthenticated = (): boolean =>
+  useAuthStore.getState().isAuthenticated;
 
 // === ACTION HELPERS ===
 
-export const loginUser = (tokens: Tokens, user: UserData): void =>
-  useAuthStore.getState().login(tokens, user);
+export const loginUser = (tokens: Tokens, userData: UserAuthType): void =>
+  useAuthStore.getState().login(tokens, userData);
 
 export const logoutUser = (): void =>
   useAuthStore.getState().logout();
@@ -34,8 +41,25 @@ export const logoutUser = (): void =>
 export const updateAccessToken = (accessToken: string): void =>
   useAuthStore.getState().updateAccessToken(accessToken);
 
-export const updateUserData = (partialUser: Partial<authStoreType>): void =>
+export const updateUserData = (partialUser: Partial<UserAuthType>): void =>
   useAuthStore.getState().updateUser(partialUser);
 
 export const verifyCurrentUser = (): void =>
   useAuthStore.getState().verifyUser();
+
+// === CAMEL CASE HELPERS ===
+
+// export const getAuthUserHelper = () => getAuthUser();
+export const getAuthTokensHelper = () => getAuthTokens();
+export const getAccessTokenHelper = () => getAccessToken();
+export const getRefreshTokenHelper = () => getRefreshToken();
+export const getUserIdHelper = () => getUserId();
+export const getUserEmailHelper = () => getUserEmail();
+export const getUserRoleHelper = () => getUserRole();
+export const isUserVerifiedHelper = () => isUserVerified();
+export const isAuthenticatedHelper = () => isAuthenticated();
+export const loginUserHelper = (tokens: Tokens, userData: UserAuthType) => loginUser(tokens, userData);
+export const logoutUserHelper = () => logoutUser();
+export const updateAccessTokenHelper = (accessToken: string) => updateAccessToken(accessToken);
+export const updateUserDataHelper = (partialUser: Partial<UserAuthType>) => updateUserData(partialUser);
+export const verifyCurrentUserHelper = () => verifyCurrentUser();

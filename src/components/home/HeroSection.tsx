@@ -8,7 +8,7 @@ import image4 from '../../assets/home/hero/hero4.jpeg'
 import image5 from '../../assets/home/hero/hero5.jpeg'
 import { AuthForm } from '../AuthForm'
 import { useLoginHook } from '@/hooks/authHook'
-import { authStore } from '@/store/authStore'
+import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper'
 
 const heroImages = [
   image1,
@@ -27,9 +27,10 @@ export default function HeroSection() {
   
   //
   useEffect(() => {
-    const isVerified = authStore.state.isVerified
-    setIsVerified(isVerified)
-  },[authStore.state])
+    console.log('hero section',isAuthenticatedHelper())
+    setIsVerified(isAuthenticatedHelper())
+  }, [logoutUserHelper, loginUserHelper, isAuthenticatedHelper])
+
 
   // Auto-scroll every 5 seconds
   useEffect(() => {
