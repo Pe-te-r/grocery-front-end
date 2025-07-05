@@ -1,5 +1,5 @@
 import { SidebarDashboard } from '@/components/SideNav';
-import {  authStore } from '@/store/authStore';
+import { isAuthenticated } from '@/lib/authHelper';
 import { createFileRoute,  Outlet, redirect } from '@tanstack/react-router';
 import {
   Bell,
@@ -8,9 +8,8 @@ import {
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: async() => {
-    const isVerified =await authStore.state.isVerified
-    console.log(isVerified)
-    if (!isVerified) {
+    console.log(isAuthenticated)
+    if (!isAuthenticated) {
       throw redirect({ to:'/login'})
     }
   },

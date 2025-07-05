@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getAllCategory, getAllSubcategoryByCategory } from '@/api/category'
+import { getAllSubcategoryByCategory } from '@/api/category'
 import {
   flexRender,
   getCoreRowModel,
@@ -13,6 +13,8 @@ import { z } from 'zod'
 // import { zodValidator } from '@tanstack/zod-form-adapter'
 import { Pen, Trash2, MoreVertical, Plus, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useGetCategoryHook } from '@/hooks/subCategoryHook'
+import { createCategoryHook, useDeleteCategoryHook, useEditCategoryHook } from '@/hooks/categoryHook'
 
 export const Route = createFileRoute('/dashboard/products/category')({
   component: CategoryManagement,
@@ -29,7 +31,7 @@ type Subcategory = {
 }
 
 function CategoryManagement() {
-  const { data: categories, isLoading, error } = useGetCategoryHook()
+  const { data: categories, isLoading, error, refetch } = useGetCategoryHook()
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -58,6 +60,7 @@ function CategoryManagement() {
           setSelectedCategory(category)
           setIsModalOpen(true)
         }}
+        refetch={() => refetch()}
         onEditCategory={(category) => {
           setCurrentEditCategory(category)
           setIsEditModalOpen(true)
@@ -77,7 +80,7 @@ function CategoryManagement() {
       {/* Create Category Modal */}
       <AnimatePresence>
         {isCreateModalOpen && (
-          <CreateCategoryModal onClose={() => setIsCreateModalOpen(false)} />
+          <CreateCategoryModal onClose={() => setIsCreateModalOpen(false)} refetch={() => refetch()} />
         )}
       </AnimatePresence>
 
@@ -87,6 +90,7 @@ function CategoryManagement() {
           <EditCategoryModal
             category={currentEditCategory}
             onClose={() => setIsEditModalOpen(false)}
+            refetch={() => refetch()}
           />
         )}
       </AnimatePresence>
@@ -98,24 +102,17 @@ function CategoryTable({
   categories,
   onSelectCategory,
   onEditCategory,
+  refetch
 }: {
   categories: Category[]
   onSelectCategory: (category: Category) => void
   onEditCategory: (category: Category) => void
+  refetch: () => void
 }) {
-  const queryClient = useQueryClient()
+
   const [actionDropdown, setActionDropdown] = useState<string | null>(null)
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      // In a real app, you would call your API here
-      // await deleteCategory(id)
-      return { status: 'success', message: 'Category deleted' }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-    },
-  })
+  const deleteMutate = useDeleteCategoryHook()
 
   const columns: ColumnDef<Category>[] = [
     {
@@ -166,8 +163,12 @@ function CategoryTable({
                 </button>
                 <button
                   onClick={() => {
-                    deleteMutation.mutate(row.original.id)
-                    setActionDropdown(null)
+                    const id = row.original.id
+                    if (id) {
+                      deleteMutate.mutate(id)
+                      refetch()
+                      setActionDropdown(null)
+                    }
                   }}
                   className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left"
                 >
@@ -296,39 +297,32 @@ function SubcategoryModal({ category, onClose }: { category: Category; onClose: 
   )
 }
 
-function CreateCategoryModal({ onClose }: { onClose: () => void }) {
+function CreateCategoryModal({ onClose, refetch }: { onClose: () => void, refetch: () => void }) {
   const queryClient = useQueryClient()
-
+  const mutation = createCategoryHook()
   const form = useForm({
     defaultValues: {
       name: '',
     },
     // validatorAdapter: zodValidator,
     onSubmit: async ({ value }) => {
-      // In a real app, you would call your API here
-      // await createCategory(value)
-      return { status: 'success', message: 'Category created' }
+      mutation.mutate(value, {
+        onSuccess: () => {
+          onClose()
+          refetch()
+          queryClient.invalidateQueries({ queryKey: ['categories'] })
+        }
+      })
     },
   })
 
-  const mutation = useMutation({
-    mutationFn: async (values: { name: string }) => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return { status: 'success', message: 'Category created', data: { id: '123', name: values.name } }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] })
-      onClose()
-    },
-  })
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-transparent bg-opacity-100 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <motion.div
@@ -402,18 +396,21 @@ function CreateCategoryModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-function EditCategoryModal({ category, onClose }: { category: Category; onClose: () => void }) {
+function EditCategoryModal({ category, onClose, refetch }: { category: Category; onClose: () => void, refetch: () => void }) {
   const queryClient = useQueryClient()
+  const editMutate = useEditCategoryHook()
 
   const form = useForm({
     defaultValues: {
       name: category.name,
     },
-    // validatorAdapter: zodValidator,
     onSubmit: async ({ value }) => {
-      // In a real app, you would call your API here
-      // await updateCategory(category.id, value)
-      return { status: 'success', message: 'Category updated' }
+      editMutate.mutate({ id: category.id, data: value }, {
+        onSuccess: () => {
+          onClose()
+          refetch()
+        }
+      })
     },
   })
 
@@ -434,7 +431,7 @@ function EditCategoryModal({ category, onClose }: { category: Category; onClose:
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <motion.div
@@ -508,9 +505,3 @@ function EditCategoryModal({ category, onClose }: { category: Category; onClose:
   )
 }
 
-function useGetCategoryHook() {
-  return useQuery({
-    queryKey: ['categories'],
-    queryFn: getAllCategory,
-  })
-}

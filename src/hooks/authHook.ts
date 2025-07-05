@@ -1,5 +1,5 @@
 import { loginFn, registerFn } from "@/api/auth"
-import { authActions } from "@/store/authStore"
+import { loginUser } from "@/lib/authHelper"
 import type { LoginDataType, LoginResponseType,  RegisterDataTypeT, RegisterResponseType } from "@/util/types"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
@@ -15,7 +15,9 @@ export const useLoginHook = () => {
       if (data?.status === 'success') {
         const userData = data.data;
         navigate({ to: '/dashboard' });
-        authActions.setUser({ user: userData, isVerified: true });
+        // loginUser(data.data.tokens,data.data.user)
+        loginUser(data.data.tokens,userData.user)
+        // loginUser(data.data.tokens, {isVerified:true,user:data.data.user})
         toast.success('Login successful');
       } else {
         toast.error(data?.message || 'Login failed');

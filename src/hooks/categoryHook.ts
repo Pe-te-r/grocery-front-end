@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getAllCategory, getAllSubcategoryByCategory, deleteCategory } from "@/api/category"
+import { getAllCategory, getAllSubcategoryByCategory, deleteCategory, createCategory, editCategory } from "@/api/category"
 
 export const useGetCategories = () => {
   return useQuery({
@@ -16,12 +16,32 @@ export const useGetSubcategories = (categoryId: string) => {
   })
 }
 
-export const useDeleteCategory = () => {
+export const useDeleteCategoryHook = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteCategory,
+    mutationFn: (id:string)=>deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
     }
   })
 }
+
+export const createCategoryHook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    }
+  })
+}
+export const useEditCategoryHook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { name: string } }) =>
+      editCategory(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+};

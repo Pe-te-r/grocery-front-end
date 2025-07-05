@@ -8,8 +8,8 @@ import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { AppFooter } from '@/components/Footer.tsx'
-import { useEffect } from 'react'
-import { authActions } from '@/store/authStore.ts'
+// import { useEffect } from 'react'
+// import { authActions } from '@/store/authStore.ts'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -20,9 +20,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RouteComponent() {
-  useEffect(() => {
-    authActions.intializeUser()
-  }, [])
+  // useEffect(() => {
+  //   authActions.intializeUser()
+  // }, [])
   return (
     <>
       <Header />

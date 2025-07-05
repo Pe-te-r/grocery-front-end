@@ -14,7 +14,6 @@ import {
   Menu,
   X,
   ChevronLeft,
-  FileChartColumnIncreasingIcon,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -281,8 +280,8 @@ export const SidebarDashboard = () => {
                 <button className="p-2 hover:bg-gray-100 rounded-lg">
                   <LogOut size={18} />
                 </button>
-              </div>
-            </div>
+                </div>
+              </div>              
           )}
         </div>
       </div>
