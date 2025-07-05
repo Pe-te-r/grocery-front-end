@@ -1,7 +1,7 @@
-import { loginFn, registerFn } from "@/api/auth"
+import { loginFn, registerFn, resetPasswordFn } from "@/api/auth"
 import { updateUserFn } from "@/api/users"
 import { loginUserHelper } from "@/lib/authHelper"
-import type { ApiResponse, LoginDataType, LoginResponseType,  RegisterDataTypeT, RegisterResponseType, updateSettingProfileType } from "@/util/types"
+import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType, updateSettingProfileType } from "@/util/types"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
@@ -17,7 +17,7 @@ export const useLoginHook = () => {
         const userData = data.data;
         navigate({ to: '/dashboard' });
         // loginUser(data.data.tokens,data.data.user)
-        loginUserHelper(data.data.tokens,userData.user)
+        loginUserHelper(data.data.tokens, userData.user)
         // loginUser(data.data.tokens, {isVerified:true,user:data.data.user})
         toast.success('Login successful');
       } else {
@@ -34,20 +34,33 @@ export const useLoginHook = () => {
 // useRegisterHook
 export const useRegisterHook = () => {
   const navigate = useNavigate();
-  return useMutation<RegisterResponseType,Error, RegisterDataTypeT>({
+  return useMutation<RegisterResponseType, Error, RegisterDataTypeT>({
     mutationKey: ['register'],
     mutationFn: registerFn,
     onSuccess: (data) => {
-      if (data.status == 'success') { 
+      if (data.status == 'success') {
         toast.success('Registration success!!Now you can login.')
-        navigate({to:'/login'})
+        navigate({ to: '/login' })
       } else if (data.status == 'error') {
         console.log(data)
         toast.error(data.message)
       }
     },
     onError: (error) => {
-      console.error('register error',error.message)
+      console.error('register error', error.message)
     }
   })
 }
+
+interface dataT {
+  oldPassword: string;
+  newPassword: string
+  userID: string
+}
+
+export const useResetPassword = () => {
+  return useMutation<ApiResponse<null>, Error, dataT>({
+    mutationFn: (data: dataT) =>
+      resetPasswordFn({id:data.userID,newPassword:data.newPassword,oldPassword:data.oldPassword}),
+  })
+};

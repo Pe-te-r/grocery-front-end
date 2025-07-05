@@ -37,7 +37,7 @@ export const resetPasswordFn = async ({
   newPassword: string;
 }) => {
   const token = getAuthTokens()?.accessToken;
-  const response = await fetch(`/api/auth/reset-password/${id}`, {
+  const response = await fetch(`${url}/auth/reset-password/${id}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -5,6 +5,7 @@ import type { UserData } from './types';
 import ProfileSection from './ProfileSection';
 import NotificationsSection from './NotificationsSection';
 import SecuritySection from './SecuritySection';
+import { getUserIdHelper } from '@/lib/authHelper';
 
 const SettingsLayout = ({ userData, refetch }: { userData: UserData, refetch:()=> void }) => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -78,6 +79,7 @@ const SettingsLayout = ({ userData, refetch }: { userData: UserData, refetch:()=
                 <SecuritySection
                   isTwoFactorEnabled={userData.isTwoFactorEnabled}
                   lastLogin={userData.lastLogin}
+                  userID={getUserIdHelper()?? ''}
                 />
               )}
               {activeSection === 'notifications' && <NotificationsSection />}
