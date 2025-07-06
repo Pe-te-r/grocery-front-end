@@ -1,18 +1,22 @@
 
 export interface CategoryItem {
   name: string;
-  images: string[]; 
+  images: string[];
 }
 
-export interface LoginDataType{
+export interface LoginDataType {
   email: string;
   password: string;
 }
 
-export enum UserRole{
-  CUSTOMER='customer'
+export enum UserRole {
+  CUSTOMER = 'customer',
+  VENDOR = 'vendor',
+  SUPERADMIN = 'superadmin',
+  // ADMIN = 'admin',
+  DRIVER = 'driver'
 }
-export interface RegisterDataType{
+export interface RegisterDataType {
   fist_name: string;
   last_name: string;
   email: string;
@@ -20,7 +24,7 @@ export interface RegisterDataType{
   phone: string;
 }
 
-export interface UserData{
+export interface UserData {
   tokens: {
     accessToken: string;
     refreshToken: string;
@@ -28,22 +32,22 @@ export interface UserData{
   user: {
     id: string;
     email: string;
-    role:UserRole
+    role: UserRole
   }
 }
 
-export interface LoginResponseType{
+export interface LoginResponseType {
   status: 'success' | 'error'
   message: string;
   data: UserData;
 }
 
-export interface authStoreType{
+export interface authStoreType {
   isVerified: boolean;
   user: UserData;
 }
 
-export interface RegisterDataTypeT{
+export interface RegisterDataTypeT {
   email: string;
   firstName: string;
   lastName: string;
@@ -51,11 +55,11 @@ export interface RegisterDataTypeT{
   password: string;
 }
 
-export interface RegisterResponseType{
+export interface RegisterResponseType {
   status: 'error' | 'success';
   message: string;
   data: null;
-  
+
 }
 
 export interface allUserQuery {
@@ -87,7 +91,7 @@ export type User = {
   is_verified: boolean
   account_status: AccountStatus
   created_at: string
-  role?: string 
+  role?: string
 }
 
 export type UserRoleEnum = 'customers' | 'admins' | 'vendors' | 'drivers'
@@ -148,8 +152,8 @@ export type AuthActions = {
 export type AuthStoreType = AuthState & AuthActions;
 
 
-export interface updateSettingProfileType{
-  id:string
+export interface updateSettingProfileType {
+  id: string
   phone?: string;
   first_name?: string;
   last_name?: string;

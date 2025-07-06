@@ -55,7 +55,7 @@ export const getAccessTokenHelper = () => getAccessToken();
 export const getRefreshTokenHelper = () => getRefreshToken();
 export const getUserIdHelper = () => getUserId();
 export const getUserEmailHelper = () => getUserEmail();
-export const getUserRoleHelper = () => getUserRole();
+export const getUserRoleHelper = () => getUserRole() || 'GUEST';
 export const isUserVerifiedHelper = () => isUserVerified();
 export const isAuthenticatedHelper = () => isAuthenticated();
 export const loginUserHelper = (tokens: Tokens, userData: UserAuthType) => loginUser(tokens, userData);
