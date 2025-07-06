@@ -57,8 +57,11 @@ export const getUserDisplayInfo = (role: UserRole | null): UserDisplayInfo | nul
   };
 };
 
+type Props = {
+  role: UserRole;
+};
 
-export const SidebarDashboard = (role: UserRole) => {
+export const SidebarDashboard = (role: Props) => {
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -113,14 +116,14 @@ export const SidebarDashboard = (role: UserRole) => {
         icon: LayoutDashboard,
         path: "/dashboard",
         roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
-        subItems:[]
+        subItems: []
       },
       {
         name: "Profile",
         icon: User,
         path: "/dashboard/profile",
         roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
-        subItems:[]
+        subItems: []
       },
     ];
 
@@ -250,14 +253,15 @@ export const SidebarDashboard = (role: UserRole) => {
       ...adminItems,
       ...superAdminItems,
       ...driverItems
-    ].filter(item => item.roles.includes(role));
+    ].filter(item => item.roles.includes(role.role));
   };
 
   const navItems = getNavItems();
+  console.log('nav items',navItems)
 
   // Role-based add button action
   const getAddButtonAction = () => {
-    switch (role) {
+    switch (role.role) {
       case UserRole.VENDOR:
         return { label: "Add Product", path: "/dashboard/products/add" };
       case UserRole.ADMIN:
@@ -273,6 +277,7 @@ export const SidebarDashboard = (role: UserRole) => {
 
 
   const userInfo = getUserDisplayInfo(getUserRoleHelper());
+  console.log('userInfo', userInfo)
 
   return (
     <>
@@ -412,7 +417,7 @@ export const SidebarDashboard = (role: UserRole) => {
         </nav>
 
         {/* Add New Button */}
-        {role !== UserRole.CUSTOMER && (
+        {role.role !== UserRole.CUSTOMER && (
           <div className="px-4 pb-4">
             <motion.button
               className="w-full flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors"

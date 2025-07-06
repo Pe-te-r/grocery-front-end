@@ -1,5 +1,6 @@
 import { SidebarDashboard } from '@/components/SideNav';
 import { getUserRoleHelper, isAuthenticatedHelper } from '@/lib/authHelper';
+import { UserRole } from '@/util/types';
 import { createFileRoute,  Outlet, redirect } from '@tanstack/react-router';
 import {
   Bell,
@@ -21,13 +22,14 @@ export const Route = createFileRoute('/dashboard')({
 
 function SuperAdminDashboard() {
 
+  const userRole: UserRole = getUserRoleHelper() as UserRole;
 
 
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       {
-      <SidebarDashboard role={getUserRoleHelper() }/>
+        <SidebarDashboard role={userRole} />
       }
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">

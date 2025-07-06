@@ -1,7 +1,7 @@
 // authHelpers.ts
 
 import useAuthStore from "@/store/authStore";
-import type { Tokens,  UserAuthType,  UserRole } from "@/util/types";
+import { UserRole, type Tokens,  type UserAuthType } from "@/util/types";
 
 // === READ HELPERS ===
 
@@ -55,7 +55,7 @@ export const getAccessTokenHelper = () => getAccessToken();
 export const getRefreshTokenHelper = () => getRefreshToken();
 export const getUserIdHelper = () => getUserId();
 export const getUserEmailHelper = () => getUserEmail();
-export const getUserRoleHelper = () => getUserRole() || 'GUEST';
+export const getUserRoleHelper = () => getUserRole() || UserRole.GUEST;
 export const isUserVerifiedHelper = () => isUserVerified();
 export const isAuthenticatedHelper = () => isAuthenticated();
 export const loginUserHelper = (tokens: Tokens, userData: UserAuthType) => loginUser(tokens, userData);
