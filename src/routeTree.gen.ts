@@ -20,6 +20,7 @@ import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
+import { Route as DashboardUsersVendorsRouteImport } from './routes/dashboard/users/vendors'
 import { Route as DashboardUsersDriversRouteImport } from './routes/dashboard/users/drivers'
 import { Route as DashboardUsersCustomersRouteImport } from './routes/dashboard/users/customers'
 import { Route as DashboardUsersAdminsRouteImport } from './routes/dashboard/users/admins'
@@ -80,6 +81,11 @@ const DashboardOrdersIndexRoute = DashboardOrdersIndexRouteImport.update({
   path: '/orders/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardUsersVendorsRoute = DashboardUsersVendorsRouteImport.update({
+  id: '/users/vendors',
+  path: '/users/vendors',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardUsersDriversRoute = DashboardUsersDriversRouteImport.update({
   id: '/users/drivers',
   path: '/users/drivers',
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
   '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
   '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
+  '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -133,6 +140,7 @@ export interface FileRoutesByTo {
   '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
   '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
   '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
+  '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
 }
 export interface FileRoutesById {
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
   '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
   '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
+  '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/admins'
     | '/dashboard/users/customers'
     | '/dashboard/users/drivers'
+    | '/dashboard/users/vendors'
     | '/dashboard/orders'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/admins'
     | '/dashboard/users/customers'
     | '/dashboard/users/drivers'
+    | '/dashboard/users/vendors'
     | '/dashboard/orders'
   id:
     | '__root__'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/admins'
     | '/dashboard/users/customers'
     | '/dashboard/users/drivers'
+    | '/dashboard/users/vendors'
     | '/dashboard/orders/'
   fileRoutesById: FileRoutesById
 }
@@ -296,6 +308,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrdersIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/users/vendors': {
+      id: '/dashboard/users/vendors'
+      path: '/users/vendors'
+      fullPath: '/dashboard/users/vendors'
+      preLoaderRoute: typeof DashboardUsersVendorsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/users/drivers': {
       id: '/dashboard/users/drivers'
       path: '/users/drivers'
@@ -334,6 +353,7 @@ interface DashboardRouteChildren {
   DashboardUsersAdminsRoute: typeof DashboardUsersAdminsRoute
   DashboardUsersCustomersRoute: typeof DashboardUsersCustomersRoute
   DashboardUsersDriversRoute: typeof DashboardUsersDriversRoute
+  DashboardUsersVendorsRoute: typeof DashboardUsersVendorsRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
 }
 
@@ -344,6 +364,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardUsersAdminsRoute: DashboardUsersAdminsRoute,
   DashboardUsersCustomersRoute: DashboardUsersCustomersRoute,
   DashboardUsersDriversRoute: DashboardUsersDriversRoute,
+  DashboardUsersVendorsRoute: DashboardUsersVendorsRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
 }
 

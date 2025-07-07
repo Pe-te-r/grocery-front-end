@@ -121,7 +121,7 @@ export const SidebarDashboard = (role: Props) => {
       {
         name: "Profile",
         icon: User,
-        path: "/dashboard/profile",
+        path: "/dashboard/settings",
         roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
         subItems: []
       },
@@ -193,7 +193,7 @@ export const SidebarDashboard = (role: Props) => {
         subItems: [
           { name: "All Products", path: "/dashboard/products" },
           { name: "Categories", path: "/dashboard/products/category" },
-          { name: "Inventory", path: "/dashboard/products/inventory" },
+          { name: "SubCategory", path: "/dashboard/products/sub_category" },
         ]
       },
       {
@@ -213,6 +213,7 @@ export const SidebarDashboard = (role: Props) => {
         path: "/dashboard/users",
         roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
         subItems: [
+          { name: "Admins", path: "/dashboard/users/admins" },
           { name: "Customers", path: "/dashboard/users/customers" },
           { name: "Vendors", path: "/dashboard/users/vendors" },
         ]
@@ -340,7 +341,7 @@ export const SidebarDashboard = (role: Props) => {
           <ul className="space-y-1 px-2">
             {navItems.map((item) => (
               <li key={item.name}>
-                {item.subItems ? (
+                {Array.isArray(item.subItems) && item.subItems?.length>0 ? (
                   <>
                     <motion.button
                       onClick={() => toggleMenu(item.name.toLowerCase())}
@@ -372,7 +373,7 @@ export const SidebarDashboard = (role: Props) => {
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
                           >
-                            {item.subItems.map((subItem) => (
+                            {Array.isArray(item.subItems) && item.subItems.map((subItem) => (
                               <motion.li
                                 key={subItem.name}
                                 whileHover={{ x: 5 }}

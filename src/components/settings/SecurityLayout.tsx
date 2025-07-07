@@ -23,7 +23,7 @@ const SettingsLayout = ({ userData, refetch }: { userData: UserData, refetch:()=
         transition={{ duration: 0.3 }}
         className="text-3xl font-bold text-gray-800 mb-6"
       >
-        Settings
+        Profile-Settings
       </motion.h1>
 
       <div className="flex flex-col md:flex-row gap-6">

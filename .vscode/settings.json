@@ -7,5 +7,16 @@
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
-  }
+  },
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "192.168.137.57",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "pg",
+      "database": "example_db",
+      "username": "postgres"
+    }
+  ]
 }
