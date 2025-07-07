@@ -158,3 +158,11 @@ export interface updateSettingProfileType {
   first_name?: string;
   last_name?: string;
 }
+
+export interface SubcategoryT{
+  names:string
+}
+export interface createSubcategory{
+  categoryId: string;
+  names:string[]
+}

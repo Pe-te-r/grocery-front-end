@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery} from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getAllSubcategoryByCategory } from '@/api/category'
 import { useState } from 'react'
 import { Pen, Trash2, Plus, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useGetCategoryHook } from '@/hooks/subCategoryHook'
+import { useCreateHookSubcategory, useGetCategoryHook } from '@/hooks/subCategoryHook'
 import { CategoryTable } from '@/components/category/CategoryTable'
 import { EditCategoryModal } from '@/components/category/EditCategory'
 import { CreateCategoryModal } from '@/components/category/CreateCategory'
@@ -92,11 +92,11 @@ function CategoryManagement() {
 }
 
 function SubcategoryModal({ category, onClose }: { category: Category; onClose: () => void }) {
-  const { data: subcategories, isLoading } = useQuery({
+  const { data: subcategories, isLoading,refetch } = useQuery({
     queryKey: ['categories', category.id],
     queryFn: () => getAllSubcategoryByCategory(category.id),
   });
-
+  const mutate = useCreateHookSubcategory()
   // State for managing new subcategories input
   const [newSubcategories, setNewSubcategories] = useState<string>('');
   const [isAdding, setIsAdding] = useState(false);
@@ -118,11 +118,20 @@ function SubcategoryModal({ category, onClose }: { category: Category; onClose: 
       categoryId: category.id,
       subcategories: subcategoriesArray
     });
+    mutate.mutate({ categoryId: category.id, names: subcategoriesArray },
+      {
+        onSuccess: (data) => {
+          console.log('data on success', data)
+          setNewSubcategories('');
+          refetch()
+          setIsAdding(false);
+          
+        }
+      }
+    )
 
     // Here you would typically call an API to save the subcategories
     // For now, we'll just log them and reset the form
-    setNewSubcategories('');
-    setIsAdding(false);
   };
 
   return (
