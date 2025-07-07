@@ -21,10 +21,13 @@ export const getAllSubcategoryByCategory = async (id: string): Promise<ApiRespon
 }
 
 export const deleteCategory = async (id: string): Promise<ApiResponse<null>> => {
+  const token = getAuthTokens()?.accessToken
   const response = await fetch(`${url}/category/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+
     }
   });
   return await response.json();
@@ -57,6 +60,8 @@ export const editCategory = async (id:string,data: { name: string }) => {
     },
     body: JSON.stringify(data)
   })
-  return await response.json();
+  const response_data = await response.json();
+  console.log('reponse data',response_data)
+  return response_data;
 
 }

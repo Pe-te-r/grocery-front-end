@@ -320,7 +320,7 @@ export const SidebarDashboard = (role: Props) => {
             </motion.div>
             {!collapsed && (
               <h1 className="text-xl font-bold text-green-800">
-                Green<span className="text-green-600">Grocery</span>
+                Grocery<span className="text-green-600">Store</span>
               </h1>
             )}
           </Link>
