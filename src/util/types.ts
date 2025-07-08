@@ -166,3 +166,14 @@ export interface createSubcategory{
   categoryId: string;
   names:string[]
 }
+export type ProductForm = {
+  createdBy: string;
+  name: string;
+  price: string;
+  stock: string;
+  description: string;
+  isAvailable: boolean;
+  category: string;
+  subCategory: string;
+  image: File | null | string;
+};
