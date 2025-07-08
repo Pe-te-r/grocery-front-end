@@ -15,3 +15,16 @@ export const createProductFn = async (data: ProductForm) => {
     })
     return await response.json();
 }
+
+export const getProductFn = async () => {
+  const fullUrl = `${url}/products`
+
+  const response = await fetch(fullUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  const data_response = await response.json()
+  return data_response;
+}

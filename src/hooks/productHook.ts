@@ -1,6 +1,6 @@
-import { createProductFn } from "@/api/product";
+import { createProductFn, getProductFn } from "@/api/product";
 import type { ProductForm } from "@/util/types";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useProductHook = () => {
   const queryClient = useQueryClient();
@@ -11,3 +11,12 @@ export const useProductHook = () => {
     },
   });
 };
+
+
+export const useGetProductQuery = () => {
+  return useQuery({
+    queryKey: ['products'],
+    queryFn: getProductFn
+  })
+  
+}
