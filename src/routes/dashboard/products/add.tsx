@@ -8,6 +8,7 @@ import { useGetCategoryHook } from '@/hooks/subCategoryHook'
 import { getAllSubcategoryByCategory } from '@/api/category'
 import { getUserIdHelper } from '@/lib/authHelper'
 import type { ProductForm } from '@/util/types'
+import { useProductHook } from '@/hooks/productHook'
 
 
 function AddProductPage() {
@@ -20,7 +21,7 @@ function AddProductPage() {
 
   // Fetch categories
   const { data: categories, isLoading: isCategoriesLoading } = useGetCategoryHook()
-
+  const productMutate = useProductHook()
   // Fetch subcategories based on selected category
   const { data: subcategories, isLoading: isSubcategoriesLoading } = useQuery({
     queryKey: ['subcategories', selectedCategory],
@@ -59,13 +60,13 @@ function AddProductPage() {
         // Prepare the product data
         const productData = {
           ...value,
-          price: parseFloat(value.price),
-          stock: parseInt(value.stock),
+          price: value.price,
+          stock: value.stock,
           image: imageData
         }
 
         console.log('Product data to submit:', productData)
-
+        productMutate.mutate(productData)
 
       } catch (error) {
         console.error('Error submitting product:', error)
