@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 import { AccountModal } from './AccountModal';
 import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
 import { useCart } from '@/lib/cartHelper';
+import { CartModal } from './CartModal';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [headerVisible, setHeaderVisible] = useState(true);
   const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountModal, setIsAccountModal] = useState(false);
   const { totalItems} = useCart();
@@ -95,7 +97,9 @@ const GroceryStoreHeader = () => {
             </Link>
 
             {/* Cart Icon - Right side on mobile */}
-            <button className="relative p-2">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2">
               <ShoppingCart className="text-gray-700" size={20} />
               <span className="absolute top-0 right-0 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {totalItems}
@@ -174,7 +178,9 @@ const GroceryStoreHeader = () => {
                 </>
               )}
 
-              <button className="relative flex flex-col items-center text-gray-700 hover:text-green-600">
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative flex flex-col items-center text-gray-700 hover:text-green-600">
                 <ShoppingCart className="mb-1" size={20} />
                 <span className="text-xs">Cart</span>
                 <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -273,6 +279,7 @@ const GroceryStoreHeader = () => {
           onClose={() => setIsAccountModal(false)}
         />
       )}
+      <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };
