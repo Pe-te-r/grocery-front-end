@@ -1,15 +1,28 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import {  X, Clock } from 'lucide-react';
+import { useSendMailCode } from '@/hooks/authHook';
+import { getUserEmailHelper } from '@/lib/authHelper';
 
 interface CodeInputProps {
   type: 'code' | 'otp';
   onVerify: (isValid: boolean) => void;
 }
 
+
+
 export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
   const [digits, setDigits] = useState<string[]>(['', '', '', '']);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-
+  const getCodeMutate= useSendMailCode()
+  // ** this will handle sending of the code to the email
+  const getCodeToEmail = (email: string) => {
+    getCodeMutate.mutate(email)
+  }
+  useEffect(() => {
+    if (type === 'code') {  // Proper comparison
+      getCodeToEmail(getUserEmailHelper() ?? '');
+    }
+  }, [type]);  // Only run when type changes
   useEffect(() => {
     inputRefs.current = inputRefs.current.slice(0, 4);
   }, []);

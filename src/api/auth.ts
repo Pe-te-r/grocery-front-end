@@ -8,7 +8,7 @@ export const loginFn = async (data: LoginDataType) => {
     headers: {
       'Content-Type': 'application/json',
     },
-    body:JSON.stringify(data)
+    body: JSON.stringify(data)
   })
   const json_data = await response.json()
   return json_data
@@ -46,10 +46,21 @@ export const resetPasswordFn = async ({
     body: JSON.stringify({ oldPassword, newPassword }),
   });
 
-  // if (!response.ok) {
-  //   const error = await response.json();
-  //   throw new Error(error.message || 'Failed to reset password');
-  // }
-
   return await response.json();
 };
+
+export const sendCodeMail = async (email: string) => {
+  console.log('email', email)
+  const token = getAuthTokens()?.accessToken;
+
+  const response = await fetch(`${url}/auth/code`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ 'email': email, reason: 'PASSWORD_RESET'})
+  })
+  const response_json = await response.json()
+  return response_json;
+}

@@ -1,6 +1,6 @@
-import { loginFn, registerFn, resetPasswordFn } from "@/api/auth"
+import { loginFn, registerFn, resetPasswordFn, sendCodeMail } from "@/api/auth"
 import { loginUserHelper } from "@/lib/authHelper"
-import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType,  } from "@/util/types"
+import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType, } from "@/util/types"
 import { useMutation, } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
@@ -60,6 +60,12 @@ interface dataT {
 export const useResetPassword = () => {
   return useMutation<ApiResponse<null>, Error, dataT>({
     mutationFn: (data: dataT) =>
-      resetPasswordFn({id:data.userID,newPassword:data.newPassword,oldPassword:data.oldPassword}),
+      resetPasswordFn({ id: data.userID, newPassword: data.newPassword, oldPassword: data.oldPassword }),
   })
 };
+
+export const useSendMailCode = () => {
+  return useMutation({
+    mutationFn: (email: string) => sendCodeMail(email)
+  })
+}
