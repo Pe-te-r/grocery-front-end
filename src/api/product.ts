@@ -3,17 +3,19 @@ import { url } from "./url";
 import type { ProductForm } from "@/util/types";
 
 export const createProductFn = async (data: ProductForm) => {
-   const token = getAuthTokens()?.accessToken
-  
+  const token = getAuthTokens()?.accessToken
+
   const response = await fetch(`${url}/products`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    })
-    return await response.json();
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  })
+  const json_data = await response.json();
+  console.log(json_data)
+  return json_data;
 }
 
 export const getProductFn = async () => {
