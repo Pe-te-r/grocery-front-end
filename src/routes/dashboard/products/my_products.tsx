@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Edit, Trash2, Plus, Minus, RotateCw, AlertCircle, Package, PackageCheck, PackageX } from 'lucide-react';
+import { Edit, Trash2, Plus, Minus, RotateCw, AlertCircle, Package, PackageCheck, PackageX, Save, X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { productsByUserIdHook } from '@/hooks/userHook';
 import { getUserIdHelper } from '@/lib/authHelper';
@@ -10,6 +10,193 @@ export const Route = createFileRoute('/dashboard/products/my_products')({
   component: VendorProductsPage,
 })
 
+// Product Card Component
+function ProductCard({
+  product,
+  onUpdateStock,
+  onDelete,
+  onToggleAvailability,
+  onSaveChanges
+}: {
+  product: any;
+  onUpdateStock: (id: string, stock: number) => void;
+  onDelete: (id: string) => void;
+  onToggleAvailability: (id: string, isAvailable: boolean) => void;
+  onSaveChanges: (product: any) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProduct, setEditedProduct] = useState(product);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setEditedProduct((prev: any) => ({
+      ...prev,
+      [name]: name === 'price' || name === 'stock' ? Number(value) : value
+    }));
+  };
+
+  const handleSave = () => {
+    onSaveChanges(editedProduct);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedProduct(product);
+    setIsEditing(false);
+  };
+
+  return (
+    <motion.div
+      layout
+      className="bg-white rounded-lg shadow-md overflow-hidden border border-green-100 hover:shadow-lg transition-shadow"
+    >
+      <div className="relative h-48 overflow-hidden">
+        <img
+          src={product.imageUrl}
+          alt={product.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-2 right-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+          {editedProduct.stock} in stock
+        </div>
+      </div>
+
+      <div className="p-4">
+        {isEditing ? (
+          <div className="space-y-3">
+            <input
+              type="text"
+              name="name"
+              value={editedProduct.name}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <textarea
+              name="description"
+              value={editedProduct.description}
+              onChange={handleInputChange}
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+            />
+            <input
+              type="number"
+              name="price"
+              value={editedProduct.price}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex justify-between items-start">
+              <h3 className="text-lg font-semibold text-gray-800">{editedProduct.name}</h3>
+              <span className="text-green-600 font-bold">KES {editedProduct.price}</span>
+            </div>
+            <p className="text-gray-600 text-sm line-clamp-2">{editedProduct.description}</p>
+          </div>
+        )}
+
+        {/* Stock Management */}
+        <div className="mt-4">
+          {isEditing ? (
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setEditedProduct((prev: any) => ({
+                    ...prev,
+                    stock: Math.max(0, prev.stock - 1)
+                  }))}
+                  className="p-1 rounded-md text-green-600 hover:bg-green-50"
+                >
+                  <Minus size={16} />
+                </button>
+                <input
+                  type="number"
+                  name="stock"
+                  value={editedProduct.stock}
+                  onChange={handleInputChange}
+                  className="mx-2 w-12 text-center border border-gray-300 rounded-md px-1 py-1"
+                />
+                <button
+                  onClick={() => setEditedProduct((prev: any) => ({
+                    ...prev,
+                    stock: prev.stock + 1
+                  }))}
+                  className="p-1 rounded-md text-green-600 hover:bg-green-50"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setEditedProduct((prev: any) => ({
+                    ...prev,
+                    isAvailable: !prev.isAvailable
+                  }))}
+                  className={`p-2 rounded-full ${editedProduct.isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}
+                  title={editedProduct.isAvailable ? 'Mark as unavailable' : 'Mark as available'}
+                >
+                  {editedProduct.isAvailable ? (
+                    <PackageCheck size={16} />
+                  ) : (
+                    <PackageX size={16} />
+                  )}
+                </button>
+                <button
+                  onClick={() => onDelete(product.id)}
+                  className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
+                  title="Delete product"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <span className="text-sm font-medium text-gray-700">
+                  Stock: {editedProduct.stock}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span className={`px-2 py-1 rounded-full text-xs ${editedProduct.isAvailable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                  {editedProduct.isAvailable ? 'Available' : 'Unavailable'}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {isEditing ? (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleSave}
+                className="flex-1 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+              >
+                <Save className="mr-2" size={16} />
+                Save Changes
+              </button>
+              <button
+                onClick={handleCancel}
+                className="py-2 px-4 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center justify-center"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+            >
+              <Edit className="mr-2" size={16} />
+              Edit Product
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function VendorProductsPage() {
   const userId = getUserIdHelper() ?? ''
@@ -27,7 +214,6 @@ function VendorProductsPage() {
 
   const totalPages = Math.ceil((data?.pagination?.total || 0) / pageSize);
 
-  // TODO: Implement these handlers
   const handleUpdateStock = (productId: string, newStock: number) => {
     console.log(`Updating product ${productId} stock to ${newStock}`);
   };
@@ -38,6 +224,11 @@ function VendorProductsPage() {
 
   const handleToggleAvailability = (productId: string, isAvailable: boolean) => {
     console.log(`Setting product ${productId} availability to ${isAvailable}`);
+  };
+
+  const handleSaveChanges = (product: any) => {
+    console.log('Saving changes for product:', product);
+    // Here you would typically make an API call to update the product
   };
 
   if (isLoading) {
@@ -138,86 +329,14 @@ function VendorProductsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
             {filteredProducts.map((product: any) => (
-              <motion.div
+              <ProductCard
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white rounded-lg shadow-md overflow-hidden border border-green-100 hover:shadow-lg transition-shadow"
-              >
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-2 right-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                    {product.stock} in stock
-                  </div>
-                </div>
-
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-                    <span className="text-green-600 font-bold">KES {product.price}</span>
-                  </div>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
-
-                  {/* Stock Management */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => handleUpdateStock(product.id, product.stock - 1)}
-                        disabled={product.stock <= 0}
-                        className={`p-1 rounded-md ${product.stock <= 0 ? 'text-gray-300' : 'text-green-600 hover:bg-green-50'}`}
-                      >
-                        <Minus size={16} />
-                      </button>
-                      <span className="mx-2 w-8 text-center font-medium">
-                        {product.stock}
-                      </span>
-                      <button
-                        onClick={() => handleUpdateStock(product.id, product.stock + 1)}
-                        className="p-1 rounded-md text-green-600 hover:bg-green-50"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleToggleAvailability(product.id, !product.isAvailable)}
-                        className={`p-2 rounded-full ${product.isAvailable ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}
-                        title={product.isAvailable ? 'Mark as unavailable' : 'Mark as available'}
-                      >
-                        {product.isAvailable ? (
-                          <PackageCheck size={16} />
-                        ) : (
-                          <PackageX size={16} />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="p-2 rounded-full bg-red-100 text-red-600 hover:bg-red-200"
-                        title="Delete product"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* TODO: Add edit functionality */}
-                  <button
-                    onClick={() => console.log(`Edit product ${product.id}`)}
-                    className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
-                  >
-                    <Edit className="mr-2" size={16} />
-                    Edit Product Details
-                  </button>
-                </div>
-              </motion.div>
+                product={product}
+                onUpdateStock={handleUpdateStock}
+                onDelete={handleDeleteProduct}
+                onToggleAvailability={handleToggleAvailability}
+                onSaveChanges={handleSaveChanges}
+              />
             ))}
           </AnimatePresence>
         </div>

@@ -155,12 +155,6 @@ export const CartModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                   {/* Summary */}
                   <div className="mb-4 space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Subtotal:</span>
-                      <span className="text-gray-800 font-medium">
-                        KES {totalPrice}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-gray-600">Delivery:</span>
                       <span className="text-gray-800 font-medium">
                         Calculated at checkout
