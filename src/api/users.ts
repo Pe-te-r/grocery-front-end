@@ -75,11 +75,22 @@ export const updateUserFn = async (data: updateSettingProfileType) => {
     },
     body: JSON.stringify(data),
   });
-
-  // if (!response.ok) {
-  //   const error = await response.json();
-  //   throw new Error(error.message || 'Failed to update user');
-  // }
-
   return await response.json();
 };
+
+
+export const getProductsByUserId = async (id: string) => {
+  const token = getAuthTokens()?.accessToken
+  const fullUrl = `${url}/users/${id}/products`
+  console.log('full url', fullUrl)
+  const response = await fetch(fullUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  })
+
+  const data = await response.json()
+  return data
+}

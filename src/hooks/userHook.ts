@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getUserByIdFn, getUsersFn, updateUserFn } from "@/api/users"
+import { getProductsByUserId, getUserByIdFn, getUsersFn, updateUserFn } from "@/api/users"
 import type { allUserQuery, ApiResponse, updateSettingProfileType } from "@/util/types"
 import toast from "react-hot-toast"
 
@@ -36,5 +36,12 @@ export const useUpdateUserHook = () => {
       console.error('update user error', error.message)
       toast.error(error.message || 'Something went wrong while updating the user.')
     }
+  })
+}
+
+export const productsByUserIdHook = (id: string) => {
+  return useQuery({
+    queryKey: ['user', id, 'products'],
+    queryFn: () => getProductsByUserId(id),
   })
 }

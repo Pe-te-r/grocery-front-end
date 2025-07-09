@@ -166,7 +166,7 @@ export const SidebarDashboard = (role: Props) => {
         path: "/dashboard/products",
         roles: [UserRole.VENDOR],
         subItems: [
-          { name: "My Products", path: "/dashboard/products" },
+          { name: "My Products", path: "/dashboard/products/my_products" },
           { name: "Add Product", path: "/dashboard/products/add" },
         ]
       },
