@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/products/')({
-  component: RouteComponent,
+  component: ProductsRouteComponent,
 })
 
 import { motion } from 'framer-motion';
@@ -97,9 +97,9 @@ const Pagination = ({
 };
 
 // Main ProductsPage component
-function RouteComponent(){
+export function ProductsRouteComponent(){
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 8;
+  const productsPerPage = 20;
 
   const { data, isLoading, isError } = useGetProductQuery();
 
@@ -108,7 +108,7 @@ function RouteComponent(){
       <div className="min-h-screen bg-green-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-3xl font-bold text-green-800 mb-2">Our Organic Products</h1>
+            <h1 className="text-3xl font-bold text-green-800 mb-2">Our Products</h1>
             <p className="text-green-600">Loading our fresh products...</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -138,8 +138,14 @@ function RouteComponent(){
   }
 
   const products = data?.data || [];
-  const totalPages = Math.ceil(products.length / productsPerPage);
-  const paginatedProducts = products.slice(
+  const sortedProducts = [...products].sort((a, b) => {
+    const aSoldOut = a.stock <= 0;
+    const bSoldOut = b.stock <= 0;
+    if (aSoldOut === bSoldOut) return 0;
+    return aSoldOut ? 1 : -1;
+  });
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+  const paginatedProducts = sortedProducts.slice(
     (currentPage - 1) * productsPerPage,
     currentPage * productsPerPage
   );
@@ -155,12 +161,9 @@ function RouteComponent(){
         >
           <div className="inline-flex items-center justify-center bg-green-100 px-6 py-2 rounded-full mb-4">
             <Leaf className="w-5 h-5 text-green-600 mr-2" />
-            <span className="text-green-600 font-medium">Organic & Natural</span>
+            <span className="text-green-600 font-medium">GroceryStore</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-green-800 mb-2">Our Fresh Products</h1>
-          <p className="text-green-600 max-w-2xl mx-auto">
-            Discover our selection of chemical-free, organic products for a healthier lifestyle.
-          </p>
         </motion.div>
 
         {products.length === 0 ? (

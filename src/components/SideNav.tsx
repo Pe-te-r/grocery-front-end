@@ -21,6 +21,7 @@ import {
   ListOrdered,
   WalletCards,
   Heart,
+  FileSignature,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -131,7 +132,7 @@ export const SidebarDashboard = (role: Props) => {
       {
         name: "Shop",
         icon: ShoppingBag,
-        path: "/shop",
+        path: "/dashboard/shop",
         roles: [UserRole.CUSTOMER]
       },
       {
@@ -155,6 +156,12 @@ export const SidebarDashboard = (role: Props) => {
         name: "Favorites",
         icon: Heart,
         path: "/dashboard/favorites",
+        roles: [UserRole.CUSTOMER]
+      },
+      {
+        name: "Vendor Applications",
+        icon: FileSignature,
+        path: "/dashboard/applications",
         roles: [UserRole.CUSTOMER]
       },
     ];

@@ -15,7 +15,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardShopRouteImport } from './routes/dashboard/shop'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardApplicationsRouteImport } from './routes/dashboard/applications'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
@@ -58,9 +60,19 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardShopRoute = DashboardShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardApplicationsRoute = DashboardApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
   getParentRoute: () => DashboardRoute,
 } as any)
 const authRegisterRoute = authRegisterRouteImport.update({
@@ -129,7 +141,9 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/dashboard/applications': typeof DashboardApplicationsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/shop': typeof DashboardShopRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
@@ -148,7 +162,9 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/dashboard/applications': typeof DashboardApplicationsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/shop': typeof DashboardShopRoute
   '/dashboard': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
@@ -169,7 +185,9 @@ export interface FileRoutesById {
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/dashboard/applications': typeof DashboardApplicationsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/shop': typeof DashboardShopRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
@@ -191,7 +209,9 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/dashboard/applications'
     | '/dashboard/settings'
+    | '/dashboard/shop'
     | '/dashboard/'
     | '/products'
     | '/dashboard/products/add'
@@ -210,7 +230,9 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/login'
     | '/register'
+    | '/dashboard/applications'
     | '/dashboard/settings'
+    | '/dashboard/shop'
     | '/dashboard'
     | '/products'
     | '/dashboard/products/add'
@@ -230,7 +252,9 @@ export interface FileRouteTypes {
     | '/(auth)/forgot-password'
     | '/(auth)/login'
     | '/(auth)/register'
+    | '/dashboard/applications'
     | '/dashboard/settings'
+    | '/dashboard/shop'
     | '/dashboard/'
     | '/products/'
     | '/dashboard/products/add'
@@ -298,11 +322,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/shop': {
+      id: '/dashboard/shop'
+      path: '/shop'
+      fullPath: '/dashboard/shop'
+      preLoaderRoute: typeof DashboardShopRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/settings': {
       id: '/dashboard/settings'
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/applications': {
+      id: '/dashboard/applications'
+      path: '/applications'
+      fullPath: '/dashboard/applications'
+      preLoaderRoute: typeof DashboardApplicationsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/(auth)/register': {
@@ -386,7 +424,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardRouteChildren {
+  DashboardApplicationsRoute: typeof DashboardApplicationsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardShopRoute: typeof DashboardShopRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardProductsAddRoute: typeof DashboardProductsAddRoute
   DashboardProductsCategoryRoute: typeof DashboardProductsCategoryRoute
@@ -399,7 +439,9 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardApplicationsRoute: DashboardApplicationsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardShopRoute: DashboardShopRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardProductsAddRoute: DashboardProductsAddRoute,
   DashboardProductsCategoryRoute: DashboardProductsCategoryRoute,
