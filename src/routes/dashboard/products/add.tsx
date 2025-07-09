@@ -9,7 +9,20 @@ import { getAllSubcategoryByCategory } from '@/api/category'
 import { getUserIdHelper } from '@/lib/authHelper'
 import type { ProductForm } from '@/util/types'
 import { useProductHook } from '@/hooks/productHook'
+import toast from 'react-hot-toast'
 
+
+const defaultValues: ProductForm = {
+  createdBy: getUserIdHelper() ?? '',
+  name: '',
+  price: '',
+  stock: '',
+  description: '',
+  isAvailable: true,
+  category: '',
+  subCategory: '',
+  image: null,
+}
 
 function AddProductPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -30,17 +43,7 @@ function AddProductPage() {
   })
 
   const form = useForm<ProductForm, any, any, any, any, any, any, any, any, any>({
-    defaultValues: {
-      createdBy: getUserIdHelper() ?? '',
-      name: '',
-      price: '',
-      stock: '',
-      description: '',
-      isAvailable: true,
-      category: '',
-      subCategory: '',
-      image: null,
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       setIsUploading(true)
 
@@ -66,13 +69,24 @@ function AddProductPage() {
         }
 
         console.log('Product data to submit:', productData)
-        productMutate.mutate(productData)
+        productMutate.mutate(productData, {
+          onSuccess: (data) => {
+            console.log('data', data)
+            if (data.status = 'success') {
+              toast.success('product added for sales')
+              form.reset(defaultValues)
+              setImagePreview(null)
+              setIsUploading(false)
+            } else if (data.status == 'error') {
+              toast.error('Product not added')
+              setIsUploading(false)
+            }
+          }
+        })
 
       } catch (error) {
         console.error('Error submitting product:', error)
         alert('Error submitting product')
-      } finally {
-        setIsUploading(false)
       }
     },
   })

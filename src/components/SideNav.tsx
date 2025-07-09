@@ -168,7 +168,6 @@ export const SidebarDashboard = (role: Props) => {
         subItems: [
           { name: "My Products", path: "/dashboard/products" },
           { name: "Add Product", path: "/dashboard/products/add" },
-          { name: "Inventory", path: "/dashboard/products/inventory" },
         ]
       },
       {
