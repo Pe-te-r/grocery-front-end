@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 import { useCart } from '@/lib/cartHelper';
+import { Link } from '@tanstack/react-router';
 
 export const CartModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const {
@@ -178,15 +179,13 @@ export const CartModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       <Trash2 size={16} className="mr-2" />
                       Clear Cart
                     </button>
-                    <button
-                      onClick={() => {
-                        // Add your checkout logic here
-                        alert('Proceeding to checkout');
-                      }}
+                    <Link
+                      to='/checkout'
+                      onClick={onClose}
                       className="flex-1 py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium flex items-center justify-center"
                     >
                       Checkout Now
-                    </button>
+                    </Link>
                   </div>
                 </div>
               )}

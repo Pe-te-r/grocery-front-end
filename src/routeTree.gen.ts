@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
@@ -38,6 +39,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -136,6 +142,7 @@ const DashboardProductsAddRoute = DashboardProductsAddRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/checkout'
     | '/contact'
     | '/dashboard'
     | '/forgot-password'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/checkout'
     | '/contact'
     | '/forgot-password'
     | '/login'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/checkout'
     | '/contact'
     | '/dashboard'
     | '/(auth)/forgot-password'
@@ -270,6 +282,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -460,6 +480,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
