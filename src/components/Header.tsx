@@ -3,6 +3,7 @@ import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut } from 'lucide-
 import { useEffect, useState } from 'react';
 import { AccountModal } from './AccountModal';
 import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
+import { useCart } from '@/lib/cartHelper';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -11,7 +12,7 @@ const GroceryStoreHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountModal, setIsAccountModal] = useState(false);
-
+  const { totalItems} = useCart();
   const logOut = () => {
     logoutUserHelper()
   }
@@ -97,7 +98,7 @@ const GroceryStoreHeader = () => {
             <button className="relative p-2">
               <ShoppingCart className="text-gray-700" size={20} />
               <span className="absolute top-0 right-0 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                0
+                {totalItems}
               </span>
             </button>
           </div>
@@ -177,7 +178,7 @@ const GroceryStoreHeader = () => {
                 <ShoppingCart className="mb-1" size={20} />
                 <span className="text-xs">Cart</span>
                 <span className="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  0
+                  {totalItems}
                 </span>
               </button>
             </div>

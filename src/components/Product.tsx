@@ -1,7 +1,11 @@
-import {motion} from 'framer-motion'
+import { useCart } from '@/lib/cartHelper';
+import { motion } from 'framer-motion';
 import { Leaf } from 'lucide-react';
+
 export const ProductCard = ({ product }: { product: any }) => {
-  console.log('product', product)
+  const { addToCart, isInCart, getItemQuantity } = useCart();
+  const quantityInCart = getItemQuantity(product.id);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,6 +22,11 @@ export const ProductCard = ({ product }: { product: any }) => {
         {product.stock === 0 && (
           <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
             Out of Stock
+          </div>
+        )}
+        {quantityInCart > 0 && (
+          <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+            In Cart: {quantityInCart}
           </div>
         )}
       </div>
@@ -40,13 +49,22 @@ export const ProductCard = ({ product }: { product: any }) => {
         </div>
 
         <button
-          disabled={product.stock === 0}
-          className={`mt-4 w-full py-2 rounded-md text-white font-medium transition-colors ${product.stock === 0
-            ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-green-600 hover:bg-green-700'
+          disabled={product.stock === 0 || quantityInCart >= product.stock}
+          onClick={() => addToCart(product)}
+          className={`mt-4 w-full py-2 rounded-md text-white font-medium transition-colors ${product.stock === 0 || quantityInCart >= product.stock
+              ? 'bg-gray-400 cursor-not-allowed'
+              : isInCart(product.id)
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-green-600 hover:bg-green-700'
             }`}
         >
-          {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+          {product.stock === 0
+            ? 'Out of Stock'
+            : quantityInCart >= product.stock
+              ? 'Max in Cart'
+              : isInCart(product.id)
+                ? 'Add More'
+                : 'Add to Cart'}
         </button>
       </div>
     </motion.div>

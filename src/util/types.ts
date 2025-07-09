@@ -177,3 +177,24 @@ export type ProductForm = {
   subCategory: string;
   image: File | null | string;
 };
+
+
+// types.ts
+export interface CartItem {
+  id: string;
+  name: string;
+  price: string;
+  imageUrl: string;
+  quantity: number;
+  stock: number;
+}
+
+export interface CartState {
+  items: CartItem[];
+  addToCart: (product: any) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
+  getTotalItems: () => number;
+  getTotalPrice: () => number;
+}
