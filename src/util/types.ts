@@ -198,3 +198,12 @@ export interface CartState {
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
+
+export enum CodeReason {
+  REGISTRATION = 'registration',
+  PASSWORD_RESET = 'password_reset',
+  EMAIL_VERIFICATION = 'email_verification',
+  TWO_FACTOR_AUTH = 'two_factor_auth',
+  ACCOUNT_RECOVERY = 'account_recovery',
+  SECURITY_ALERT = 'security_alert'
+}

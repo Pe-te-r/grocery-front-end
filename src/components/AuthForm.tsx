@@ -1,15 +1,31 @@
 import { FormApi, useForm } from '@tanstack/react-form'
-import { ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from '@tanstack/react-router'
 
 type AuthFormProps = {
   mode?: 'modal' | 'page'
-  onSubmit: (values: { email: string; password: string }, setFieldValue: (fieldName: string, value: string) => void) => Promise<void>
+  onSubmit: (
+    values: { email: string; password: string },
+    formApi: FormApi<{ email: string; password: string }, undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined>
+  ) => Promise<void>
+isLoading ?: boolean
+error ?: string | null
 }
-
-export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
+export const AuthForm = ({
+  mode = 'page',
+  onSubmit,
+  isLoading = false,
+  error = null
+}: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
   const [backgroundImages] = useState([
     'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
@@ -17,26 +33,27 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
     'https://images.unsplash.com/photo-1560743641-3914f2c45636?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
   ])
   const [currentBgImage, setCurrentBgImage] = useState(0)
-
+  const [internalError, setInternalError] = useState<string | null>(null)
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
-    
-    onSubmit: async (
-      props: {
-        value: { email: string; password: string },
-        formApi: FormApi<{ email: string; password: string }>
-      }
-    ) => {
+    onSubmit: async ({ value, formApi }) => {
+      setInternalError(null)
       try {
-        await onSubmit(props.value, props.formApi.setFieldValue)
+        await onSubmit(value, formApi)
       } catch (error) {
         console.error('Login failed:', error)
+        setInternalError(typeof error === 'string' ? error : 'An unexpected error occurred')
+        formApi.setFieldValue('password', '', true)
+        throw error
       }
     },
   })
+
+  // Combine external error and internal error
+  const displayError = error || internalError
 
   // Rotate background images
   useEffect(() => {
@@ -46,14 +63,42 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
       }, 5000)
       return () => clearInterval(interval)
     }
-  },[mode])
+  }, [mode])
+
+  // Auto-focus password field when error occurs
+  useEffect(() => {
+    if (displayError) {
+      const passwordInput = document.getElementById('password')
+      passwordInput?.focus()
+    }
+  }, [displayError])
+
+
+
+  // Rotate background images
+  useEffect(() => {
+    if (mode === 'page') {
+      const interval = setInterval(() => {
+        setCurrentBgImage((prev) => (prev + 1) % backgroundImages.length)
+      }, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [mode])
+
+  // Auto-focus password field on error
+  // useEffect(() => {
+  //   if (form.state > 0 && form.state.errorMap['']) {
+  //     const passwordInput = document.getElementById('password')
+  //     passwordInput?.focus()
+  //   }
+  // }, [form.state.errorMap, form.state.submitCount])
 
   return (
     <div className={`${mode === 'page' ? 'w-full' : 'max-w-4xl mx-auto'}`}>
       <div className={`${mode === 'page' ? 'flex flex-col md:flex-row gap-8' : ''}`}>
         {/* Left Column - Form */}
         <div className={`${mode === 'page' ? 'w-full md:w-1/2' : 'w-full'}`}>
-        <div className="text-center md:text-left">
+          <div className="text-center md:text-left">
             <motion.h2
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -71,6 +116,36 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
               Sign in to your account
             </motion.p>
           </div>
+
+          {/* Form-level error message */}
+          {form.state.submitCount > 0 &&
+            form.state.errorMap['' as keyof typeof form.state.errorMap] && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-md bg-red-50 p-4 mt-4 border border-red-200"
+              >
+                <div className="flex items-center">
+                  <XCircle className="h-5 w-5 text-red-400 mr-2" />
+                  <p className="text-sm text-red-700">
+                    {form.state.errorMap['' as keyof typeof form.state.errorMap].join(', ')}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+          {displayError && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-md bg-red-50 p-4 mt-4 border border-red-200"
+            >
+              <div className="flex items-center">
+                <XCircle className="h-5 w-5 text-red-400 mr-2" />
+                <p className="text-sm text-red-700">{displayError}</p>
+              </div>
+            </motion.div>
+          )}
 
           <form
             onSubmit={(e) => {
@@ -114,12 +189,13 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
                         onChange={(e) => field.handleChange(e.target.value)}
                         type="email"
                         className={`block w-full rounded-lg border-2 py-2 px-3 shadow-sm focus:ring-2 focus:ring-inset ${hasErrors
-                            ? 'border-red-400 focus:border-red-500 focus:ring-red-100 bg-red-50'
-                            : isValid
-                              ? 'border-green-400 focus:border-green-500 focus:ring-green-100'
-                              : 'border-gray-200 focus:border-green-500 focus:ring-green-100'
+                          ? 'border-red-400 focus:border-red-500 focus:ring-red-100 bg-red-50'
+                          : isValid
+                            ? 'border-green-400 focus:border-green-500 focus:ring-green-100'
+                            : 'border-gray-200 focus:border-green-500 focus:ring-green-100'
                           } transition-colors duration-200`}
                         placeholder="you@example.com"
+                        autoComplete="username"
                       />
                       {isValid && (
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -173,12 +249,13 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
                         onBlur={field.handleBlur}
                         onChange={(e) => field.handleChange(e.target.value)}
                         className={`block w-full rounded-lg border-2 py-2 px-3 shadow-sm focus:ring-2 focus:ring-inset pr-10 ${hasErrors
-                            ? 'border-red-400 focus:border-red-500 focus:ring-red-100 bg-red-50'
-                            : isValid
-                              ? 'border-green-400 focus:border-green-500 focus:ring-green-100'
-                              : 'border-gray-200 focus:border-green-500 focus:ring-green-100'
+                          ? 'border-red-400 focus:border-red-500 focus:ring-red-100 bg-red-50'
+                          : isValid
+                            ? 'border-green-400 focus:border-green-500 focus:ring-green-100'
+                            : 'border-gray-200 focus:border-green-500 focus:ring-green-100'
                           } transition-colors duration-200`}
                         placeholder="••••••••"
+                        autoComplete="current-password"
                       />
                       <button
                         type="button"
@@ -211,7 +288,7 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
-              {([canSubmit, isSubmitting]) => (
+              {([canSubmit]) => (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -220,13 +297,13 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
                 >
                   <button
                     type="submit"
-                    disabled={!canSubmit || isSubmitting}
-                    className={`flex w-full justify-center items-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 ${isSubmitting
-                        ? 'bg-green-700'
-                        : 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 hover:shadow-md'
+                    disabled={!canSubmit || isLoading}
+                    className={`flex w-full justify-center items-center rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-200 ${isLoading
+                      ? 'bg-green-700'
+                      : 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 hover:shadow-md'
                       } focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-green-600`}
                   >
-                    {isSubmitting ? (
+                    {isLoading ? (
                       <span className="flex items-center">
                         <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -270,7 +347,6 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
           </form>
 
           {/* Social Login */}
-          
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -349,17 +425,3 @@ export const AuthForm = ({ mode = 'page', onSubmit }: AuthFormProps) => {
     </div>
   )
 }
-
-// Contact page route implementation
-// import { createFileRoute } from '@tanstack/react-router'
-
-// export const Route = createFileRoute('/login')({
-//   component: () => (
-//     <div className="max-w-7xl mx-auto px-4 py-12">
-//       <AuthForm mode="page" onSubmit={async (values) => {
-//         console.log('Login submitted:', values)
-//         await new Promise(resolve => setTimeout(resolve, 1000))
-//       }} />
-//     </div>
-//   ),
-// })

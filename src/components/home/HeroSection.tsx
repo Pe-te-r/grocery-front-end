@@ -9,6 +9,7 @@ import image5 from '../../assets/home/hero/hero5.jpeg'
 import { AuthForm } from '../AuthForm'
 import { useLoginHook } from '@/hooks/authHook'
 import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper'
+import type { FormApi } from '@tanstack/react-form'
 
 const heroImages = [
   image1,
@@ -44,24 +45,37 @@ export default function HeroSection() {
   }, [isAutoScrolling])
 
   const [isOpen, setIsOpen] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const handleSubmit = async (values: { email: string; password: string }) => {
-    // Your login API call
-    console.log('Logging in with:', values)
-    mutate.mutate(values, {
-      onSuccess: (data) => {
-        console.log('data from mutate',data)
-        if (data?.status === 'success') {
-          console.log('inside if')
-          navigate({ to: '/dashboard' })
-          setIsOpen(false)
-        }
-      },
-      onError: (error) => {
-        console.error(error)
-        setIsOpen(true)
+
+const handleSubmit = async (
+    values: { email: string; password: string },
+    formApi: FormApi<{ email: string; password: string }, undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined>
+  ) => {
+    try {
+      const response = await mutate.mutateAsync(values)
+
+      if (response.status === 'error') {
+        formApi.setFieldValue('password', '')
+        setSubmitError(response.message || 'Invalid credentials')
+        throw new Error(response.message)
       }
-    })
+
+      // Handle successful login
+      console.log('Login successful', response.data)
+
+    } catch (error) {
+      formApi.setFieldValue('password', '')
+      setSubmitError('Invalid email or password')
+      throw error
+    }
   }
 
   const nextImage = () => {
@@ -210,6 +224,8 @@ export default function HeroSection() {
               </button>
               <AuthForm
                 mode="modal"
+                isLoading={mutate.isPending}
+                error={submitError}
                 onSubmit={handleSubmit}
               />
             </div>

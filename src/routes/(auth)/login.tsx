@@ -1,28 +1,43 @@
 import { AuthForm } from '@/components/AuthForm';
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ShoppingBag, Leaf } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useLoginHook } from '@/hooks/authHook';
+import { useState } from 'react';
+import type { FormApi } from '@tanstack/react-form';
 
 export const Route = createFileRoute('/(auth)/login')({
   component: LoginPage,
 })
 
 function LoginPage() {
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const mutate = useLoginHook()
-  const handleSubmit = async (values: { email: string; password: string }, setFieldValue: (fieldName: string, value: string) => void) => {
-    mutate.mutate(values, {
-      onSuccess: (data) => {
-        if (data?.status == 'error') {
-          setFieldValue('password', '')
-        }
-      },
-      onError: (error) => {
-        console.log(error)
-        setFieldValue('password', '')
-        
+  const handleSubmit = async (
+    values: { email: string; password: string },
+    formApi: FormApi<{ email: string; password: string }, undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined>
+  ) => {
+    try {
+      const response = await mutate.mutateAsync(values)
+
+      if (response.status === 'error') {
+        formApi.setFieldValue('password', '')
+        setSubmitError(response.message || 'Invalid credentials')
+        throw new Error(response.message)
       }
-    })
+
+    } catch (error) {
+      formApi.setFieldValue('password', '')
+      setSubmitError('Invalid email or password')
+      throw error
+    }
   }
 
   return (
@@ -64,6 +79,8 @@ function LoginPage() {
             {/* Main Auth Form */}
             <AuthForm
               mode="page"
+              isLoading={mutate.isPending}
+              error={submitError}
               onSubmit={handleSubmit}
             />
 

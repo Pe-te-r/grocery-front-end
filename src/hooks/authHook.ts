@@ -1,8 +1,7 @@
 import { loginFn, registerFn, resetPasswordFn } from "@/api/auth"
-import { updateUserFn } from "@/api/users"
 import { loginUserHelper } from "@/lib/authHelper"
-import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType, updateSettingProfileType } from "@/util/types"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType,  } from "@/util/types"
+import { useMutation, } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
 
