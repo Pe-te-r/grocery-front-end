@@ -1,42 +1,159 @@
 import { createFileRoute } from '@tanstack/react-router'
-
 export const Route = createFileRoute('/dashboard/applications')({
   component: VendorApplicationPage,
 })
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, Store, User, Mail, Phone, Home, MapPin, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { Check, ChevronRight, Store, User, Phone, Home, MapPin, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { PersonalInfoStep } from '@/components/vendors/VendorProfile';
+import { BenefitsSection } from '@/components/vendors/BenefistSection';
+import { BusinessInfoStep } from '@/components/vendors/BusinessDetails';
+import { ReviewStep } from '@/components/vendors/Review';
+import { LocationInfoStep } from '@/components/vendors/LocationDetails';
+import { userByIdHook } from '@/hooks/userHook';
+import { getUserIdHelper } from '@/lib/authHelper';
+import { fullName } from '@/lib/demo-store';
 
-function VendorApplicationPage(){
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    businessName: '',
-    businessDescription: '',
-    businessType: 'individual', // 'individual' or 'company'
+// Types
+type FormData = {
+  userInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+  };
+  businessInfo: {
+    businessName: string;
+    businessDescription: string;
+    businessType: 'individual' | 'company';
+    businessContact: string;
+  };
+  locationInfo: {
+    county: string;
+    constituency: string;
+    ward: string;
+    streetAddress: string;
+  };
+  termsAccepted: boolean;
+};
+
+export type LocationData = {
+  counties: {
+    id: string;
+    name: string;
+    constituencies: {
+      id: string;
+      name: string;
+      wards: {
+        id: string;
+        name: string;
+      }[];
+    }[];
+  }[];
+};
+
+// Mock API data
+const mockUserData = {
+  fullName: 'John Doe',
+  email: 'john.doe@example.com',
+  phone: '+254712345678'
+};
+
+export const locationData: LocationData = {
+  counties: [
+    {
+      id: '1',
+      name: 'Nairobi',
+      constituencies: [
+        {
+          id: '101',
+          name: 'Westlands',
+          wards: [
+            { id: '10101', name: 'Parklands' },
+            { id: '10102', name: 'Karura' }
+          ]
+        },
+        {
+          id: '102',
+          name: 'Dagoretti North',
+          wards: [
+            { id: '10201', name: 'Kilimani' },
+            { id: '10202', name: 'Kawangware' }
+          ]
+        }
+      ]
+    },
+    {
+      id: '2',
+      name: 'Mombasa',
+      constituencies: [
+        {
+          id: '201',
+          name: 'Mvita',
+          wards: [
+            { id: '20101', name: 'Tudor' },
+            { id: '20102', name: 'Old Town' }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+
+
+
+
+
+
+function VendorApplicationPage() {
+  const [formData, setFormData] = useState<FormData>({
+    userInfo: {
+      fullName: '',
+      email: '',
+      phone: ''
+    },
+    businessInfo: {
+      businessName: '',
+      businessDescription: '',
+      businessType: 'individual',
+      businessContact: ''
+    },
+    locationInfo: {
+      county: '',
+      constituency: '',
+      ward: '',
+      streetAddress: ''
+    },
     termsAccepted: false
   });
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const userId = getUserIdHelper() ?? ''
+  const { data,isSuccess } = userByIdHook(userId)
+  console.log('data',data)
+  useEffect(() => {
+    if (data) {
+      const user = data.data
+      const userInfo = {
+        fullName: `${user.first_name} ${user.last_name}`,
+        email: user.email,
+        phone:user.phone
+      }
+      setFormData(prevState => ({
+        ...prevState,
+        userInfo: {
+          ...prevState.userInfo,
+          ...userInfo
+        }
+      }));    }
+  }, [data, isSuccess])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
-
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
 
   const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 3));
+    setCurrentStep(prev => Math.min(prev + 1, 4));
   };
 
   const prevStep = () => {
@@ -47,23 +164,49 @@ function VendorApplicationPage(){
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Prepare data for API
+    const submissionData = {
+      user: formData.userInfo,
+      business: {
+        ...formData.businessInfo,
+        location: {
+          countyId: formData.locationInfo.county,
+          constituencyId: formData.locationInfo.constituency,
+          wardId: formData.locationInfo.ward,
+          streetAddress: formData.locationInfo.streetAddress
+        }
+      },
+      termsAccepted: formData.termsAccepted,
+      applicationDate: new Date().toISOString()
+    };
+
+    console.log('Submitting application:', JSON.stringify(submissionData, null, 2));
+
     // Simulate API call
     setTimeout(() => {
-      console.log('Form submitted:', formData);
       setIsSubmitting(false);
       setSubmitSuccess(true);
 
       // Reset form after 3 seconds
       setTimeout(() => {
         setFormData({
-          fullName: '',
-          email: '',
-          phone: '',
-          address: '',
-          city: '',
-          businessName: '',
-          businessDescription: '',
-          businessType: 'individual',
+          userInfo: {
+            fullName: mockUserData.fullName,
+            email: mockUserData.email,
+            phone: mockUserData.phone
+          },
+          businessInfo: {
+            businessName: '',
+            businessDescription: '',
+            businessType: 'individual',
+            businessContact: ''
+          },
+          locationInfo: {
+            county: '',
+            constituency: '',
+            ward: '',
+            streetAddress: ''
+          },
           termsAccepted: false
         });
         setCurrentStep(1);
@@ -73,9 +216,10 @@ function VendorApplicationPage(){
   };
 
   const steps = [
-    { id: 1, name: 'Personal Information', icon: User },
+    { id: 1, name: 'Personal Info', icon: User },
     { id: 2, name: 'Business Details', icon: Store },
-    { id: 3, name: 'Review & Submit', icon: FileText }
+    { id: 3, name: 'Location', icon: MapPin },
+    { id: 4, name: 'Review & Submit', icon: FileText }
   ];
 
   return (
@@ -159,276 +303,32 @@ function VendorApplicationPage(){
                 >
                   {/* Step 1: Personal Information */}
                   {currentStep === 1 && (
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                        <User className="w-5 h-5 mr-2 text-green-600" />
-                        Personal Information
-                      </h3>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-                            Full Name
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              id="fullName"
-                              name="fullName"
-                              value={formData.fullName}
-                              onChange={handleChange}
-                              required
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            />
-                            <User className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="email"
-                              id="email"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              required
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            />
-                            <Mail className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="tel"
-                              id="phone"
-                              name="phone"
-                              value={formData.phone}
-                              onChange={handleChange}
-                              required
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            />
-                            <Phone className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
-                            City
-                          </label>
-                          <div className="relative">
-                            <input
-                              type="text"
-                              id="city"
-                              name="city"
-                              value={formData.city}
-                              onChange={handleChange}
-                              required
-                              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            />
-                            <MapPin className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                          Full Address
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            id="address"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            required
-                            rows={3}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                          />
-                          <Home className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-                    </div>
+                    <PersonalInfoStep userInfo={formData.userInfo} />
                   )}
 
                   {/* Step 2: Business Details */}
                   {currentStep === 2 && (
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                        <Store className="w-5 h-5 mr-2 text-green-600" />
-                        Business Details
-                      </h3>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Business Type
-                        </label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <label className={`flex items-center p-4 border rounded-lg cursor-pointer ${formData.businessType === 'individual' ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}>
-                            <input
-                              type="radio"
-                              name="businessType"
-                              value="individual"
-                              checked={formData.businessType === 'individual'}
-                              onChange={handleChange}
-                              className="h-4 w-4 text-green-600 focus:ring-green-500"
-                            />
-                            <span className="ml-3 block text-sm font-medium text-gray-700">
-                              Individual/Sole Proprietor
-                            </span>
-                          </label>
-
-                          <label className={`flex items-center p-4 border rounded-lg cursor-pointer ${formData.businessType === 'company' ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}>
-                            <input
-                              type="radio"
-                              name="businessType"
-                              value="company"
-                              checked={formData.businessType === 'company'}
-                              onChange={handleChange}
-                              className="h-4 w-4 text-green-600 focus:ring-green-500"
-                            />
-                            <span className="ml-3 block text-sm font-medium text-gray-700">
-                              Registered Company
-                            </span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
-                          Business Name
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            id="businessName"
-                            name="businessName"
-                            value={formData.businessName}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                          />
-                          <Store className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="businessDescription" className="block text-sm font-medium text-gray-700 mb-1">
-                          Business Description
-                        </label>
-                        <div className="relative">
-                          <textarea
-                            id="businessDescription"
-                            name="businessDescription"
-                            value={formData.businessDescription}
-                            onChange={handleChange}
-                            required
-                            rows={4}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                            placeholder="Describe your business, products you plan to sell, etc."
-                          />
-                          <FileText className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-                        </div>
-                      </div>
-                    </div>
+                    <BusinessInfoStep
+                      businessInfo={formData.businessInfo}
+                      setBusinessInfo={(data) => setFormData({ ...formData, businessInfo: data })}
+                    />
                   )}
 
-                  {/* Step 3: Review & Submit */}
+                  {/* Step 3: Location */}
                   {currentStep === 3 && (
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-semibold text-gray-800 flex items-center">
-                        <FileText className="w-5 h-5 mr-2 text-green-600" />
-                        Review Your Application
-                      </h3>
+                    <LocationInfoStep
+                      locationInfo={formData.locationInfo}
+                      setLocationInfo={(data) => setFormData({ ...formData, locationInfo: data })}
+                      locationData={locationData}
+                    />
+                  )}
 
-                      <div className="bg-green-50 rounded-lg p-4 mb-6">
-                        <h4 className="font-medium text-green-800 mb-2 flex items-center">
-                          <AlertCircle className="w-5 h-5 mr-2" />
-                          Important Information
-                        </h4>
-                        <p className="text-sm text-green-700">
-                          By submitting this application, you agree to GroceryStore's Vendor Terms and Conditions.
-                          Our team will review your application and contact you within 3-5 business days.
-                        </p>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-medium text-gray-800 mb-2">Personal Information</h4>
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
-                                <p className="text-sm text-gray-500">Full Name</p>
-                                <p className="font-medium">{formData.fullName || '-'}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-500">Email</p>
-                                <p className="font-medium">{formData.email || '-'}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-500">Phone</p>
-                                <p className="font-medium">{formData.phone || '-'}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-500">City</p>
-                                <p className="font-medium">{formData.city || '-'}</p>
-                              </div>
-                              <div className="md:col-span-2">
-                                <p className="text-sm text-gray-500">Address</p>
-                                <p className="font-medium">{formData.address || '-'}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h4 className="font-medium text-gray-800 mb-2">Business Information</h4>
-                          <div className="bg-gray-50 rounded-lg p-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div>
-                                <p className="text-sm text-gray-500">Business Type</p>
-                                <p className="font-medium capitalize">{formData.businessType || '-'}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm text-gray-500">Business Name</p>
-                                <p className="font-medium">{formData.businessName || '-'}</p>
-                              </div>
-                              <div className="md:col-span-2">
-                                <p className="text-sm text-gray-500">Business Description</p>
-                                <p className="font-medium">{formData.businessDescription || '-'}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start">
-                        <div className="flex items-center h-5">
-                          <input
-                            id="termsAccepted"
-                            name="termsAccepted"
-                            type="checkbox"
-                            checked={formData.termsAccepted || false}
-                            onChange={handleChange}
-                            required
-                            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
-                          />
-                        </div>
-                        <div className="ml-3 text-sm">
-                          <label htmlFor="termsAccepted" className="font-medium text-gray-700">
-                            I agree to the <a href="#" className="text-green-600 hover:text-green-800">Vendor Terms and Conditions</a>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Step 4: Review & Submit */}
+                  {currentStep === 4 && (
+                    <ReviewStep
+                      formData={formData}
+                      setTermsAccepted={(accepted) => setFormData({ ...formData, termsAccepted: accepted })}
+                    />
                   )}
 
                   {/* Navigation Buttons */}
@@ -445,7 +345,7 @@ function VendorApplicationPage(){
                       <div></div>
                     )}
 
-                    {currentStep < 3 ? (
+                    {currentStep < 4 ? (
                       <button
                         type="button"
                         onClick={nextStep}
@@ -476,44 +376,7 @@ function VendorApplicationPage(){
           </form>
         </motion.div>
 
-        {/* Benefits Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="mt-16"
-        >
-          <h3 className="text-2xl font-bold text-center text-green-800 mb-8">Why Become a GroceryStore Vendor?</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Reach More Customers",
-                description: "Access thousands of customers looking for quality products every day.",
-                icon: "👥"
-              },
-              {
-                title: "Easy Management",
-                description: "Our vendor dashboard makes it simple to manage your products and orders.",
-                icon: "📊"
-              },
-              {
-                title: "Fast Payments",
-                description: "Get paid quickly with our reliable payment processing system.",
-                icon: "💳"
-              }
-            ].map((benefit, index) => (
-              <motion.div
-                key={index}
-                whileHover={{ y: -5 }}
-                className="bg-white p-6 rounded-xl shadow-md border border-green-100 text-center"
-              >
-                <div className="text-4xl mb-4">{benefit.icon}</div>
-                <h4 className="text-lg font-semibold text-green-700 mb-2">{benefit.title}</h4>
-                <p className="text-gray-600">{benefit.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <BenefitsSection />
       </div>
     </div>
   );
