@@ -79,3 +79,35 @@ export const verifyCodeMail = async (code: string) => {
   const response_json = await response.json()
   return response_json;
 }
+
+export const setupTotp = async () => {
+  const token = getAuthTokens()?.accessToken
+  const fullUrl = `${url}/2fa/setup`
+  console.log('full url', fullUrl)
+  const response = await fetch(fullUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  })
+  const data_json = response.json()
+  return data_json
+}
+
+
+export const verifyTotpMail = async (code: string) => {
+  console.log('here 1')
+  const token = getAuthTokens()?.accessToken;
+
+  const response = await fetch(`${url}/2fa/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ totp: code })
+  })
+  const response_json = await response.json()
+  return response_json;
+}

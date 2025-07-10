@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, Key, Calendar, Loader2, Check } from 'lucide-react';
-import { useResetPassword } from '@/hooks/authHook';
+import { useCreateTotp, useResetPassword, useVerifyTotp } from '@/hooks/authHook';
+import { VerificationModal } from '../codes/VerificationModal';
+import { TotpSetupModal } from '../TotpSetup';
+import toast from 'react-hot-toast';
 
 interface PasswordFormData {
   currentPassword: string;
@@ -25,17 +28,46 @@ const SecuritySection = ({
   });
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [verifyForOtpSetup, setVerifyForOtpSetup] = useState(false);
+  const [showSetOtp, setShowSetOtp] = useState(false);
+  const [verifyForPassword, setVerifyForPassword] = useState(false);
+  const [isVerifiedForPassword, setIsVerifiedForPassword] = useState(false);
 
-  const { mutate: resetPassword, isPending, isSuccess } = useResetPassword();
+  const { data } = useCreateTotp({ enabled: showSetOtp });
+  const { mutate: resetPassword, isPending } = useResetPassword();
+  const totpMutate = useVerifyTotp();
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPasswordForm(prev => ({ ...prev, [name]: value }));
-    // Clear errors when user types
     if (passwordError) setPasswordError('');
   };
 
+  const handleSubmitTotp = (code: string) => {
+    totpMutate.mutate(code, {
+      onSuccess: (data) => {
+        if (data.status == 'success') {
+          toast.success('TOTP verified successfully');
+          setShowSetOtp(false);
+        } else if (data.status === 'error') {
+          toast.error('Verification failed. Please try again.');
+        }
+      }
+    });
+  };
+
   const handleSubmitPassword = () => {
+    // If 2FA is enabled and not yet verified, show verification modal
+    if (isTwoFactorEnabled && !isVerifiedForPassword) {
+      setVerifyForPassword(true);
+      return;
+    }
+
+    // Proceed with password change after verification (or if 2FA is disabled)
+    submitPasswordChange();
+  };
+
+  const submitPasswordChange = () => {
     // Reset previous states
     setPasswordError('');
     setPasswordSuccess(false);
@@ -68,6 +100,7 @@ const SecuritySection = ({
       onSuccess: (data) => {
         if (data.status == 'success') {
           setPasswordSuccess(true);
+          setIsVerifiedForPassword(false); // Reset verification for next time
           setPasswordForm({
             currentPassword: '',
             newPassword: '',
@@ -84,7 +117,7 @@ const SecuritySection = ({
   };
 
   const handleToggle2FA = (enable: boolean) => {
-    console.log(`2FA ${enable ? 'enabled' : 'disabled'}`);
+    setVerifyForOtpSetup(true);
   };
 
   const formatDate = (dateString: string) => {
@@ -176,6 +209,7 @@ const SecuritySection = ({
               value={passwordForm.currentPassword}
               onChange={handlePasswordChange}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              disabled={isTwoFactorEnabled && !isVerifiedForPassword}
             />
           </motion.div>
 
@@ -192,6 +226,7 @@ const SecuritySection = ({
               value={passwordForm.newPassword}
               onChange={handlePasswordChange}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              disabled={isTwoFactorEnabled && !isVerifiedForPassword}
             />
           </motion.div>
 
@@ -208,8 +243,15 @@ const SecuritySection = ({
               value={passwordForm.confirmPassword}
               onChange={handlePasswordChange}
               className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              disabled={isTwoFactorEnabled && !isVerifiedForPassword}
             />
           </motion.div>
+
+          {isTwoFactorEnabled && !isVerifiedForPassword && (
+            <div className="text-sm text-blue-600">
+              Please verify your identity with your 2FA code to change your password.
+            </div>
+          )}
 
           <AnimatePresence>
             {passwordError && (
@@ -253,8 +295,8 @@ const SecuritySection = ({
             onClick={handleSubmitPassword}
             disabled={isPending}
             className={`mt-2 flex items-center justify-center px-4 py-2 rounded-lg transition ${isPending
-                ? 'bg-green-400 cursor-not-allowed'
-                : 'bg-green-600 hover:bg-green-700'
+              ? 'bg-green-400 cursor-not-allowed'
+              : 'bg-green-600 hover:bg-green-700'
               } text-white`}
           >
             {isPending ? (
@@ -271,6 +313,35 @@ const SecuritySection = ({
           </motion.button>
         </div>
       </motion.div>
+
+      {/* Verification Modals */}
+      <VerificationModal
+        isOpen={verifyForOtpSetup}
+        onClose={() => setVerifyForOtpSetup(false)}
+        isOTPEnabled={false}
+        is2FAEnabled={false}
+        onVerified={() => setShowSetOtp(true)}
+      />
+
+      <VerificationModal
+        isOpen={verifyForPassword}
+        onClose={() => setVerifyForPassword(false)}
+        isOTPEnabled={isTwoFactorEnabled}
+        is2FAEnabled={isTwoFactorEnabled}
+        onVerified={() => {
+          setIsVerifiedForPassword(true);
+          setVerifyForPassword(false);
+        }}
+      />
+
+      {showSetOtp && (
+        <TotpSetupModal
+          isOpen={showSetOtp}
+          onClose={() => setShowSetOtp(false)}
+          totpData={{ secret: data?.data?.secret }}
+          onComplete={(code) => handleSubmitTotp(code)}
+        />
+      )}
     </div>
   );
 };

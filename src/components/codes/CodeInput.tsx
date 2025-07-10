@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import { X, Clock, Mail, RotateCw, Check } from 'lucide-react';
-import { useSendMailCode, useVerifyMailCode } from '@/hooks/authHook';
+import { useSendMailCode, useVerifyMailCode, useVerifyTotp } from '@/hooks/authHook';
 import { getUserEmailHelper } from '@/lib/authHelper';
 import toast from 'react-hot-toast';
 
@@ -10,12 +10,14 @@ interface CodeInputProps {
 }
 
 export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
+  console.log('type',type)
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [isSending, setIsSending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const getCodeMutate = useSendMailCode();
   const verifyCodeMutate = useVerifyMailCode();
+  const verifyTotpMutate = useVerifyTotp()
 
   // Handle cooldown timer
   useEffect(() => {
@@ -64,9 +66,23 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
         }
       });
     } else {
-      // For OTP, just log and pretend to verify
+      console.log('submiting')
+      verifyTotpMutate.mutate(code, {
+        onSuccess: (data) => {
+          console.log('otp data', data)
+          if (data.status === 'success') {
+            toast.success(data.message);
+            onVerify(true);
+          } else {
+            toast.error(data?.message || 'Verification failed');
+            onVerify(false);
+          }
+        },
+        onError: (error) => {
+          console.error('error', error)
+        }
+      })
       console.log('OTP to verify:', code);
-      onVerify(true); // Simulate successful verification
     }
   };
 
@@ -181,7 +197,7 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
           )}
         </div>
 
-        {digits.every(d => d) && type === 'code' && isSending &&(
+        {digits.every(d => d) && type === 'code' && isSending && (
           <div className="flex items-center text-gray-500">
             <Clock size={18} className="mr-1 animate-pulse" />
             Verifying...

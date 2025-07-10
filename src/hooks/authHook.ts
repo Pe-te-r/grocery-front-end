@@ -1,7 +1,7 @@
-import { loginFn, registerFn, resetPasswordFn, sendCodeMail, verifyCodeMail } from "@/api/auth"
+import { loginFn, registerFn, resetPasswordFn, sendCodeMail, setupTotp, verifyCodeMail, verifyTotpMail } from "@/api/auth"
 import { loginUserHelper } from "@/lib/authHelper"
 import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType, } from "@/util/types"
-import { useMutation, } from "@tanstack/react-query"
+import { useMutation, useQuery, type UseQueryOptions, } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
 
@@ -72,5 +72,30 @@ export const useSendMailCode = () => {
 export const useVerifyMailCode = () => {
   return useMutation({
     mutationFn: (code: string) => verifyCodeMail(code)
+  })
+}
+
+
+interface UseCreateTotpOptions extends Omit<UseQueryOptions<
+  Awaited<ReturnType<typeof setupTotp>>,
+  Error,
+  Awaited<ReturnType<typeof setupTotp>>,
+  ['totp']
+>, 'queryKey' | 'queryFn'> { }
+
+export const useCreateTotp = (options?: UseCreateTotpOptions) => {
+  return useQuery({
+    queryFn: setupTotp,
+    queryKey: ['totp'],
+    gcTime: 0,
+    staleTime: 0,
+    ...options
+  });
+};
+
+export const useVerifyTotp = () => {
+  return useMutation({
+    mutationKey:['totp'],
+    mutationFn: (code: string) => verifyTotpMail(code)
   })
 }
