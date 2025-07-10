@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import {  useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, Key, Calendar, Loader2, Check } from 'lucide-react';
-import { useCreateTotp, useResetPassword, useVerifyTotp } from '@/hooks/authHook';
+import { useCreateTotp, useDisableTotp, useResetPassword, useVerifyTotp } from '@/hooks/authHook';
 import { VerificationModal } from '../codes/VerificationModal';
 import { TotpSetupModal } from '../TotpSetup';
 import toast from 'react-hot-toast';
@@ -15,11 +15,13 @@ interface PasswordFormData {
 const SecuritySection = ({
   isTwoFactorEnabled,
   lastLogin,
-  userID
+  userID,
+  refetch
 }: {
   isTwoFactorEnabled: boolean;
   lastLogin: string;
   userID: string;
+  refetch: () => void
 }) => {
   const [passwordForm, setPasswordForm] = useState<PasswordFormData>({
     currentPassword: '',
@@ -32,6 +34,8 @@ const SecuritySection = ({
   const [showSetOtp, setShowSetOtp] = useState(false);
   const [verifyForPassword, setVerifyForPassword] = useState(false);
   const [isVerifiedForPassword, setIsVerifiedForPassword] = useState(false);
+  const [isDisabling, setIsDisabling] = useState(false)
+  const sendDisable = useRef(false)
 
   const { data } = useCreateTotp({ enabled: showSetOtp });
   const { mutate: resetPassword, isPending } = useResetPassword();
@@ -43,11 +47,16 @@ const SecuritySection = ({
     if (passwordError) setPasswordError('');
   };
 
+  const disableMutate = useDisableTotp()
+
+
+
   const handleSubmitTotp = (code: string) => {
     totpMutate.mutate(code, {
       onSuccess: (data) => {
         if (data.status == 'success') {
           toast.success('TOTP verified successfully');
+          refetch()
           setShowSetOtp(false);
         } else if (data.status === 'error') {
           toast.error('Verification failed. Please try again.');
@@ -106,9 +115,29 @@ const SecuritySection = ({
       }
     });
   };
+  useEffect(() => {
+    if (sendDisable.current) {
 
-  const handleToggle2FA = (enable: boolean) => {
-    setVerifyForOtpSetup(true);
+      disableMutate.mutate(undefined, {
+        onSuccess: (data) => {
+          console.log('data for disbale', data)
+          if (data.status == 'success') {
+            toast.success('Disable was success')
+            refetch()
+          } else if (data.status == 'error') {
+            toast.error('Disable was not successful')
+          }
+        }
+      })
+    }
+  },[sendDisable.current])
+
+  const handleToggle2FA = () => {
+    if (isTwoFactorEnabled) {
+      setIsDisabling(true)
+    } else {
+      setVerifyForOtpSetup(true);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -159,7 +188,7 @@ const SecuritySection = ({
                 on: { backgroundColor: '#10B981' },
                 off: { backgroundColor: '#E5E7EB' }
               }}
-              onClick={() => handleToggle2FA(!isTwoFactorEnabled)}
+              onClick={() => handleToggle2FA()}
               className="relative inline-flex h-6 w-11 items-center rounded-full"
               whileTap={{ scale: 0.95 }}
             >
@@ -335,6 +364,16 @@ const SecuritySection = ({
         onVerified={() => {
           setIsVerifiedForPassword(true);
           setVerifyForPassword(false);
+        }}
+      />
+      <VerificationModal
+        isOpen={isDisabling}
+        onClose={() => setIsDisabling(false)}
+        isOTPEnabled={isTwoFactorEnabled}
+        is2FAEnabled={false}
+        onVerified={() => {
+          setIsDisabling(false);
+          sendDisable.current=true
         }}
       />
 

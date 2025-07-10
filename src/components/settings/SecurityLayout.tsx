@@ -80,6 +80,7 @@ const SettingsLayout = ({ userData, refetch }: { userData: UserData, refetch:()=
                   isTwoFactorEnabled={userData.isTwoFactorEnabled}
                   lastLogin={userData.lastLogin}
                   userID={getUserIdHelper()?? ''}
+                  refetch={refetch}
                 />
               )}
               {activeSection === 'notifications' && <NotificationsSection />}

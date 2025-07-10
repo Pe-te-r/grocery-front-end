@@ -111,3 +111,18 @@ export const verifyTotpMail = async (code: string) => {
   const response_json = await response.json()
   return response_json;
 }
+
+
+export const disableTotp = async () => {
+  const token = getAuthTokens()?.accessToken
+  const fullUrl = `${url}/2fa/disable`
+  const response = await fetch(fullUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  })
+  const data_json = response.json()
+  return data_json
+}

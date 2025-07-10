@@ -1,7 +1,7 @@
-import { loginFn, registerFn, resetPasswordFn, sendCodeMail, setupTotp, verifyCodeMail, verifyTotpMail } from "@/api/auth"
+import { disableTotp, loginFn, registerFn, resetPasswordFn, sendCodeMail, setupTotp, verifyCodeMail, verifyTotpMail } from "@/api/auth"
 import { loginUserHelper } from "@/lib/authHelper"
 import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType, } from "@/util/types"
-import { useMutation, useQuery, type UseQueryOptions, } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient, type UseQueryOptions, } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
 
@@ -94,8 +94,19 @@ export const useCreateTotp = (options?: UseCreateTotpOptions) => {
 };
 
 export const useVerifyTotp = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationKey:['totp'],
-    mutationFn: (code: string) => verifyTotpMail(code)
+    mutationKey: ['totp'],
+    mutationFn: (code: string) => verifyTotpMail(code),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    }
+  })
+}
+
+export const useDisableTotp = () => {
+  return useMutation({
+    mutationKey: ['totp'],
+    mutationFn: disableTotp,
   })
 }
