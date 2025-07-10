@@ -57,17 +57,6 @@ const SecuritySection = ({
   };
 
   const handleSubmitPassword = () => {
-    // If 2FA is enabled and not yet verified, show verification modal
-    if (isTwoFactorEnabled && !isVerifiedForPassword) {
-      setVerifyForPassword(true);
-      return;
-    }
-
-    // Proceed with password change after verification (or if 2FA is disabled)
-    submitPasswordChange();
-  };
-
-  const submitPasswordChange = () => {
     // Reset previous states
     setPasswordError('');
     setPasswordSuccess(false);
@@ -100,6 +89,7 @@ const SecuritySection = ({
       onSuccess: (data) => {
         if (data.status == 'success') {
           setPasswordSuccess(true);
+          toast.success('Password updated success')
           setIsVerifiedForPassword(false); // Reset verification for next time
           setPasswordForm({
             currentPassword: '',
@@ -107,6 +97,7 @@ const SecuritySection = ({
             confirmPassword: ''
           });
         } else if (data.status == 'error') {
+          toast.error(data.message)
           setPasswordError(data.message || 'Failed to change password');
         }
       },
@@ -124,6 +115,10 @@ const SecuritySection = ({
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+  };
+
+  const handleStartPasswordChange = () => {
+    setVerifyForPassword(true);
   };
 
   return (
@@ -195,123 +190,132 @@ const SecuritySection = ({
           <Key className="mr-2 h-5 w-5" />
           Change Password
         </h3>
-        <div className="space-y-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col"
-          >
-            <label className="text-gray-600 mb-1">Current Password</label>
-            <input
-              type="password"
-              name="currentPassword"
-              value={passwordForm.currentPassword}
-              onChange={handlePasswordChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              disabled={isTwoFactorEnabled && !isVerifiedForPassword}
-            />
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            className="flex flex-col"
-          >
-            <label className="text-gray-600 mb-1">New Password</label>
-            <input
-              type="password"
-              name="newPassword"
-              value={passwordForm.newPassword}
-              onChange={handlePasswordChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              disabled={isTwoFactorEnabled && !isVerifiedForPassword}
-            />
-          </motion.div>
+        {!isVerifiedForPassword ? (
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              To change your password, please verify your identity first.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleStartPasswordChange}
+              className="mt-2 flex items-center justify-center px-4 py-2 rounded-lg transition bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Lock className="mr-2 h-4 w-4" />
+              Verify Identity to Change Password
+            </motion.button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col"
+            >
+              <label className="text-gray-600 mb-1">Current Password</label>
+              <input
+                type="password"
+                name="currentPassword"
+                value={passwordForm.currentPassword}
+                onChange={handlePasswordChange}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              />
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-col"
-          >
-            <label className="text-gray-600 mb-1">Confirm New Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={passwordForm.confirmPassword}
-              onChange={handlePasswordChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
-              disabled={isTwoFactorEnabled && !isVerifiedForPassword}
-            />
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.35 }}
+              className="flex flex-col"
+            >
+              <label className="text-gray-600 mb-1">New Password</label>
+              <input
+                type="password"
+                name="newPassword"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              />
+            </motion.div>
 
-          {isTwoFactorEnabled && !isVerifiedForPassword && (
-            <div className="text-sm text-blue-600">
-              Please verify your identity with your 2FA code to change your password.
-            </div>
-          )}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="flex flex-col"
+            >
+              <label className="text-gray-600 mb-1">Confirm New Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={passwordForm.confirmPassword}
+                onChange={handlePasswordChange}
+                className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 transition"
+              />
+            </motion.div>
 
-          <AnimatePresence>
-            {passwordError && (
-              <motion.div
-                key="error"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="text-red-500 text-sm flex items-center">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  {passwordError}
-                </div>
-              </motion.div>
-            )}
+            <AnimatePresence>
+              {passwordError && (
+                <motion.div
+                  key="error"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="text-red-500 text-sm flex items-center">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {passwordError}
+                  </div>
+                </motion.div>
+              )}
 
-            {passwordSuccess && (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="text-green-600 text-sm flex items-center">
-                  <Check className="w-4 h-4 mr-1" />
-                  Password changed successfully!
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              {passwordSuccess && (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="text-green-600 text-sm flex items-center">
+                    <Check className="w-4 h-4 mr-1" />
+                    Password changed successfully!
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleSubmitPassword}
-            disabled={isPending}
-            className={`mt-2 flex items-center justify-center px-4 py-2 rounded-lg transition ${isPending
-              ? 'bg-green-400 cursor-not-allowed'
-              : 'bg-green-600 hover:bg-green-700'
-              } text-white`}
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Changing...
-              </>
-            ) : (
-              <>
-                <Lock className="mr-2 h-4 w-4" />
-                Change Password
-              </>
-            )}
-          </motion.button>
-        </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleSubmitPassword}
+              disabled={isPending}
+              className={`mt-2 flex items-center justify-center px-4 py-2 rounded-lg transition ${isPending
+                ? 'bg-green-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700'
+                } text-white`}
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Changing...
+                </>
+              ) : (
+                <>
+                  <Lock className="mr-2 h-4 w-4" />
+                  Change Password
+                </>
+              )}
+            </motion.button>
+          </div>
+        )}
       </motion.div>
 
       {/* Verification Modals */}

@@ -5,9 +5,18 @@ import type { UserData } from './types';
 import { useForm } from '@tanstack/react-form';
 import { getUserIdHelper } from '@/lib/authHelper';
 import { useUpdateUserHook } from '@/hooks/userHook';
+import { VerificationModal } from '../codes/VerificationModal';
+import toast from 'react-hot-toast';
 
 const ProfileSection = ({ userData, refetch }: { userData: UserData; refetch: () => void }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [verifyBeforeSave, setVerifyBeforeSave] = useState(false);
+  const [formValues, setFormValues] = useState({
+    id: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+  });
   const { mutate, isPending, error } = useUpdateUserHook();
   const id = getUserIdHelper() ?? '';
 
@@ -19,26 +28,26 @@ const ProfileSection = ({ userData, refetch }: { userData: UserData; refetch: ()
       phone: userData.phone || '',
     },
     onSubmit: async ({ value }) => {
-      console.log('Data to be submitted:', value);
-      // For now, just log the data and exit edit mode
-      console.log('Form submitted with data:', value);
-
-      // If you want to actually submit, uncomment this:
-      
-      mutate(value, {
-        onSuccess: (data) => {
-          console.log('Mutation successful, response:', data);
-          refetch();
-          setIsEditing(false);
-        },
-        onError: (error) => {
-          console.error('Mutation error:', error);
-        }
-      });
-      setIsEditing(false);
-
+      // Store form values and trigger verification
+      setFormValues(value);
+      setVerifyBeforeSave(true);
     },
   });
+
+  const handleVerified = () => {
+    // This is called after successful verification
+    mutate(formValues, {
+      onSuccess: (data) => {
+        toast.success('Profile updated successfully');
+        refetch();
+        setIsEditing(false);
+        setVerifyBeforeSave(false);
+      },
+      onError: (error) => {
+        toast.error(error.message || 'Failed to update profile');
+      }
+    });
+  };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A';
@@ -202,8 +211,8 @@ const ProfileSection = ({ userData, refetch }: { userData: UserData; refetch: ()
                     type="submit"
                     disabled={isPending}
                     className={`flex items-center px-4 py-2 ${isPending
-                        ? 'bg-green-600 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700'
+                      ? 'bg-green-600 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700'
                       } text-white rounded-lg transition`}
                   >
                     {isPending ? (
@@ -254,6 +263,15 @@ const ProfileSection = ({ userData, refetch }: { userData: UserData; refetch: ()
           </form>
         </motion.div>
       )}
+
+      {/* Verification Modal */}
+      <VerificationModal
+        isOpen={verifyBeforeSave}
+        onClose={() => setVerifyBeforeSave(false)}
+        isOTPEnabled={userData.isTwoFactorEnabled}
+        is2FAEnabled={false}
+        onVerified={handleVerified}
+      />
     </div>
   );
 };

@@ -10,14 +10,14 @@ interface CodeInputProps {
 }
 
 export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
-  console.log('type',type)
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [isSending, setIsSending] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [isVerifying, setIsVerifying] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const getCodeMutate = useSendMailCode();
   const verifyCodeMutate = useVerifyMailCode();
-  const verifyTotpMutate = useVerifyTotp()
+  const verifyTotpMutate = useVerifyTotp();
 
   // Handle cooldown timer
   useEffect(() => {
@@ -53,6 +53,10 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
   };
 
   const verifyCode = (code: string) => {
+    if (code.length !== 6) return;
+
+    setIsVerifying(true);
+
     if (type === 'code') {
       verifyCodeMutate.mutate(code, {
         onSuccess: (data) => {
@@ -63,13 +67,14 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
             toast.error(data?.message || 'Verification failed');
             onVerify(false);
           }
+        },
+        onSettled: () => {
+          setIsVerifying(false);
         }
       });
     } else {
-      console.log('submiting')
       verifyTotpMutate.mutate(code, {
         onSuccess: (data) => {
-          console.log('otp data', data)
           if (data.status === 'success') {
             toast.success(data.message);
             onVerify(true);
@@ -79,10 +84,12 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
           }
         },
         onError: (error) => {
-          console.error('error', error)
+          console.error('error', error);
+        },
+        onSettled: () => {
+          setIsVerifying(false);
         }
-      })
-      console.log('OTP to verify:', code);
+      });
     }
   };
 
@@ -97,8 +104,8 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-submit when 6 digits are entered (for code only)
-    if (newDigits.every(d => d) && newDigits.join('').length === 6) {
+    // Auto-submit when 6 digits are entered for both code and OTP
+    if (newDigits.every(d => d) ){
       verifyCode(newDigits.join(''));
     }
   };
@@ -184,20 +191,9 @@ export const CodeInput = ({ type, onVerify }: CodeInputProps) => {
               {cooldown > 0 ? `Resend in ${cooldown}s` : 'Request Code'}
             </button>
           )}
-
-          {type === 'otp' && (
-            <button
-              onClick={() => verifyCode(digits.join(''))}
-              disabled={!digits.every(d => d)}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg flex items-center hover:bg-green-700 transition-colors disabled:opacity-50"
-            >
-              <Check size={18} className="mr-1" />
-              Verify
-            </button>
-          )}
         </div>
 
-        {digits.every(d => d) && type === 'code' && isSending && (
+        {(isVerifying || (digits.every(d => d) && isSending)) && (
           <div className="flex items-center text-gray-500">
             <Clock size={18} className="mr-1 animate-pulse" />
             Verifying...
