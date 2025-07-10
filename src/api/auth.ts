@@ -59,7 +59,22 @@ export const sendCodeMail = async (email: string) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ 'email': email, reason: 'PASSWORD_RESET'})
+    body: JSON.stringify({ 'email': email, reason: 'PASSWORD_RESET' })
+  })
+  const response_json = await response.json()
+  return response_json;
+}
+
+export const verifyCodeMail = async (code: string) => {
+  const token = getAuthTokens()?.accessToken;
+
+  const response = await fetch(`${url}/auth/code/verify`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ code })
   })
   const response_json = await response.json()
   return response_json;

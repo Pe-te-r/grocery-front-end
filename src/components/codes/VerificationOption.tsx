@@ -2,6 +2,7 @@ import { Check } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { ReactNode } from 'react';
 
+
 interface VerificationOptionProps {
   title: string;
   description: string;

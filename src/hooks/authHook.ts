@@ -1,4 +1,4 @@
-import { loginFn, registerFn, resetPasswordFn, sendCodeMail } from "@/api/auth"
+import { loginFn, registerFn, resetPasswordFn, sendCodeMail, verifyCodeMail } from "@/api/auth"
 import { loginUserHelper } from "@/lib/authHelper"
 import type { ApiResponse, LoginDataType, LoginResponseType, RegisterDataTypeT, RegisterResponseType, } from "@/util/types"
 import { useMutation, } from "@tanstack/react-query"
@@ -67,5 +67,10 @@ export const useResetPassword = () => {
 export const useSendMailCode = () => {
   return useMutation({
     mutationFn: (email: string) => sendCodeMail(email)
+  })
+}
+export const useVerifyMailCode = () => {
+  return useMutation({
+    mutationFn: (code: string) => verifyCodeMail(code)
   })
 }
