@@ -22,6 +22,7 @@ import {
   WalletCards,
   Heart,
   FileSignature,
+  LocationEditIcon,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -192,6 +193,13 @@ export const SidebarDashboard = (role: Props) => {
 
     const adminItems = [
       {
+
+        name: "Locations",
+        icon: LocationEditIcon,
+        path: "/dashboard/locations",
+        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+      },
+      {
         name: "Products",
         icon: Package,
         path: "/dashboard/products",
@@ -199,7 +207,6 @@ export const SidebarDashboard = (role: Props) => {
         subItems: [
           { name: "All Products", path: "/dashboard/products" },
           { name: "Categories", path: "/dashboard/products/category" },
-          { name: "SubCategory", path: "/dashboard/products/sub_category" },
         ]
       },
       {
@@ -264,7 +271,6 @@ export const SidebarDashboard = (role: Props) => {
   };
 
   const navItems = getNavItems();
-  console.log('nav items',navItems)
 
   // Role-based add button action
   const getAddButtonAction = () => {

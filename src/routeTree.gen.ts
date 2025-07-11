@@ -18,6 +18,7 @@ import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as DashboardShopRouteImport } from './routes/dashboard/shop'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardLocationsRouteImport } from './routes/dashboard/locations'
 import { Route as DashboardApplicationsRouteImport } from './routes/dashboard/applications'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
@@ -75,6 +76,11 @@ const DashboardShopRoute = DashboardShopRouteImport.update({
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardLocationsRoute = DashboardLocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardApplicationsRoute = DashboardApplicationsRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
+  '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
+  '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
+  '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard/applications'
+    | '/dashboard/locations'
     | '/dashboard/settings'
     | '/dashboard/shop'
     | '/dashboard/'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard/applications'
+    | '/dashboard/locations'
     | '/dashboard/settings'
     | '/dashboard/shop'
     | '/dashboard'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/register'
     | '/dashboard/applications'
+    | '/dashboard/locations'
     | '/dashboard/settings'
     | '/dashboard/shop'
     | '/dashboard/'
@@ -366,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/dashboard/settings'
       preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/locations': {
+      id: '/dashboard/locations'
+      path: '/locations'
+      fullPath: '/dashboard/locations'
+      preLoaderRoute: typeof DashboardLocationsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/applications': {
@@ -464,6 +483,7 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardApplicationsRoute: typeof DashboardApplicationsRoute
+  DashboardLocationsRoute: typeof DashboardLocationsRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardShopRoute: typeof DashboardShopRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -480,6 +500,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardApplicationsRoute: DashboardApplicationsRoute,
+  DashboardLocationsRoute: DashboardLocationsRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardShopRoute: DashboardShopRoute,
   DashboardIndexRoute: DashboardIndexRoute,

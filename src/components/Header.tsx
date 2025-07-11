@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router';
-import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut } from 'lucide-react';
+import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut, Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AccountModal } from './AccountModal';
 import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
 import { useCart } from '@/lib/cartHelper';
 import { CartModal } from './CartModal';
+import { useCountyQuery } from '@/hooks/countyHook';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -14,13 +15,20 @@ const GroceryStoreHeader = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountModal, setIsAccountModal] = useState(false);
-  const { totalItems} = useCart();
+  const { totalItems } = useCart();
   const logOut = () => {
     logoutUserHelper()
   }
 
+  const { data, isLoading } = useCountyQuery()
+  const [counties, setCounty] = useState([])
   useEffect(() => {
-    console.log('use Effect',isAuthenticatedHelper())
+    if (data && Array.isArray(data.data)) {
+      setCounty(data.data)
+    }
+  }, [data])
+  useEffect(() => {
+    console.log('use Effect', isAuthenticatedHelper())
     setIsLoggedIn(isAuthenticatedHelper())
   }, [logoutUserHelper, loginUserHelper, logOut, isAuthenticatedHelper])
 
@@ -60,7 +68,7 @@ const GroceryStoreHeader = () => {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
- 
+
   return (
     <>
       {/* Top Announcement Bar */}
@@ -129,10 +137,19 @@ const GroceryStoreHeader = () => {
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm md:text-base"
                   defaultValue="nairobi"
                 >
-                  <option value="nairobi">Nairobi</option>
-                  <option value="mombasa">Mombasa</option>
-                  <option value="kisumu">Kisumu</option>
-                  <option value="nakuru">Nakuru</option>
+                  {
+                    isLoading ?
+                    <option>Counties are loading</option>
+                    :counties.length > 0 ?
+                    counties.map((county: any, index) => (
+                      <option key={index} value={county?.county_name}>
+                        {county.county_name}
+                      </option>
+                    )) :
+                        <option>No counties found</option>
+                  }
+
+
                 </select>
               </div>
             </div>
@@ -167,11 +184,11 @@ const GroceryStoreHeader = () => {
               ) : (
                 // Would show user profile and other options if logged in
                 <>
-                    <button onClick={() => setIsAccountModal(true)} className="flex flex-col cursor-pointer items-center text-gray-700">
+                  <button onClick={() => setIsAccountModal(true)} className="flex flex-col cursor-pointer items-center text-gray-700">
                     <User className="mb-1" size={20} />
                     <span className="text-xs">Account</span>
                   </button>
-                    <button onClick={logOut} className="flex cursor-pointer flex-col items-center text-gray-700">
+                  <button onClick={logOut} className="flex cursor-pointer flex-col items-center text-gray-700">
                     <LogOut className="mb-1" size={20} />
                     <span className="text-xs">Logout</span>
                   </button>
@@ -238,11 +255,11 @@ const GroceryStoreHeader = () => {
                     <li>
                       <button
                         className="flex items-center text-gray-700 hover:text-green-600 p-2 rounded-lg hover:bg-gray-100"
-                          onClick={() => {
-                            setMobileMenuOpen(false)
-                            setIsAccountModal(true)
-                          }
-                          }
+                        onClick={() => {
+                          setMobileMenuOpen(false)
+                          setIsAccountModal(true)
+                        }
+                        }
                       >
                         <User className="mr-2" size={18} />
                         My Account

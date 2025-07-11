@@ -97,7 +97,6 @@ export const setupTotp = async () => {
 
 
 export const verifyTotpMail = async (code: string) => {
-  console.log('here 1')
   const token = getAuthTokens()?.accessToken;
 
   const response = await fetch(`${url}/2fa/verify`, {
