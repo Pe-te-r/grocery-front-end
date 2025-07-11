@@ -1,37 +1,31 @@
-import { locationData } from "@/routes/dashboard/applications";
-import type { FormData } from "./VendorProfile";
 import { AlertCircle, FileText } from "lucide-react";
+import type { FormData } from "./VendorProfile";
 
 export const ReviewStep = ({
   formData,
-  setTermsAccepted
+  setTermsAccepted,
+  counties,
+  constituencies,
+  errors
 }: {
   formData: FormData,
-  setTermsAccepted: (accepted: boolean) => void
+  setTermsAccepted: (accepted: boolean) => void,
+  counties: Array<{ id: string; county_name: string }>,
+  constituencies: Array<{ id: string; name: string }>,
+  errors: Record<string, string>
 }) => {
-  const getLocationName = (type: 'county' | 'constituency' | 'ward') => {
-    if (!formData.locationInfo[type]) return '-';
+  // const getCountyName = () => {
+  //   if (!formData.locationInfo.county) return '-';
+  //   console.log('id review', formData.locationInfo)
+  //   const county = counties.find(c => c.id === formData.locationInfo.county);
+  //   return county?.county_name || '-';
+  // };
 
-    for (const county of locationData.counties) {
-      if (type === 'county' && county.id === formData.locationInfo.county) {
-        return county.name;
-      }
-
-      for (const constituency of county.constituencies) {
-        if (type === 'constituency' && constituency.id === formData.locationInfo.constituency) {
-          return constituency.name;
-        }
-
-        for (const ward of constituency.wards) {
-          if (type === 'ward' && ward.id === formData.locationInfo.ward) {
-            return ward.name;
-          }
-        }
-      }
-    }
-
-    return '-';
-  };
+  // const getConstituencyName = () => {
+  //   if (!formData.locationInfo.constituency) return '-';
+  //   const constituency = constituencies.find(c => c.id === formData.locationInfo.constituency);
+  //   return constituency?.name || '-';
+  // };
 
   return (
     <div className="space-y-6">
@@ -42,11 +36,11 @@ export const ReviewStep = ({
 
       <div className="bg-green-50 rounded-lg p-4 mb-6">
         <h4 className="font-medium text-green-800 mb-2 flex items-center">
-          <AlertCircle  className="w-5 h-5 mr-2" />
+          <AlertCircle className="w-5 h-5 mr-2" />
           Important Information
         </h4>
         <p className="text-sm text-green-700">
-          By submitting this application, you agree to GroceryStore's Vendor Terms and Conditions.
+          By submitting this application, you agree to our Vendor Terms and Conditions.
           Our team will review your application and contact you within 3-5 business days.
         </p>
       </div>
@@ -102,15 +96,11 @@ export const ReviewStep = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">County</p>
-                <p className="font-medium">{getLocationName('county')}</p>
+                <p className="font-medium">{formData.locationInfo.county}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Constituency</p>
-                <p className="font-medium">{getLocationName('constituency')}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Ward</p>
-                <p className="font-medium">{getLocationName('ward')}</p>
+                <p className="font-medium">{formData.locationInfo.constituency}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Street Address</p>
@@ -130,13 +120,17 @@ export const ReviewStep = ({
             checked={formData.termsAccepted || false}
             onChange={(e) => setTermsAccepted(e.target.checked)}
             required
-            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+            className={`h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded ${errors.termsAccepted ? 'border-red-500' : ''
+              }`}
           />
         </div>
         <div className="ml-3 text-sm">
           <label htmlFor="termsAccepted" className="font-medium text-gray-700">
             I agree to the <a href="#" className="text-green-600 hover:text-green-800">Vendor Terms and Conditions</a>
           </label>
+          {errors.termsAccepted && (
+            <p className="mt-1 text-sm text-red-600">{errors.termsAccepted}</p>
+          )}
         </div>
       </div>
     </div>

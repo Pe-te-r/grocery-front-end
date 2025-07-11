@@ -15,7 +15,6 @@ export interface FormData{
   locationInfo: {
     county: string;
     constituency: string;
-    ward: string;
     streetAddress: string;
   };
   termsAccepted: boolean;

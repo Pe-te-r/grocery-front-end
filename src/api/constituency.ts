@@ -1,3 +1,4 @@
+import { getAuthTokens } from "@/lib/authHelper"
 import { url } from "./url"
 
 // export const getConstituenciesByCounty = async (county: string) => {
@@ -26,7 +27,6 @@ export const getConstituenciesByCounty = async (county: string) => {
   }
 
   const fullUrl = `${url}/constituency?county=${encodeURIComponent(county)}`
-  console.log('Fetching constituencies from:', fullUrl)
 
   try {
     const response = await fetch(fullUrl, {
@@ -60,10 +60,13 @@ export const createConstituencies = async (payload: {
   county_id: string;
   constituencies: string[];
 }) => {
-  const response = await fetch('/api/constituencies/multiple', {
+  const fullUrl = `${url}/constituency`
+    const token = getAuthTokens()?.accessToken
+  const response = await fetch(fullUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization':`Bearer ${token}`
     },
     body: JSON.stringify(payload),
   });

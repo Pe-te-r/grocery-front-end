@@ -5,7 +5,7 @@ export const Route = createFileRoute('/dashboard/applications')({
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, ChevronRight, Store, User, Phone, Home, MapPin, FileText, AlertCircle, Loader2 } from 'lucide-react';
+import { Check, ChevronRight, Store, User,  MapPin, FileText, Loader2 } from 'lucide-react';
 import { PersonalInfoStep } from '@/components/vendors/VendorProfile';
 import { BenefitsSection } from '@/components/vendors/BenefistSection';
 import { BusinessInfoStep } from '@/components/vendors/BusinessDetails';
@@ -13,9 +13,9 @@ import { ReviewStep } from '@/components/vendors/Review';
 import { LocationInfoStep } from '@/components/vendors/LocationDetails';
 import { userByIdHook } from '@/hooks/userHook';
 import { getUserIdHelper } from '@/lib/authHelper';
-import { fullName } from '@/lib/demo-store';
+import { useCountyQuery } from '@/hooks/countyHook';
+import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook';
 
-// Types
 type FormData = {
   userInfo: {
     fullName: string;
@@ -30,81 +30,13 @@ type FormData = {
   };
   locationInfo: {
     county: string;
+    countyId: string;
     constituency: string;
-    ward: string;
+    constituencyId: string;
     streetAddress: string;
   };
   termsAccepted: boolean;
 };
-
-export type LocationData = {
-  counties: {
-    id: string;
-    name: string;
-    constituencies: {
-      id: string;
-      name: string;
-      wards: {
-        id: string;
-        name: string;
-      }[];
-    }[];
-  }[];
-};
-
-// Mock API data
-const mockUserData = {
-  fullName: 'John Doe',
-  email: 'john.doe@example.com',
-  phone: '+254712345678'
-};
-
-export const locationData: LocationData = {
-  counties: [
-    {
-      id: '1',
-      name: 'Nairobi',
-      constituencies: [
-        {
-          id: '101',
-          name: 'Westlands',
-          wards: [
-            { id: '10101', name: 'Parklands' },
-            { id: '10102', name: 'Karura' }
-          ]
-        },
-        {
-          id: '102',
-          name: 'Dagoretti North',
-          wards: [
-            { id: '10201', name: 'Kilimani' },
-            { id: '10202', name: 'Kawangware' }
-          ]
-        }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Mombasa',
-      constituencies: [
-        {
-          id: '201',
-          name: 'Mvita',
-          wards: [
-            { id: '20101', name: 'Tudor' },
-            { id: '20102', name: 'Old Town' }
-          ]
-        }
-      ]
-    }
-  ]
-};
-
-
-
-
-
-
 
 function VendorApplicationPage() {
   const [formData, setFormData] = useState<FormData>({
@@ -121,8 +53,9 @@ function VendorApplicationPage() {
     },
     locationInfo: {
       county: '',
+      countyId: '',
       constituency: '',
-      ward: '',
+      constituencyId: '',
       streetAddress: ''
     },
     termsAccepted: false
@@ -131,29 +64,70 @@ function VendorApplicationPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const userId = getUserIdHelper() ?? ''
-  const { data,isSuccess } = userByIdHook(userId)
-  console.log('data',data)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  const userId = getUserIdHelper() ?? '';
+  const { data, isSuccess } = userByIdHook(userId);
+
+  // Fetch counties
+  const { data: countiesData } = useCountyQuery();
+  const counties = countiesData?.data || [];
+
+  // Fetch constituencies when county is selected
+  const { data: constituenciesData } = useGetconstituenciesByCounty(formData.locationInfo.county);
+  const constituencies = constituenciesData?.data || [];
+
   useEffect(() => {
     if (data) {
-      const user = data.data
+      const user = data.data;
       const userInfo = {
         fullName: `${user.first_name} ${user.last_name}`,
         email: user.email,
-        phone:user.phone
-      }
-      setFormData(prevState => ({
-        ...prevState,
+        phone: user.phone
+      };
+      setFormData(prev => ({
+        ...prev,
         userInfo: {
-          ...prevState.userInfo,
+          ...prev.userInfo,
           ...userInfo
         }
-      }));    }
-  }, [data, isSuccess])
+      }));
+    }
+  }, [data, isSuccess]);
 
+  const validateStep = (step: number) => {
+    const errors: Record<string, string> = {};
+
+    if (step === 2) { // Business info validation
+      if (!formData.businessInfo.businessName.trim()) {
+        errors.businessName = 'Business name is required';
+      }
+      if (!formData.businessInfo.businessContact.trim()) {
+        errors.businessContact = 'Business contact is required';
+      }
+      if (!formData.businessInfo.businessDescription.trim()) {
+        errors.businessDescription = 'Business description is required';
+      }
+    } else if (step === 3) { // Location validation
+      if (!formData.locationInfo.countyId) {
+        errors.county = 'County is required';
+      }
+      if (!formData.locationInfo.constituencyId) {
+        errors.constituency = 'Constituency is required';
+      }
+      if (!formData.locationInfo.streetAddress.trim()) {
+        errors.streetAddress = 'Street address is required';
+      }
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, 4));
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => Math.min(prev + 1, 4));
+    }
   };
 
   const prevStep = () => {
@@ -162,57 +136,33 @@ function VendorApplicationPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // Prepare data for API
-    const submissionData = {
-      user: formData.userInfo,
-      business: {
-        ...formData.businessInfo,
-        location: {
-          countyId: formData.locationInfo.county,
-          constituencyId: formData.locationInfo.constituency,
-          wardId: formData.locationInfo.ward,
-          streetAddress: formData.locationInfo.streetAddress
-        }
-      },
-      termsAccepted: formData.termsAccepted,
-      applicationDate: new Date().toISOString()
-    };
+    if (validateStep(4)) { // Final validation
+      setIsSubmitting(true);
 
-    console.log('Submitting application:', JSON.stringify(submissionData, null, 2));
+      const submissionData = {
+        user: formData.userInfo,
+        business: {
+          ...formData.businessInfo,
+          location: {
+            countyId: formData.locationInfo.countyId,
+            countyName: formData.locationInfo.county,
+            constituencyId: formData.locationInfo.constituencyId,
+            constituencyName: formData.locationInfo.constituency,
+            streetAddress: formData.locationInfo.streetAddress
+          }
+        },
+        termsAccepted: formData.termsAccepted
+      };
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
+      console.log('Submitting application:', submissionData);
 
-      // Reset form after 3 seconds
+      // Simulate API call
       setTimeout(() => {
-        setFormData({
-          userInfo: {
-            fullName: mockUserData.fullName,
-            email: mockUserData.email,
-            phone: mockUserData.phone
-          },
-          businessInfo: {
-            businessName: '',
-            businessDescription: '',
-            businessType: 'individual',
-            businessContact: ''
-          },
-          locationInfo: {
-            county: '',
-            constituency: '',
-            ward: '',
-            streetAddress: ''
-          },
-          termsAccepted: false
-        });
-        setCurrentStep(1);
-        setSubmitSuccess(false);
-      }, 3000);
-    }, 1500);
+        setIsSubmitting(false);
+        setSubmitSuccess(true);
+      }, 1500);
+    }
   };
 
   const steps = [
@@ -311,6 +261,7 @@ function VendorApplicationPage() {
                     <BusinessInfoStep
                       businessInfo={formData.businessInfo}
                       setBusinessInfo={(data) => setFormData({ ...formData, businessInfo: data })}
+                      errors={formErrors}
                     />
                   )}
 
@@ -319,7 +270,9 @@ function VendorApplicationPage() {
                     <LocationInfoStep
                       locationInfo={formData.locationInfo}
                       setLocationInfo={(data) => setFormData({ ...formData, locationInfo: data })}
-                      locationData={locationData}
+                      counties={counties}
+                      constituencies={constituencies}
+                      errors={formErrors}
                     />
                   )}
 
@@ -328,6 +281,9 @@ function VendorApplicationPage() {
                     <ReviewStep
                       formData={formData}
                       setTermsAccepted={(accepted) => setFormData({ ...formData, termsAccepted: accepted })}
+                      counties={counties}
+                        constituencies={constituencies}
+                        errors={formErrors}
                     />
                   )}
 
@@ -357,7 +313,8 @@ function VendorApplicationPage() {
                       <button
                         type="submit"
                         disabled={isSubmitting || !formData.termsAccepted}
-                        className={`px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center ${(!formData.termsAccepted || isSubmitting) ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center ${(!formData.termsAccepted || isSubmitting) ? 'opacity-70 cursor-not-allowed' : ''
+                          }`}
                       >
                         {isSubmitting ? (
                           <>
