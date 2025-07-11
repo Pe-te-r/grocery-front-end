@@ -1,10 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-
 export const Route = createFileRoute('/dashboard/locations')({
   component: LocationManagement,
 })
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus,
@@ -16,9 +15,9 @@ import {
   Loader2
 } from 'lucide-react'
 import { useCountyQuery } from '@/hooks/countyHook'
-import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook'
+import { useCreateConstituencies, useGetconstituenciesByCounty } from '@/hooks/constituencyHook'
 
-function LocationManagement(){
+function LocationManagement() {
   const { data, isLoading: isCountiesLoading } = useCountyQuery()
   const counties = data?.data
   const [selectedCounty, setSelectedCounty] = useState<{
@@ -28,16 +27,26 @@ function LocationManagement(){
     initials: string
   } | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [newConstituencyName, setNewConstituencyName] = useState('')
-  const [expandedCounty, setExpandedCounty] = useState<string | null>(null)
+  const [newConstituenciesInput, setNewConstituenciesInput] = useState('')
 
   const {
     data: constituenciesData,
     isLoading: isConstituenciesLoading,
     refetch: refetchConstituencies
-  } = useGetconstituenciesByCounty(selectedCounty?.name|| '')
+  } = useGetconstituenciesByCounty(selectedCounty?.name || '')
   const constituencies = constituenciesData?.data
-  console.log('constituencies', constituencies)
+
+  const [expandedCounty, setExpandedCounty] = useState<string | null>(null)
+
+  const parsedConstituencies = useMemo(() => {
+    if (!newConstituenciesInput.trim()) return []
+
+    // Split by either commas or new lines, then trim each item
+    return newConstituenciesInput
+      .split(/[,\n]/)
+      .map(item => item.trim())
+      .filter(item => item.length > 0)
+  }, [newConstituenciesInput])
 
   const handleViewConstituencies = (county: {
     id: string
@@ -53,20 +62,23 @@ function LocationManagement(){
     })
     setIsModalOpen(true)
   }
+  const constituenciesMutate = useCreateConstituencies()
+  const handleAddConstituencies = () => {
+    if (!selectedCounty || parsedConstituencies.length === 0) return
 
-  const handleAddConstituency = () => {
-    if (!newConstituencyName.trim() || !selectedCounty) return
-
-    // In a real app, you would call an API here
-    console.log('Adding constituency:', {
+    // Format the data as requested
+    const payload = {
       county_id: selectedCounty.id,
-      name: newConstituencyName
-    })
+      constituencies: parsedConstituencies
+    }
+    constituenciesMutate.mutate(payload)
+
+    console.log('Adding constituencies:', payload)
 
     // Simulate API call
     setTimeout(() => {
-      console.log('Constituency added successfully!')
-      setNewConstituencyName('')
+      console.log('Constituencies added successfully!')
+      setNewConstituenciesInput('')
       refetchConstituencies()
     }, 500)
   }
@@ -74,7 +86,6 @@ function LocationManagement(){
   const handleDeleteConstituency = (constituencyId: string) => {
     if (!selectedCounty) return
 
-    // In a real app, you would call an API here
     console.log('Deleting constituency:', {
       county_id: selectedCounty.id,
       constituency_id: constituencyId
@@ -183,9 +194,9 @@ function LocationManagement(){
           <>
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              animate={{ opacity: 0.7 }}  // More blurred background
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-md z-40"  // Increased blur
               onClick={() => setIsModalOpen(false)}
             />
 
@@ -224,9 +235,9 @@ function LocationManagement(){
                     </div>
                   ) : (
                     <>
-                      {constituencies?.length> 0 ? (
+                      {constituencies?.length > 0 ? (
                         <ul className="space-y-3">
-                          {constituencies.map((constituency:any) => (
+                          {constituencies.map((constituency: any) => (
                             <li
                               key={constituency.id}
                               className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
@@ -251,24 +262,45 @@ function LocationManagement(){
                   )}
                 </div>
 
-                <div className="p-6 border-t border-gray-200">
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newConstituencyName}
-                      onChange={(e) => setNewConstituencyName(e.target.value)}
-                      placeholder="New constituency name"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                <div className="p-6 border-t border-gray-200 space-y-4">
+                  <div className="space-y-2">
+                    <label htmlFor="constituencies-input" className="block text-sm font-medium text-gray-700">
+                      Add Constituencies (separate by commas or new lines)
+                    </label>
+                    <textarea
+                      id="constituencies-input"
+                      value={newConstituenciesInput}
+                      onChange={(e) => setNewConstituenciesInput(e.target.value)}
+                      placeholder={`Enter constituency names separated by commas or new lines\nExample:\nConstituency 1\nConstituency 2, Constituency 3`}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
-                    <button
-                      onClick={handleAddConstituency}
-                      disabled={!newConstituencyName.trim()}
-                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-green-300 flex items-center space-x-1"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Add</span>
-                    </button>
                   </div>
+
+                  {parsedConstituencies.length > 0 && (
+                    <div className="bg-gray-50 p-3 rounded-md">
+                      <h4 className="text-sm font-medium text-gray-700 mb-1">
+                        Constituencies to be added ({parsedConstituencies.length}):
+                      </h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        {parsedConstituencies.map((name, index) => (
+                          <li key={index} className="flex items-center">
+                            <span className="mr-2">•</span>
+                            <span>{name}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={handleAddConstituencies}
+                    disabled={parsedConstituencies.length === 0}
+                    className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:bg-green-300 flex items-center justify-center space-x-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Add {parsedConstituencies.length > 0 ? `${parsedConstituencies.length} Constituencies` : 'Constituencies'}</span>
+                  </button>
                 </div>
               </div>
             </motion.div>

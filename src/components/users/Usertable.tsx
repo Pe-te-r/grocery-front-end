@@ -187,8 +187,7 @@ export const UserTable = ({
         </div>
       </div>
 
-      {/* Table implementation same as before */}
-      {/* ... */}
+ 
        <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">

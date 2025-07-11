@@ -20,9 +20,12 @@ import {
   ChevronUp
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import useAuthStore from '@/store/authStore'
+import { getUserIdHelper } from '@/lib/authHelper'
 
 function DashboardPage(){
   const [expandedSection, setExpandedSection] = useState<string | null>(null)
+  
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section)

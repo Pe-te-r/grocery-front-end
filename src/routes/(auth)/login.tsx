@@ -1,5 +1,5 @@
 import { AuthForm } from '@/components/AuthForm';
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { ShoppingBag, Leaf } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useLoginHook } from '@/hooks/authHook';

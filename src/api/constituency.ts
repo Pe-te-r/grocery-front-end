@@ -54,3 +54,23 @@ export const getConstituenciesByCounty = async (county: string) => {
     throw error
   }
 }
+
+
+export const createConstituencies = async (payload: {
+  county_id: string;
+  constituencies: string[];
+}) => {
+  const response = await fetch('/api/constituencies/multiple', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to create constituencies');
+  }
+
+  return await response.json();
+};
