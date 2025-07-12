@@ -4,8 +4,6 @@ import type { FormData } from "./VendorProfile";
 export const ReviewStep = ({
   formData,
   setTermsAccepted,
-  counties,
-  constituencies,
   errors
 }: {
   formData: FormData,

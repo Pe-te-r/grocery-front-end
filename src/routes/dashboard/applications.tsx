@@ -15,6 +15,7 @@ import { userByIdHook } from '@/hooks/userHook';
 import { getUserIdHelper } from '@/lib/authHelper';
 import { useCountyQuery } from '@/hooks/countyHook';
 import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook';
+import { useCreateStoreHook, useCheckAppliedHook } from '@/hooks/storeHook';
 
 type FormData = {
   userInfo: {
@@ -61,6 +62,7 @@ function VendorApplicationPage() {
     termsAccepted: false
   });
 
+  const storeMutation = useCreateStoreHook();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -71,6 +73,8 @@ function VendorApplicationPage() {
 
   // Fetch counties
   const { data: countiesData } = useCountyQuery();
+  const { data: validateApplication } = useCheckAppliedHook(userId);
+  console.log('data from validation', validateApplication)
   const counties = countiesData?.data || [];
 
   // Fetch constituencies when county is selected
@@ -136,7 +140,8 @@ function VendorApplicationPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    
     if (validateStep(4)) { // Final validation
       setIsSubmitting(true);
 
@@ -154,16 +159,35 @@ function VendorApplicationPage() {
         },
         termsAccepted: formData.termsAccepted
       };
+      const dataRequired = {
+        userId: getUserIdHelper() ?? '',
+        businessName:submissionData.business.businessName,
+        businessDescription:submissionData.business.businessName,
+        businessType: submissionData.business.businessType,
+        businessContact: submissionData.business.businessContact,
+        termsAccepted: submissionData.termsAccepted,
+        streetAddress: submissionData.business.location.streetAddress,
+        constituencyId: submissionData.business.location.constituencyId,
 
-      console.log('Submitting application:', submissionData);
+      }
 
-      // Simulate API call
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setSubmitSuccess(true);
-      }, 1500);
+      storeMutation.mutate(dataRequired, {
+        onSuccess: (data) => {
+          console.log('return',data)
+          
+  
+        }
+      });
+      console.log('Submitting application:', dataRequired);
     }
   };
+  useEffect(() => {
+    if (storeMutation.isSuccess) {
+      setIsSubmitting(false);
+      setSubmitSuccess(true);
+    }
+  }, [storeMutation.isSuccess])
+  
 
   const steps = [
     { id: 1, name: 'Personal Info', icon: User },
@@ -219,7 +243,7 @@ function VendorApplicationPage() {
         >
           <form onSubmit={handleSubmit}>
             <AnimatePresence mode="wait">
-              {submitSuccess ? (
+              {submitSuccess || validateApplication?.data == false ? (
                 <motion.div
                   key="success"
                   initial={{ opacity: 0 }}
