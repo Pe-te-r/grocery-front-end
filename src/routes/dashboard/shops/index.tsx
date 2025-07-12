@@ -12,7 +12,7 @@ export const Route = createFileRoute('/dashboard/shops/')({
 type TabType = 'all' | 'approved' | 'pending';
 
 function ShopsPage({ isAdmin = true }: { isAdmin?: boolean }) {
-  const { data } = useAdminShopsdHook();
+  const { data, refetch } = useAdminShopsdHook();
   const [activeTab, setActiveTab] = useState<TabType>('approved');
   const [sampleShops, setSampleShops] = useState([
     {
@@ -120,7 +120,7 @@ function ShopsPage({ isAdmin = true }: { isAdmin?: boolean }) {
         {filteredShops.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredShops.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} isAdmin={isAdmin} />
+              <ShopCard key={shop.id} shop={shop} refetch={refetch} isAdmin={isAdmin} />
             ))}
           </div>
         ) : (

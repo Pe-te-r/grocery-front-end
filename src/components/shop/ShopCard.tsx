@@ -1,3 +1,4 @@
+import { useUpdateStoreHook } from "@/hooks/storeHook";
 import { motion } from "framer-motion";
 import { CheckCircle2, Clock, MapPin, Phone, Store, User, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -21,12 +22,21 @@ interface Shop {
   };
 }
 
-const ShopCard = ({ shop, isAdmin = false }: { shop: Shop; isAdmin?: boolean }) => {
+const ShopCard = ({ shop,refetch, isAdmin = false }: { shop: Shop; refetch:()=>void, isAdmin?: boolean }) => {
   const [isApproved, setIsApproved] = useState(shop.approved);
-
+  const updateMutate = useUpdateStoreHook()
   const handleApprove = () => {
     console.log(`Approving shop with ID: ${shop.id}`);
-    setIsApproved(true);
+    const data = {
+      id: shop.id,
+      approved: true
+    }
+    updateMutate.mutate(data, {
+      onSuccess: () => {
+        setIsApproved(true);
+        refetch()
+      }
+    })
   };
 
   return (

@@ -1,10 +1,14 @@
-import { createStore, getAdminStore, getStore } from "@/api/store"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { createStore, getAdminStore, getStore, updateStore } from "@/api/store"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useCreateStoreHook = () => {
+  const queryClient = useQueryClient();
   return useMutation<unknown, Error, unknown>({
-    mutationKey: ['createStore'],
-    mutationFn: (store) => createStore(store)
+    mutationKey: ['store'],
+    mutationFn: (store) => createStore(store),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stores'] });
+    },
   })
 }
 
@@ -24,3 +28,14 @@ export const useAdminShopsdHook = () => {
     queryFn: () => getAdminStore(),
   });
 };
+
+export const useUpdateStoreHook = () => {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, Error, unknown>({
+    mutationFn: (data) => updateStore(data),
+    mutationKey: ['store'],
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stores'] });
+    },
+  })
+}

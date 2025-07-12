@@ -23,7 +23,7 @@ export const getStore = async (id: string) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    
+
   })
   const data = response.json()
   return data
@@ -37,6 +37,21 @@ export const getAdminStore = async () => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
+
+  })
+  const data = response.json()
+  return data
+}
+
+export const updateStore = async (updateData: any) => {
+  const token = getAccessTokenHelper()
+  const response = await fetch(`${url}/stores/${updateData.id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(updateData)
 
   })
   const data = response.json()
