@@ -28,3 +28,17 @@ export const getStore = async (id: string) => {
   const data = response.json()
   return data
 }
+
+export const getAdminStore = async () => {
+  const token = getAccessTokenHelper()
+  const response = await fetch(`${url}/stores/admin`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+
+  })
+  const data = response.json()
+  return data
+}

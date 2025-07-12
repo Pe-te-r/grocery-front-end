@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 export const Route = createFileRoute('/dashboard/applications')({
   component: VendorApplicationPage,
 })
@@ -258,13 +258,13 @@ function VendorApplicationPage() {
                   <p className="text-gray-600 mb-6">
                     Thank you for applying to become a GroceryStore vendor. Our team will review your application and contact you within 3-5 business days.
                   </p>
-                  <button
+                  <Link
+                    to='/dashboard'
                     type="button"
-                    onClick={() => setSubmitSuccess(false)}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     Back to Home
-                  </button>
+                  </Link>
                 </motion.div>
               ) : (
                 <motion.div

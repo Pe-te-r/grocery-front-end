@@ -23,6 +23,7 @@ import {
   Heart,
   FileSignature,
   LocationEditIcon,
+  ShoppingBagIcon,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -198,6 +199,18 @@ export const SidebarDashboard = (role: Props) => {
         icon: LocationEditIcon,
         path: "/dashboard/locations",
         roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+      },
+      {
+
+        name: "Shops",
+        icon: ShoppingBagIcon,
+        path: "/dashboard/shops",
+        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+        subItems: [
+          { name: "All shops", path: "/dashboard/shops" },
+          { name: "Approved shops", path: "/dashboard/shops/approved" },
+          { name: "Pending shops", path: "/dashboard/shops/pending" },
+        ]
       },
       {
         name: "Products",

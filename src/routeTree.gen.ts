@@ -23,6 +23,7 @@ import { Route as DashboardApplicationsRouteImport } from './routes/dashboard/ap
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as DashboardShopsIndexRouteImport } from './routes/dashboard/shops/index'
 import { Route as DashboardProductsIndexRouteImport } from './routes/dashboard/products/index'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardUsersVendorsRouteImport } from './routes/dashboard/users/vendors'
@@ -103,6 +104,11 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardShopsIndexRoute = DashboardShopsIndexRouteImport.update({
+  id: '/shops/',
+  path: '/shops/',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProductsIndexRoute = DashboardProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
   '/dashboard/products': typeof DashboardProductsIndexRoute
+  '/dashboard/shops': typeof DashboardShopsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
   '/dashboard/products': typeof DashboardProductsIndexRoute
+  '/dashboard/shops': typeof DashboardShopsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -225,6 +233,7 @@ export interface FileRoutesById {
   '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
   '/dashboard/products/': typeof DashboardProductsIndexRoute
+  '/dashboard/shops/': typeof DashboardShopsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/vendors'
     | '/dashboard/orders'
     | '/dashboard/products'
+    | '/dashboard/shops'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/vendors'
     | '/dashboard/orders'
     | '/dashboard/products'
+    | '/dashboard/shops'
   id:
     | '__root__'
     | '/'
@@ -301,6 +312,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/vendors'
     | '/dashboard/orders/'
     | '/dashboard/products/'
+    | '/dashboard/shops/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -415,6 +427,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/shops/': {
+      id: '/dashboard/shops/'
+      path: '/shops'
+      fullPath: '/dashboard/shops'
+      preLoaderRoute: typeof DashboardShopsIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/products/': {
       id: '/dashboard/products/'
       path: '/products'
@@ -496,6 +515,7 @@ interface DashboardRouteChildren {
   DashboardUsersVendorsRoute: typeof DashboardUsersVendorsRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
   DashboardProductsIndexRoute: typeof DashboardProductsIndexRoute
+  DashboardShopsIndexRoute: typeof DashboardShopsIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -513,6 +533,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardUsersVendorsRoute: DashboardUsersVendorsRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
   DashboardProductsIndexRoute: DashboardProductsIndexRoute,
+  DashboardShopsIndexRoute: DashboardShopsIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
