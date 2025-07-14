@@ -50,7 +50,8 @@ export const useCartStore = create<CartState>()(
               price: product.price,
               imageUrl: product.imageUrl,
               quantity: 1,
-              stock: product.stock
+              stock: product.stock,
+              store_id: product.store.id
             }
           ]
         });

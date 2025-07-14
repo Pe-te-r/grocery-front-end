@@ -187,6 +187,7 @@ export interface CartItem {
   imageUrl: string;
   quantity: number;
   stock: number;
+  store_id: string;
 }
 
 export interface CartState {

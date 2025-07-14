@@ -14,6 +14,8 @@ import { ProductsStep } from '@/components/checkout/ProductsStep';
 import { LocationStep } from '@/components/checkout/LocationStep';
 import { DeliveryStep } from '@/components/checkout/DeliveryStep';
 import { PaymentStep } from '@/components/checkout/PaymentStep';
+import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook';
+import { useCountyQuery } from '@/hooks/countyHook';
 
 export function CheckoutPage() {
   const { cartItems, totalPrice, clearCart } = useCart();
@@ -29,6 +31,9 @@ export function CheckoutPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+
+  const { data: countiesData } = useCountyQuery ();
+  const { data: constituenciesData } = useGetconstituenciesByCounty(orderData.county);
 
   // Mock pickup stations
   const PICKUP_STATIONS = [
@@ -117,6 +122,8 @@ export function CheckoutPage() {
               pickupStations={PICKUP_STATIONS}
               onBack={() => setCurrentStep('products')}
               onNext={() => setCurrentStep('delivery')}
+              counties={countiesData?.data || []}
+              constituencies={constituenciesData?.data || []}
             />
           )}
 
