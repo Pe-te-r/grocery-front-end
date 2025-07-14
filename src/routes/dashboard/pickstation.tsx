@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/dashboard/pickstation')({
   component: AdminPickupStations,
 })
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useCountyQuery } from '@/hooks/countyHook';
@@ -11,30 +11,28 @@ import PickupStationCard from '@/components/PickupStation/PickupStationCard';
 import PaginationControls from '@/components/PickupStation/PaginationControls';
 import AddEditStationModal from '@/components/PickupStation/AddEditStationModal';
 import SearchBar from '@/components/PickupStation/SearchBar';
+import { useCreatePickupStation, usePickupStationsQuery } from '@/hooks/pickStationHook';
+import toast from 'react-hot-toast';
 
 // Mock data - replace with your API calls
-const mockPickupStations = [
-  {
-    id: '1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p',
-    name: 'Westlands Grocery Hub',
-    contactPhone: '+254712345678',
-    constituency: {
-      id: '7aa72fe6-5d59-4258-9d03-107777296db1',
-      name: 'Changamwe'
-    },
-    county: {
-      id: '3a8d56df-031b-4164-b060-f6b25cda8629',
-      county_code: '01',
-      county_name: 'Mombasa County',
-      county_initials: 'MSA'
-    },
-    openingTime: '08:00',
-    closingTime: '18:00'
+interface mockPickupStations {
+  id: '',
+  name: '',
+  contactPhone: '',
+  constituency: {
+    id: '',
+    name: ''
   },
-  // Add more mock data as needed
-];
-
-function AdminPickupStations(){
+  county: {
+    id: '',
+    county_code: '',
+    county_name: '',
+    county_initials: ''
+  },
+  openingTime: '',
+  closingTime: ''
+}
+function AdminPickupStations() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(20);
@@ -42,13 +40,19 @@ function AdminPickupStations(){
   const [editingStation, setEditingStation] = useState(null);
 
   const { data: countiesData } = useCountyQuery();
-  const [pickupStations, setPickupStations] = useState(mockPickupStations);
+  const [pickupStations, setPickupStations] = useState<mockPickupStations[]>([]);
 
   // Filter stations based on search term
   const filteredStations = pickupStations.filter(station =>
     station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     station.constituency.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const { data, isSuccess } = usePickupStationsQuery()
+  const createMutate = useCreatePickupStation()
+  useEffect(() => {
+    console.log('data',data)
+    if (data) setPickupStations(data)
+  }, [data, isSuccess])
 
   // Pagination logic
   const totalPages = Math.ceil(filteredStations.length / itemsPerPage);
@@ -59,6 +63,11 @@ function AdminPickupStations(){
 
   const handleAddStation = (newStation: any) => {
     console.log('Adding new station:', newStation);
+    createMutate.mutate(newStation, {
+      onSuccess: () => {
+        toast.success('Pick station added success')
+      }
+    })
     // In a real app: setPickupStations([...pickupStations, newStation]);
   };
 
