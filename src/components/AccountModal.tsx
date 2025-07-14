@@ -3,6 +3,7 @@ import { X, LogOut, Shield, ShieldOff, Edit } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Loading } from './Loading';
 import {  getUserIdHelper, logoutUserHelper } from '@/lib/authHelper';
+import { useNavigate } from '@tanstack/react-router';
 
 interface AccountModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface AccountModalProps {
 
 export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
   const userId = getUserIdHelper() ?? ''
+  const navigate = useNavigate()
   const { data, isSuccess, isLoading } = userByIdHook(userId, { account_modal: true })
   const [userData, setUser] = useState({
     profileImage: 'https://randomuser.me/api/portraits/men/1.jpg',
@@ -72,19 +74,6 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
           : <>
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto max-h-[calc(100vh-200px)] sm:max-h-none">
                 <div className="flex flex-col sm:flex-row gap-6">
-
-                  {/* Profile image section */}
-                  {/* <div className="flex flex-col items-center">
-                    <img
-                      src={userData.profileImage}
-                      alt="Profile"
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-green-100"
-                    />
-                    <button className="mt-3 text-sm text-green-600 hover:text-green-800 flex items-center">
-                      <Edit className="w-4 h-4 mr-1" />
-                      Change Photo
-                    </button>
-                  </div> */}
 
                   {/* User details - single column on mobile */}
                   <div className="flex-1 w-full">
@@ -157,6 +146,7 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
                   onClick={() => {
                     logoutUserHelper()
                     onClose();
+                    navigate({to:'/'})
                   }}
                 >
                   <LogOut className="w-5 h-5 mr-2 inline" />

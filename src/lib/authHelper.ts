@@ -2,7 +2,6 @@
 
 import useAuthStore from "@/store/authStore";
 import { UserRole, type Tokens,  type UserAuthType } from "@/util/types";
-import { useNavigate } from "@tanstack/react-router";
 
 // === READ HELPERS ===
 
@@ -62,7 +61,6 @@ export const isUserVerifiedHelper = () => isUserVerified();
 export const isAuthenticatedHelper = () => isAuthenticated();
 export const loginUserHelper = (tokens: Tokens, userData: UserAuthType) => loginUser(tokens, userData);
 export const logoutUserHelper = () => {
-  // navigate({to:'/login'})
   logoutUser();
 }
 export const updateAccessTokenHelper = (accessToken: string) => updateAccessToken(accessToken);

@@ -16,6 +16,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardWalletRouteImport } from './routes/dashboard/wallet'
 import { Route as DashboardShopRouteImport } from './routes/dashboard/shop'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
 import { Route as DashboardPickstationRouteImport } from './routes/dashboard/pickstation'
@@ -68,6 +69,11 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardWalletRoute = DashboardWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardShopRoute = DashboardShopRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/dashboard/pickstation'
     | '/dashboard/settings'
     | '/dashboard/shop'
+    | '/dashboard/wallet'
     | '/dashboard/'
     | '/products'
     | '/dashboard/products/add'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/dashboard/pickstation'
     | '/dashboard/settings'
     | '/dashboard/shop'
+    | '/dashboard/wallet'
     | '/dashboard'
     | '/products'
     | '/dashboard/products/add'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/dashboard/pickstation'
     | '/dashboard/settings'
     | '/dashboard/shop'
+    | '/dashboard/wallet'
     | '/dashboard/'
     | '/products/'
     | '/dashboard/products/add'
@@ -388,6 +400,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/wallet': {
+      id: '/dashboard/wallet'
+      path: '/wallet'
+      fullPath: '/dashboard/wallet'
+      preLoaderRoute: typeof DashboardWalletRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/shop': {
@@ -525,6 +544,7 @@ interface DashboardRouteChildren {
   DashboardPickstationRoute: typeof DashboardPickstationRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
   DashboardShopRoute: typeof DashboardShopRoute
+  DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardProductsAddRoute: typeof DashboardProductsAddRoute
   DashboardProductsCategoryRoute: typeof DashboardProductsCategoryRoute
@@ -544,6 +564,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardPickstationRoute: DashboardPickstationRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
   DashboardShopRoute: DashboardShopRoute,
+  DashboardWalletRoute: DashboardWalletRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardProductsAddRoute: DashboardProductsAddRoute,
   DashboardProductsCategoryRoute: DashboardProductsCategoryRoute,
