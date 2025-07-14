@@ -208,3 +208,27 @@ export enum CodeReason {
   ACCOUNT_RECOVERY = 'account_recovery',
   SECURITY_ALERT = 'security_alert'
 }
+
+interface County {
+  id: string;
+  county_code: string;
+  county_name: string;
+  county_initials: string;
+}
+
+interface Constituency {
+  id: string;
+  name: string;
+}
+
+export interface PickupStation {
+  id: string;
+  name: string;
+  contactPhone: string;
+  constituency: Constituency;
+  county: County;
+  openingTime: string;
+  closingTime: string;
+  createdAt?: string;  // Optional if your API includes timestamps
+  updatedAt?: string;  // Optional if your API includes timestamps
+}

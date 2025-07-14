@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook';
 
 interface AddEditStationModalProps {
@@ -15,6 +15,8 @@ interface AddEditStationModalProps {
   }>;
   initialData: any;
   onSubmit: (data: any) => void;
+  isLoading: boolean;
+
 }
 
 const AddEditStationModal = ({
@@ -22,7 +24,8 @@ const AddEditStationModal = ({
   onClose,
   counties,
   initialData,
-  onSubmit
+  onSubmit,
+  isLoading
 }: AddEditStationModalProps) => {
   const [selectedCounty, setSelectedCounty] = useState<string | null>(null);
   const { data } = useGetconstituenciesByCounty(selectedCounty || '');
@@ -48,7 +51,6 @@ const AddEditStationModal = ({
       };
 
       onSubmit(stationData);
-      onClose();
     },
   });
 
@@ -260,7 +262,9 @@ const AddEditStationModal = ({
                   type="submit"
                   className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                 >
-                  {initialData ? 'Update Station' : 'Add Station'}
+                {initialData ? 'Update Station' :
+                 isLoading ? <Loader2 className="animate-spin" size={18} />:
+                  'Add Station'}
                 </button>
               </div>
             </form>

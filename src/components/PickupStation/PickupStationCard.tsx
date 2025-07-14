@@ -1,33 +1,21 @@
-import { motion } from 'framer-motion';
-import { Clock, Phone, MapPin, Edit, Trash2 } from 'lucide-react';
+import type { PickupStation } from '@/util/types';
+import { Clock, Phone, MapPin, Edit, Trash2, Loader2 } from 'lucide-react';
 
 interface PickupStationCardProps {
-  station: {
-    id: string;
-    name: string;
-    contactPhone: string;
-    constituency: {
-      id: string;
-      name: string;
-    };
-    county: {
-      county_name: string;
-    };
-    openingTime: string;
-    closingTime: string;
-  };
+  station: PickupStation;
   onEdit: () => void;
   onDelete: (id: string) => void;
+  isDeleting?: boolean;
 }
 
-const PickupStationCard = ({ station, onEdit, onDelete }: PickupStationCardProps) => {
+const PickupStationCard = ({ station, onEdit, onDelete, isDeleting }: PickupStationCardProps) => {
   return (
-    <motion.div
-      initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="bg-white rounded-xl shadow-md overflow-hidden border border-green-100 hover:shadow-lg transition-shadow"
-    >
+    <div className="bg-white rounded-xl shadow-md overflow-hidden border border-green-100 hover:shadow-lg transition-shadow relative">
+      {isDeleting && (
+        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center z-10">
+          <Loader2 className="animate-spin text-white" size={24} />
+        </div>
+      )}
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-semibold text-green-800">{station.name}</h3>
@@ -35,14 +23,14 @@ const PickupStationCard = ({ station, onEdit, onDelete }: PickupStationCardProps
             <button
               onClick={onEdit}
               className="text-green-600 hover:text-green-800"
-              aria-label="Edit station"
+              disabled={isDeleting}
             >
               <Edit size={18} />
             </button>
             <button
               onClick={() => onDelete(station.id)}
               className="text-red-500 hover:text-red-700"
-              aria-label="Delete station"
+              disabled={isDeleting}
             >
               <Trash2 size={18} />
             </button>
@@ -69,7 +57,7 @@ const PickupStationCard = ({ station, onEdit, onDelete }: PickupStationCardProps
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

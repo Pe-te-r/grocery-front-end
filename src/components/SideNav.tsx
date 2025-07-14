@@ -25,6 +25,7 @@ import {
   LocationEditIcon,
   ShoppingBagIcon,
   LucideShoppingBag,
+  PickaxeIcon,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -202,10 +203,15 @@ export const SidebarDashboard = (role: Props) => {
         roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
       },
       {
-
         name: "Shops",
         icon: ShoppingBagIcon,
         path: "/dashboard/shops",
+        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+      },
+      {
+        name: "Pickup Stations",
+        icon: PickaxeIcon,
+        path: "/dashboard/pickstation",
         roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
       },
       {
