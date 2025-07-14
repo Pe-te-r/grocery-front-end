@@ -110,6 +110,7 @@ export function CheckoutPage() {
           phone: orderData.useSystemNumber ? 'SYSTEM_NUMBER' : orderData.phoneNumber
         })
       },
+      subCounty: orderData.subCounty,
       totalAmount
     }
     

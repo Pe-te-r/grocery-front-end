@@ -115,7 +115,7 @@ export function LocationStep({
               >
                 <option value="">Select Sub-County</option>
                 {orderData.countyId && constituencies.map((constituency) => (
-                  <option key={constituency.id} value={constituency.name}>{constituency.name}</option>
+                  <option key={constituency.id} value={constituency.id}>{constituency.name}</option>
                 ))}
               </select>
               <MapPin className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 pointer-events-none" />
