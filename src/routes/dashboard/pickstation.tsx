@@ -39,6 +39,7 @@ function AdminPickupStations() {
   // Mutations
   const createMutation = useCreatePickupStation();
   const updateMutation = useUpdatePickupStation();
+  const [is24Hour, setIs24Hour] = useState(false)
   const deleteMutation = useDeletePickupStation();
 
   // Filter stations based on search term (now handled by API)
@@ -154,6 +155,21 @@ function AdminPickupStations() {
                 setPage(1); // Reset to first page when searching
               }}
             />
+            <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border border-gray-200">
+              <span className="text-sm text-gray-600">Time Format:</span>
+              <button
+                onClick={() => setIs24Hour(false)}
+                className={`px-2 py-1 text-sm rounded-md ${!is24Hour ? 'bg-green-100 text-green-800' : 'text-gray-600'}`}
+              >
+                12h
+              </button>
+              <button
+                onClick={() => setIs24Hour(true)}
+                className={`px-2 py-1 text-sm rounded-md ${is24Hour ? 'bg-green-100 text-green-800' : 'text-gray-600'}`}
+              >
+                24h
+              </button>
+            </div>
             <button
               onClick={() => {
                 setEditingStation(null);
@@ -189,6 +205,7 @@ function AdminPickupStations() {
             >
               {filteredStations.map((station: PickupStation) => (
                 <PickupStationCard
+                  is24Hour={is24Hour}
                   key={station.id}
                   station={station}
                   onEdit={() => {

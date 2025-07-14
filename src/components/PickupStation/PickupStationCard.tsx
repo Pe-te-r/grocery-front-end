@@ -1,3 +1,4 @@
+import { formatTime } from '@/lib/utils';
 import type { PickupStation } from '@/util/types';
 import { Clock, Phone, MapPin, Edit, Trash2, Loader2 } from 'lucide-react';
 
@@ -6,9 +7,10 @@ interface PickupStationCardProps {
   onEdit: () => void;
   onDelete: (id: string) => void;
   isDeleting?: boolean;
+  is24Hour: boolean;
 }
 
-const PickupStationCard = ({ station, onEdit, onDelete, isDeleting }: PickupStationCardProps) => {
+const PickupStationCard = ({ station, onEdit, onDelete, isDeleting,is24Hour }: PickupStationCardProps) => {
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden border border-green-100 hover:shadow-lg transition-shadow relative">
       {isDeleting && (
@@ -52,7 +54,7 @@ const PickupStationCard = ({ station, onEdit, onDelete, isDeleting }: PickupStat
           <div className="flex items-center gap-2">
             <Clock size={16} className="text-green-600" />
             <span>
-              {station.openingTime} - {station.closingTime}
+              {formatTime(station.openingTime, is24Hour)} - {formatTime(station.closingTime, is24Hour)}
             </span>
           </div>
         </div>
