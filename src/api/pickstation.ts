@@ -87,3 +87,24 @@ export const deletePickupStation = async (id: string) => {
 
   return response.json();
 };
+
+
+export const fetchPickupStationsByCounty = async (id: string) => {
+  const token = getAuthTokens()?.accessToken;
+  let url = `${BASE_URL}/pickup-stations/${id}/county`;
+
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch pickup stations');
+  }
+
+  return response.json();
+};

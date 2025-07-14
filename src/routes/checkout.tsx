@@ -24,6 +24,7 @@ export function CheckoutPage() {
   const [orderData, setOrderData] = useState({
     county: '',
     subCounty: '',
+    pickStation:null,
     deliveryOption: 'pickup' as 'pickup' | 'delivery',
     deliveryInstructions: '',
     paymentMethod: 'mpesa' as 'mpesa' | 'wallet' | 'card',
@@ -37,12 +38,6 @@ export function CheckoutPage() {
   const { data: countiesData } = useCountyQuery();
   const { data: constituenciesData } = useGetconstituenciesByCounty(orderData.county);
 
-  // Mock pickup stations
-  const PICKUP_STATIONS = [
-    { id: '1', name: 'Nairobi CBD', address: 'Moi Avenue, Shop No. 5' },
-    { id: '2', name: 'Westlands', address: 'Westgate Mall, Food Court' },
-    { id: '3', name: 'Kasarani', address: 'Thika Road Mall, Ground Floor' },
-  ];
 
   // Calculate fees
   // const pickupFee = Number(totalPrice) * 0.10;
@@ -66,7 +61,6 @@ export function CheckoutPage() {
         location: {
           county: orderData.county,
           subCounty: orderData.subCounty,
-          ...(orderData.deliveryOption === 'pickup' && { pickupStation: PICKUP_STATIONS[0] })
         },
         delivery: {
           option: orderData.deliveryOption,
@@ -103,6 +97,7 @@ export function CheckoutPage() {
         instructions: orderData.deliveryInstructions,
         fee: orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee
       },
+      location: {orderData},
       products,
       payment: {
         method: orderData.paymentMethod,
@@ -153,7 +148,6 @@ export function CheckoutPage() {
             <LocationStep
               orderData={orderData}
               setOrderData={setOrderData}
-              pickupStations={PICKUP_STATIONS}
               onBack={() => setCurrentStep('products')}
               onNext={() => setCurrentStep('delivery')}
               counties={countiesData?.data || []}
