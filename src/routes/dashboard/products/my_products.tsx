@@ -205,7 +205,7 @@ function VendorProductsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
-  const { data, isLoading, isError, error } = productsByUserIdHook(userId);
+  const { data, isLoading, isError, error } = productsByUserIdHook(userId)
 
   // Filter products based on active tab
   const filteredProducts = data?.data?.filter((product: any) =>
