@@ -12,7 +12,13 @@ export function OrderSuccess({
   deliveryOption: string;
   deliveryFee: number;
   location: string;
-}) {
+  }) {
+  console.log({
+    totalAmount,
+    deliveryOption,
+    deliveryFee,
+    location
+  })
   return (
     <motion.div
       initial={{ opacity: 0 }}

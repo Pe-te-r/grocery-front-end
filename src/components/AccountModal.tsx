@@ -74,7 +74,7 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
                 <div className="flex flex-col sm:flex-row gap-6">
 
                   {/* Profile image section */}
-                  <div className="flex flex-col items-center">
+                  {/* <div className="flex flex-col items-center">
                     <img
                       src={userData.profileImage}
                       alt="Profile"
@@ -84,7 +84,7 @@ export const AccountModal = ({ isOpen, onClose }: AccountModalProps) => {
                       <Edit className="w-4 h-4 mr-1" />
                       Change Photo
                     </button>
-                  </div>
+                  </div> */}
 
                   {/* User details - single column on mobile */}
                   <div className="flex-1 w-full">

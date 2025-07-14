@@ -4,18 +4,19 @@ export const Route = createFileRoute('/checkout')({
   component: CheckoutPage,
 })
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '@/lib/cartHelper';
 import { EmptyCart } from '@/components/checkout/EmptyCart';
 import { OrderSuccess } from '@/components/checkout/OrderSuccess';
 import { CheckoutSteps } from '@/components/checkout/CheckoutSteps';
 import { ProductsStep } from '@/components/checkout/ProductsStep';
-import { LocationStep } from '@/components/checkout/LocationStep';
 import { DeliveryStep } from '@/components/checkout/DeliveryStep';
 import { PaymentStep } from '@/components/checkout/PaymentStep';
 import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook';
 import { useCountyQuery } from '@/hooks/countyHook';
+import { getUserIdHelper } from '@/lib/authHelper';
+import { LocationStep } from '@/components/checkout/LocationStep';
 
 export function CheckoutPage() {
   const { cartItems, totalPrice, clearCart } = useCart();
@@ -27,12 +28,13 @@ export function CheckoutPage() {
     deliveryInstructions: '',
     paymentMethod: 'mpesa' as 'mpesa' | 'wallet' | 'card',
     phoneNumber: '',
-    useSystemNumber: true
+    useSystemNumber: true,
+    store: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  const { data: countiesData } = useCountyQuery ();
+  const { data: countiesData } = useCountyQuery();
   const { data: constituenciesData } = useGetconstituenciesByCounty(orderData.county);
 
   // Mock pickup stations
@@ -43,11 +45,17 @@ export function CheckoutPage() {
   ];
 
   // Calculate fees
-  const pickupFee = Number(totalPrice) * 0.10;
-  const deliveryFee = Number(totalPrice) * 0.15;
-  const totalAmount = Number(totalPrice) +
-    (orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee);
-
+  // const pickupFee = Number(totalPrice) * 0.10;
+  // const deliveryFee = Number(totalPrice) * 0.15;
+  const [totalAmount,setTotalAmount] = useState(0)
+  const [deliveryFee, setDeliveryFee] = useState(0)
+  const [pickupFee, sePickupFee] = useState(0)
+  useEffect(() => {
+    setDeliveryFee(Number(totalPrice) * 0.15)
+    sePickupFee(Number(totalPrice) * 0.10)
+    setTotalAmount(Number(totalPrice) +
+    (orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee))
+  },[])
   const handleSubmitOrder = () => {
     setIsSubmitting(true);
 
@@ -74,18 +82,43 @@ export function CheckoutPage() {
         totalAmount,
         createdAt: new Date().toISOString()
       };
-
-      console.log('Order submitted:', orderPayload);
+     
       setIsSubmitting(false);
       setOrderSuccess(true);
       clearCart();
     }, 2000);
+
+    const products: { item_id: string, quantity: number, store_id: string }[] = []
+    cartItems.forEach((item) => {
+      products.push({
+        item_id: item.id,
+        quantity: item.quantity,
+        store_id: item.store_id
+      })
+    })
+    const order_data = {
+      customer_id: getUserIdHelper() ?? '',
+      delivery: {
+        option: orderData.deliveryOption,
+        instructions: orderData.deliveryInstructions,
+        fee: orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee
+      },
+      products,
+      payment: {
+        method: orderData.paymentMethod,
+        ...(orderData.paymentMethod === 'mpesa' && {
+          phone: orderData.useSystemNumber ? 'SYSTEM_NUMBER' : orderData.phoneNumber
+        })
+      },
+      totalAmount
+    }
+    
+    console.log('Order submitted:', order_data);
   };
 
   if (cartItems.length === 0 && !orderSuccess) {
     return <EmptyCart />;
   }
-
   if (orderSuccess) {
     return <OrderSuccess
       totalAmount={totalAmount}

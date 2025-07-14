@@ -2,6 +2,7 @@
 
 import useAuthStore from "@/store/authStore";
 import { UserRole, type Tokens,  type UserAuthType } from "@/util/types";
+import { useNavigate } from "@tanstack/react-router";
 
 // === READ HELPERS ===
 
@@ -48,6 +49,7 @@ export const verifyCurrentUser = (): void =>
   useAuthStore.getState().verifyUser();
 
 // === CAMEL CASE HELPERS ===
+// const navigate = useNavigate()
 
 // export const getAuthUserHelper = () => getAuthUser();
 export const getAuthTokensHelper = () => getAuthTokens();
@@ -59,7 +61,10 @@ export const getUserRoleHelper = () => getUserRole() || UserRole.GUEST;
 export const isUserVerifiedHelper = () => isUserVerified();
 export const isAuthenticatedHelper = () => isAuthenticated();
 export const loginUserHelper = (tokens: Tokens, userData: UserAuthType) => loginUser(tokens, userData);
-export const logoutUserHelper = () => logoutUser();
+export const logoutUserHelper = () => {
+  // navigate({to:'/login'})
+  logoutUser();
+}
 export const updateAccessTokenHelper = (accessToken: string) => updateAccessToken(accessToken);
 export const updateUserDataHelper = (partialUser: Partial<UserAuthType>) => updateUserData(partialUser);
 export const verifyCurrentUserHelper = () => verifyCurrentUser();

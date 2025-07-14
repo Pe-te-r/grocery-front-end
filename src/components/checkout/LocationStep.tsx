@@ -69,7 +69,7 @@ export function LocationStep({
                 setOrderData({
                   ...orderData,
                   deliveryOption: 'pickup',
-                  county: 'Nairobi', // Default county for pickup
+                  county: 'Nairobi City County', // Default county for pickup
                   countyId: '1', // Assuming Nairobi has ID 1
                   subCounty: station.name
                 });
