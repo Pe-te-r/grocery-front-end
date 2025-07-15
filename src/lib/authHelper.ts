@@ -1,7 +1,8 @@
 // authHelpers.ts
 
 import useAuthStore from "@/store/authStore";
-import { UserRole, type Tokens,  type UserAuthType } from "@/util/types";
+import { UserRole, type Tokens, type UserAuthType } from "@/util/types";
+import { handleTokenRefresh, isTokenExpired } from "./utils";
 
 // === READ HELPERS ===
 
@@ -9,8 +10,30 @@ import { UserRole, type Tokens,  type UserAuthType } from "@/util/types";
 
 export const getAuthTokens = (): Tokens | null => useAuthStore.getState().tokens;
 
-export const getAccessToken = (): string | null =>
-  useAuthStore.getState().tokens?.accessToken || null;
+export const getAccessToken = async (): Promise<string> => {
+  console.log('one')
+  // 1. Get current token from store
+  const token = useAuthStore.getState().tokens?.accessToken;
+  console.log('two')
+
+  // 2. If no token exists, try to refresh
+  if (!token) {
+    console.log('three')
+    return await handleTokenRefresh();
+  }
+
+  console.log('four')
+  // 3. Check if token is expired
+  if (isTokenExpired(token)) {
+    console.log('five')
+    return await handleTokenRefresh();
+  }
+  console.log('six')
+
+  // 4. Return valid token
+  return token;
+};
+
 
 export const getRefreshToken = (): string | null =>
   useAuthStore.getState().tokens?.refreshToken || null;
@@ -52,7 +75,10 @@ export const verifyCurrentUser = (): void =>
 
 // export const getAuthUserHelper = () => getAuthUser();
 export const getAuthTokensHelper = () => getAuthTokens();
-export const getAccessTokenHelper = () => getAccessToken();
+export const getAccessTokenHelper =async () => {
+  return await getAccessToken();
+  
+}
 export const getRefreshTokenHelper = () => getRefreshToken();
 export const getUserIdHelper = () => getUserId();
 export const getUserEmailHelper = () => getUserEmail();

@@ -1,9 +1,9 @@
-import { getAuthTokens } from "@/lib/authHelper";
+import { getAccessTokenHelper } from "@/lib/authHelper";
 import { url } from "./url";
 import type { ProductForm } from "@/util/types";
 
 export const createProductFn = async (data: ProductForm) => {
-  const token = getAuthTokens()?.accessToken
+  const token = getAccessTokenHelper()
 
   const response = await fetch(`${url}/products`, {
     method: 'POST',

@@ -1,4 +1,4 @@
-import { getAuthTokens } from "@/lib/authHelper"
+import {  getAccessTokenHelper } from "@/lib/authHelper"
 import { url } from "./url"
 import type { allUserQuery, updateSettingProfileType } from "@/util/types"
 
@@ -26,7 +26,8 @@ function buildQueryParams2(params: allUserQuery ): string {
 
 
 export const getUserByIdFn = async (id: string, params: Record<string, boolean> = {}) => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
+  console.log('token here',token)
   const queryString = buildQueryParams(params)
   const fullUrl = `${url}/users/${id}${queryString ? `?${queryString}` : ''}`
   console.log('full url',fullUrl)
@@ -47,7 +48,7 @@ export const getUserByIdFn = async (id: string, params: Record<string, boolean> 
 
 // New function to get users with filters
 export const getUsersFn = async (params: allUserQuery = {}) => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
   const queryString = buildQueryParams2(params)
   const fullUrl = `${url}/users${queryString ? `?${queryString}` : ''}`
   console.log('full url',queryString)
@@ -64,7 +65,7 @@ export const getUsersFn = async (params: allUserQuery = {}) => {
 }
 
 export const updateUserFn = async (data: updateSettingProfileType) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   const fullUrl = `${url}/users/${data.id}`;
 
   const response = await fetch(fullUrl, {
@@ -80,7 +81,7 @@ export const updateUserFn = async (data: updateSettingProfileType) => {
 
 
 export const getProductsByUserId = async (id: string) => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
   const fullUrl = `${url}/users/${id}/products`
   console.log('full url', fullUrl)
   const response = await fetch(fullUrl, {

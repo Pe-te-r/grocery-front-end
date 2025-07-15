@@ -1,6 +1,6 @@
 import type { LoginDataType, RegisterDataTypeT } from "@/util/types";
 import { url } from "./url";
-import { getAuthTokens } from "@/lib/authHelper";
+import { getAuthTokens, getRefreshTokenHelper, getUserIdHelper } from "@/lib/authHelper";
 
 export const loginFn = async (data: LoginDataType) => {
   const response = await fetch(`${url}/auth/login`, {
@@ -125,3 +125,47 @@ export const disableTotp = async () => {
   const data_json = response.json()
   return data_json
 }
+
+// get access new token
+export const newAccessToken = async (): Promise<string | null> => {
+  try {
+    const refresh = getRefreshTokenHelper();
+
+    if (!refresh) {
+      console.error('No refresh token available');
+      return null;
+    }
+
+    const userId = getUserIdHelper();
+    if (!userId) {
+      console.error('No user ID available');
+      return null;
+    }
+
+    const fullUrl = `${url}/auth/refresh/${userId}`;
+    const response = await fetch(fullUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${refresh}`
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('data from token',data)
+
+    if (!data?.data) {
+      throw new Error('No access token in response');
+    }
+
+    return data.data as string;
+
+  } catch (error) {
+    console.error('Failed to refresh access token:', error);
+    return null;
+  }
+};
