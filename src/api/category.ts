@@ -1,6 +1,6 @@
 import type { ApiResponse, Category, Subcategory } from "@/util/types";
 import { url } from "./url";
-import { getAuthTokens } from "@/lib/authHelper";
+import { getAccessTokenHelper, getAuthTokens } from "@/lib/authHelper";
 
 export const getAllCategory = async (): Promise<ApiResponse<Category[]>> => {
   const response = await fetch(`${url}/category`, {
@@ -21,7 +21,7 @@ export const getAllSubcategoryByCategory = async (id: string): Promise<ApiRespon
 }
 
 export const deleteCategory = async (id: string): Promise<ApiResponse<null>> => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
   const response = await fetch(`${url}/category/${id}`, {
     method: 'DELETE',
     headers: {
@@ -34,7 +34,7 @@ export const deleteCategory = async (id: string): Promise<ApiResponse<null>> => 
 }
 
 export const createCategory = async(data: { name: string }) => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
 
   const response = await fetch(`${url}/category`, {
     method: 'POST',
@@ -50,7 +50,7 @@ export const createCategory = async(data: { name: string }) => {
 
 
 export const editCategory = async (id:string,data: { name: string }) => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
 
   const response = await fetch(`${url}/category/${id}`, {
     method: 'PATCH',

@@ -1,10 +1,10 @@
-import { getAuthTokens } from '@/lib/authHelper';
+import { getAccessTokenHelper } from '@/lib/authHelper';
 
 import { url as BASE_URL } from './url';
 
 // Get all pickup stations
 export const getPickupStations = async (search?: string) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   let url = `${BASE_URL}/pickup-stations`;
 
   if (search) {
@@ -28,7 +28,7 @@ export const getPickupStations = async (search?: string) => {
 
 // Create a new pickup station
 export const createPickupStation = async (data: any) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   const url = `${BASE_URL}/pickup-stations`;
 
   const response = await fetch(url, {
@@ -49,7 +49,7 @@ export const createPickupStation = async (data: any) => {
 
 // Update a pickup station
 export const updatePickupStation = async (id: string, data: any) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   const url = `${BASE_URL}/pickup-stations/${id}`;
 
   const response = await fetch(url, {
@@ -70,7 +70,7 @@ export const updatePickupStation = async (id: string, data: any) => {
 
 // Delete a pickup station
 export const deletePickupStation = async (id: string) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   const url = `${BASE_URL}/pickup-stations/${id}`;
 
   const response = await fetch(url, {
@@ -90,7 +90,7 @@ export const deletePickupStation = async (id: string) => {
 
 
 export const fetchPickupStationsByCounty = async (id: string) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   let url = `${BASE_URL}/pickup-stations/${id}/county`;
 
 

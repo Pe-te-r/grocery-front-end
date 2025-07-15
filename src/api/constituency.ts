@@ -1,25 +1,5 @@
-import { getAuthTokens } from "@/lib/authHelper"
+import { getAccessTokenHelper } from "@/lib/authHelper"
 import { url } from "./url"
-
-// export const getConstituenciesByCounty = async (county: string) => {
-//   if (!county) {
-//     throw new Error('County is required to fetch constituencies')
-//   }
-
-//   const fullUrl = `${url}/constituency?county=${encodeURIComponent(county)}`
-//   console.log('Fetching constituencies from:', fullUrl)
-
-//   const response = await fetch(fullUrl, {
-//     method: 'GET',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//   })
-
-//   const data = await response.json()
-//   console.log('data api', data)
-//   return data
-// }
 
 export const getConstituenciesByCounty = async (county: string) => {
   if (!county) {
@@ -61,7 +41,7 @@ export const createConstituencies = async (payload: {
   constituencies: string[];
 }) => {
   const fullUrl = `${url}/constituency`
-    const token = getAuthTokens()?.accessToken
+    const token = await getAccessTokenHelper()
   const response = await fetch(fullUrl, {
     method: 'POST',
     headers: {

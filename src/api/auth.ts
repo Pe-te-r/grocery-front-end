@@ -1,6 +1,6 @@
 import type { LoginDataType, RegisterDataTypeT } from "@/util/types";
 import { url } from "./url";
-import { getAuthTokens, getRefreshTokenHelper, getUserIdHelper } from "@/lib/authHelper";
+import { getAccessTokenHelper,  getRefreshTokenHelper, getUserIdHelper } from "@/lib/authHelper";
 
 export const loginFn = async (data: LoginDataType) => {
   const response = await fetch(`${url}/auth/login`, {
@@ -36,7 +36,7 @@ export const resetPasswordFn = async ({
   oldPassword: string;
   newPassword: string;
 }) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
   const response = await fetch(`${url}/auth/reset-password/${id}`, {
     method: 'POST',
     headers: {
@@ -51,7 +51,7 @@ export const resetPasswordFn = async ({
 
 export const sendCodeMail = async (email: string) => {
   console.log('email', email)
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
 
   const response = await fetch(`${url}/auth/code`, {
     method: 'POST',
@@ -66,8 +66,7 @@ export const sendCodeMail = async (email: string) => {
 }
 
 export const verifyCodeMail = async (code: string) => {
-  const token = getAuthTokens()?.accessToken;
-
+  const token = await getAccessTokenHelper()
   const response = await fetch(`${url}/auth/code/verify`, {
     method: 'POST',
     headers: {
@@ -81,7 +80,7 @@ export const verifyCodeMail = async (code: string) => {
 }
 
 export const setupTotp = async () => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
   const fullUrl = `${url}/2fa/setup`
   console.log('full url', fullUrl)
   const response = await fetch(fullUrl, {
@@ -97,7 +96,7 @@ export const setupTotp = async () => {
 
 
 export const verifyTotpMail = async (code: string) => {
-  const token = getAuthTokens()?.accessToken;
+  const token = await getAccessTokenHelper()
 
   const response = await fetch(`${url}/2fa/verify`, {
     method: 'POST',
@@ -113,7 +112,7 @@ export const verifyTotpMail = async (code: string) => {
 
 
 export const disableTotp = async () => {
-  const token = getAuthTokens()?.accessToken
+  const token = await getAccessTokenHelper()
   const fullUrl = `${url}/2fa/disable`
   const response = await fetch(fullUrl, {
     method: 'POST',

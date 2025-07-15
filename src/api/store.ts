@@ -2,7 +2,7 @@ import { getAccessTokenHelper } from "@/lib/authHelper"
 import { url } from "./url"
 
 export const createStore = async (store: any) => {
-  const token = getAccessTokenHelper()
+  const token =await getAccessTokenHelper()
   const response = await fetch(`${url}/stores`, {
     method: 'POST',
     headers: {
@@ -16,7 +16,7 @@ export const createStore = async (store: any) => {
 }
 
 export const getStore = async (id: string) => {
-  const token = getAccessTokenHelper()
+  const token =await getAccessTokenHelper()
   const response = await fetch(`${url}/stores/${id}/applied`, {
     method: 'GET',
     headers: {
@@ -30,7 +30,7 @@ export const getStore = async (id: string) => {
 }
 
 export const getAdminStore = async () => {
-  const token = getAccessTokenHelper()
+  const token =await getAccessTokenHelper()
   const response = await fetch(`${url}/stores/admin`, {
     method: 'GET',
     headers: {
@@ -44,7 +44,7 @@ export const getAdminStore = async () => {
 }
 
 export const updateStore = async (updateData: any) => {
-  const token = getAccessTokenHelper()
+  const token =await getAccessTokenHelper()
   const response = await fetch(`${url}/stores/${updateData.id}`, {
     method: 'PATCH',
     headers: {

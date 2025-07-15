@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut, Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AccountModal } from './AccountModal';
@@ -16,8 +16,11 @@ const GroceryStoreHeader = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountModal, setIsAccountModal] = useState(false);
   const { totalItems } = useCart();
+  const navigate = useNavigate()
   const logOut = () => {
     logoutUserHelper()
+    setIsLoggedIn(false)
+    navigate({to:'/'})
   }
 
   const { data, isLoading } = useCountyQuery()

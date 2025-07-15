@@ -3,7 +3,7 @@ import { url } from "./url";
 import type { ProductForm } from "@/util/types";
 
 export const createProductFn = async (data: ProductForm) => {
-  const token = getAccessTokenHelper()
+  const token =await getAccessTokenHelper()
 
   const response = await fetch(`${url}/products`, {
     method: 'POST',
