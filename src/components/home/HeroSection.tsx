@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import image1 from '../../assets/home/hero/hero1.jpeg'
@@ -24,7 +24,6 @@ export default function HeroSection() {
   const [isAutoScrolling, setIsAutoScrolling] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
   const mutate = useLoginHook()
-  const navigate = useNavigate()
   
   //
   useEffect(() => {

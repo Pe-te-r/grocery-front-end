@@ -21,7 +21,7 @@ export const formatTime = (timeString: string, is24Hour: boolean) => {
 
 
 import { jwtDecode } from "jwt-decode";
-import { getRefreshToken, logoutUserHelper, updateAccessToken, updateAccessTokenHelper } from "./authHelper";
+import { getRefreshToken, logoutUserHelper,  updateAccessTokenHelper } from "./authHelper";
 import { newAccessToken } from "@/api/auth";
 
 

@@ -3,6 +3,9 @@ import { ArrowRight, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from '@tanstack/react-router'
+import img1 from '../assets/login/img1.jpeg'
+import img2 from '../assets/login/img2.jpeg'
+import img3 from '../assets/login/img3.jpeg'
 
 type AuthFormProps = {
   mode?: 'modal' | 'page'
@@ -27,11 +30,7 @@ export const AuthForm = ({
   error = null
 }: AuthFormProps) => {
   const [showPassword, setShowPassword] = useState(false)
-  const [backgroundImages] = useState([
-    'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1550583724-b2692b85b150?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1560743641-3914f2c45636?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
-  ])
+  const [backgroundImages] = useState(['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxy4emBgYuh7SiVc3uR5yIuveql6q6Mtj6gw&s',img1, img2, img3 ])
   const [currentBgImage, setCurrentBgImage] = useState(0)
   const [internalError, setInternalError] = useState<string | null>(null)
   const form = useForm({
@@ -80,18 +79,11 @@ export const AuthForm = ({
     if (mode === 'page') {
       const interval = setInterval(() => {
         setCurrentBgImage((prev) => (prev + 1) % backgroundImages.length)
-      }, 5000)
+      }, 6000)
       return () => clearInterval(interval)
     }
   }, [mode])
 
-  // Auto-focus password field on error
-  // useEffect(() => {
-  //   if (form.state > 0 && form.state.errorMap['']) {
-  //     const passwordInput = document.getElementById('password')
-  //     passwordInput?.focus()
-  //   }
-  // }, [form.state.errorMap, form.state.submitCount])
 
   return (
     <div className={`${mode === 'page' ? 'w-full' : 'max-w-4xl mx-auto'}`}>
@@ -390,15 +382,22 @@ export const AuthForm = ({
         {mode === 'page' && (
           <div className="hidden md:flex md:w-1/2 flex-col justify-center rounded-lg p-8 relative overflow-hidden">
             {/* Background images with transition */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 overflow-hidden">
               {backgroundImages.map((img, index) => (
-                <div
+                <motion.div
                   key={index}
-                  className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${index === currentBgImage ? 'opacity-100' : 'opacity-0'}`}
-                  style={{ backgroundImage: `url(${img})` }}
+                  className="absolute inset-0 bg-cover bg-center"
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: index === currentBgImage ? 1 : 0,
+                    transition: { duration: 1 }
+                  }}
+                  style={{
+                    backgroundImage: `url(${img})`,
+                  }}
                 />
               ))}
-              <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-opacity-90 backdrop-blur-xs" />
             </div>
 
             {/* Content on top of the background */}
