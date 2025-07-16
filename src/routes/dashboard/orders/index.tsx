@@ -25,11 +25,11 @@ export default function AdminOrdersPage() {
   const { data, isLoading, error } = useOrders({
     page: currentPage,
     limit: itemsPerPage,
-    sort: '-created_at' // Sort by newest first
+    sort: '-created_at'
   });
 
   const orders = data?.data || [];
-  const totalOrders = orders.length; // In a real app, you'd get total count from API
+  const totalOrders = orders.length;
 
   if (isLoading) {
     return (

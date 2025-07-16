@@ -52,7 +52,7 @@ export const OrderCard = ({ order, onViewDetails }: OrderCardProps) => (
         </div>
         <div className="flex items-center gap-2 text-sm font-medium">
           <span>Total:</span>
-          <span className="text-green-700">${order.totalAmount}</span>
+          <span className="text-green-700">KES. {order.totalAmount}</span>
         </div>
       </div>
 

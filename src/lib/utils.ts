@@ -65,30 +65,22 @@ export function isTokenExpired(
 }
 export const handleTokenRefresh = async (): Promise<string> => {
   try {
-    console.log('1')
     // 1. Check if refresh token exists
     const refreshToken = getRefreshToken();
     if (!refreshToken) {
-      console.log('2')
       logoutUserHelper();
       return '';
     }
-    console.log('3')
     
     // 2. Attempt to get new access token
     const newToken = await newAccessToken();
-    console.log('4')
     if (!newToken) {
-      console.log('5')
       logoutUserHelper();
       return '';
     }
     
     // 3. Store and return the new token
-    console.log('6')
     updateAccessTokenHelper(newToken)
-    console.log('7')
-    console.log('token new',newToken)
 
     return newToken;
 

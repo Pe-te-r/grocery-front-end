@@ -53,7 +53,7 @@ export const OrdersTable = ({ orders, onViewDetails }: OrdersTableProps) => (
                 {new Date(order.created_at).toLocaleDateString()}
               </div>
             </td>
-            <td className="p-3 text-sm font-medium text-green-700">${order.totalAmount}</td>
+            <td className="p-3 text-sm font-medium text-green-700">KES. {order.totalAmount}</td>
             <td className="p-3 text-sm">
               <span className={`px-2 py-1 rounded-full text-xs ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                   order.status === 'completed' ? 'bg-green-100 text-green-800' :

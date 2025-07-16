@@ -11,14 +11,11 @@ import { handleTokenRefresh, isTokenExpired } from "./utils";
 export const getAuthTokens = (): Tokens | null => useAuthStore.getState().tokens;
 
 export const getAccessToken = async (): Promise<string> => {
-  console.log('one')
   // 1. Get current token from store
   const token = useAuthStore.getState().tokens?.accessToken;
-  console.log('two')
 
   // 2. If no token exists, try to refresh
   if (!token) {
-    console.log('three')
     return await handleTokenRefresh();
   }
 
