@@ -14,7 +14,7 @@ export enum UserRole {
   VENDOR = 'vendor',
   SUPERADMIN = 'superadmin',
   // ADMIN = 'admin',
-  DRIVER = 'driver'
+  // DRIVER = 'driver'
 }
 export interface RegisterDataType {
   fist_name: string;
@@ -125,7 +125,8 @@ export type Tokens = {
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
-  GUEST = 'guest'
+  GUEST = 'guest',
+  DRIVER = 'driver'
 }
 
 export interface UserAuthType {

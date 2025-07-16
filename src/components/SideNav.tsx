@@ -172,6 +172,12 @@ export const SidebarDashboard = (role: Props) => {
 
     const vendorItems = [
       {
+        name: "Orders",
+        icon: ShoppingCart,
+        path: "/dashboard/orders/vendor-orders",
+        roles: [UserRole.VENDOR],
+      },
+      {
         name: "My Shop",
         icon: LucideShoppingBag,
         path: "/dashboard/products",
@@ -179,17 +185,6 @@ export const SidebarDashboard = (role: Props) => {
         subItems: [
           { name: "My Products", path: "/dashboard/products/my_products" },
           { name: "Add Product", path: "/dashboard/products/add" },
-        ]
-      },
-      {
-        name: "Orders",
-        icon: ShoppingCart,
-        path: "/dashboard/vendor-orders",
-        roles: [UserRole.VENDOR],
-        subItems: [
-          { name: "All Orders", path: "/dashboard/orders/vendor-orders" },
-          { name: "Pending", path: "/dashboard/vendor-orders/pending" },
-          { name: "Completed", path: "/dashboard/vendor-orders/completed" },
         ]
       },
     ];
