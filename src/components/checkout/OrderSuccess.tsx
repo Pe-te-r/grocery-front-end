@@ -36,7 +36,7 @@ export function OrderSuccess({
         <div className="bg-green-50 rounded-lg p-4 mb-6 text-left">
           <h4 className="font-medium text-green-800 mb-2">Order Summary</h4>
           <p className="text-sm text-gray-700">
-            <span className="font-medium">Total:</span> KES {totalAmount.toFixed(2)}
+            <span className="font-medium">Total:</span> KES {(totalAmount +   deliveryFee).toFixed(2)}
             {deliveryOption === 'delivery' && (
               <span className="block">(Including KES {deliveryFee.toFixed(2)} delivery fee)</span>
             )}

@@ -7,7 +7,7 @@ import { userByIdHook } from '@/hooks/userHook';
 
 function WalletPage() {
   const userId = getUserIdHelper() ?? '';
-  const { data, isSuccess, isLoading } = userByIdHook(userId);
+  const { data,  isLoading } = userByIdHook(userId);
   const user = data?.data;
 
   // Static balance since it's not in user data yet

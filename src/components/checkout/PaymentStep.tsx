@@ -145,15 +145,15 @@ export function PaymentStep({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span>Subtotal:</span>
-            <span>KES {(totalAmount - (deliveryOption === 'pickup' ? pickupFee : deliveryFee)).toFixed(2)}</span>
+            <span>KES {(totalAmount).toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
             <span>{deliveryOption === 'pickup' ? 'Pickup Fee (10%)' : 'Delivery Fee (15%)'}:</span>
-            <span>KES {(deliveryOption === 'pickup' ? pickupFee : deliveryFee).toFixed(2)}</span>
+            <span>KES {deliveryFee.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-medium text-lg pt-2 border-t border-gray-200">
             <span>Total:</span>
-            <span>KES {totalAmount.toFixed(2)}</span>
+            <span>KES {(totalAmount + ( deliveryFee)).toFixed(2)}</span>
           </div>
         </div>
       </div>  

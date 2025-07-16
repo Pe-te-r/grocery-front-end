@@ -243,20 +243,43 @@ function VendorApplicationPage() {
         >
           <form onSubmit={handleSubmit}>
             <AnimatePresence mode="wait">
-              {submitSuccess || validateApplication?.data == false ? (
+              {validateApplication?.data === false ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden border border-green-100 p-8 text-center"
+                >
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-blue-800 mb-2">Application Under Review</h3>
+                  <p className="text-gray-600 mb-6">
+                    Your vendor application is currently being reviewed by our team.
+                    You'll receive a notification once a decision has been made.
+                    Please don't submit another application.
+                  </p>
+                  <Link
+                    to='/dashboard'
+                    type="button"
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Back to Dashboard
+                  </Link>
+                </motion.div>
+              ) : submitSuccess ? (
                 <motion.div
                   key="success"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="p-8 text-center"
+                  className="bg-white rounded-xl shadow-lg overflow-hidden border border-green-100 p-8 text-center"
                 >
                   <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Check className="w-10 h-10 text-green-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-green-800 mb-2">Application Submitted!</h3>
                   <p className="text-gray-600 mb-6">
-                    Thank you for applying to become a GroceryStore vendor. Our team will review your application and contact you within 3-5 business days.
+                    Thank you for applying to become a GroceryStore vendor. Our team will review
+                    your application and contact you within 3-5 business days.
                   </p>
                   <Link
                     to='/dashboard'
