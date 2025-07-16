@@ -1,4 +1,4 @@
-import { createStore, getAdminStore, getStore, updateStore } from "@/api/store"
+import { createStore, getAdminStore, getStore, getStoreOrders, updateStore } from "@/api/store"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useCreateStoreHook = () => {
@@ -26,6 +26,12 @@ export const useAdminShopsdHook = () => {
   return useQuery({
     queryKey: ['store'],
     queryFn: () => getAdminStore(),
+  });
+};
+export const useStoreOrderQuery = (id: string) => {
+  return useQuery({
+    queryKey: ['store', id],
+    queryFn: () => getStoreOrders(id),
   });
 };
 

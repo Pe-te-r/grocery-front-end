@@ -25,7 +25,21 @@ export const getStore = async (id: string) => {
     },
 
   })
-  const data = response.json()
+  const data =await response.json()
+  return data
+}
+
+export const getStoreOrders = async (id: string) => {
+  const token = await getAccessTokenHelper()
+  const response = await fetch(`${url}/stores/${id}/orders`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+
+  })
+  const data =await response.json()
   return data
 }
 

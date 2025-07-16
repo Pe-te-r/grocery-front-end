@@ -21,7 +21,6 @@ export function PaymentStep({
   isSubmitting: boolean;
 }) {
   const [mpesaOption, setMpesaOption] = useState<'system' | 'custom'>('system');
-  const pickupFee = 10;
 
   // Set M-Pesa as the only allowed payment method initially
   useState(() => {
