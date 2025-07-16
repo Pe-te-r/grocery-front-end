@@ -17,6 +17,8 @@ import { useGetconstituenciesByCounty } from '@/hooks/constituencyHook';
 import { useCountyQuery } from '@/hooks/countyHook';
 import { getUserIdHelper } from '@/lib/authHelper';
 import { LocationStep } from '@/components/checkout/LocationStep';
+import { useCreateOrder } from '@/hooks/ordersHook';
+import toast from 'react-hot-toast';
 
 export function CheckoutPage() {
   const { cartItems, totalPrice, clearCart } = useCart();
@@ -24,7 +26,7 @@ export function CheckoutPage() {
   const [orderData, setOrderData] = useState({
     county: '',
     subCounty: '',
-    pickStation:null,
+    pickStation: null,
     deliveryOption: 'pickup' as 'pickup' | 'delivery',
     deliveryInstructions: '',
     paymentMethod: 'mpesa' as 'mpesa' | 'wallet' | 'card',
@@ -42,45 +44,43 @@ export function CheckoutPage() {
   // Calculate fees
   // const pickupFee = Number(totalPrice) * 0.10;
   // const deliveryFee = Number(totalPrice) * 0.15;
-  const [totalAmount,setTotalAmount] = useState(0)
+  const [totalAmount, setTotalAmount] = useState(0)
   const [deliveryFee, setDeliveryFee] = useState(0)
   const [pickupFee, sePickupFee] = useState(0)
+  const createOrderMutate = useCreateOrder()
   useEffect(() => {
     setDeliveryFee(Number(totalPrice) * 0.15)
     sePickupFee(Number(totalPrice) * 0.10)
     setTotalAmount(Number(totalPrice) +
-    (orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee))
-  },[])
+      (orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee))
+  }, [])
   const handleSubmitOrder = () => {
     setIsSubmitting(true);
 
     // Simulate API call
-    setTimeout(() => {
-      const orderPayload = {
-        products: cartItems,
-        location: {
-          county: orderData.county,
-          subCounty: orderData.subCounty,
-        },
-        delivery: {
-          option: orderData.deliveryOption,
-          instructions: orderData.deliveryInstructions,
-          fee: orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee
-        },
-        payment: {
-          method: orderData.paymentMethod,
-          ...(orderData.paymentMethod === 'mpesa' && {
-            phone: orderData.useSystemNumber ? 'SYSTEM_NUMBER' : orderData.phoneNumber
-          })
-        },
-        totalAmount,
-        createdAt: new Date().toISOString()
-      };
-     
-      setIsSubmitting(false);
-      setOrderSuccess(true);
-      clearCart();
-    }, 2000);
+    // setTimeout(() => {
+    //   const orderPayload = {
+    //     products: cartItems,
+    //     location: {
+    //       county: orderData.county,
+    //       subCounty: orderData.subCounty,
+    //     },
+    //     delivery: {
+    //       option: orderData.deliveryOption,
+    //       instructions: orderData.deliveryInstructions,
+    //       fee: orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee
+    //     },
+    //     payment: {
+    //       method: orderData.paymentMethod,
+    //       ...(orderData.paymentMethod === 'mpesa' && {
+    //         phone: orderData.useSystemNumber ? 'SYSTEM_NUMBER' : orderData.phoneNumber
+    //       })
+    //     },
+    //     totalAmount,
+    //     createdAt: new Date().toISOString()
+    //   };
+    //   clearCart();
+    // }, 2000);
 
     const products: { item_id: string, quantity: number, store_id: string }[] = []
     cartItems.forEach((item) => {
@@ -97,7 +97,7 @@ export function CheckoutPage() {
         instructions: orderData.deliveryInstructions,
         fee: orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee
       },
-      location: {orderData},
+      location: { orderData },
       products,
       payment: {
         method: orderData.paymentMethod,
@@ -108,8 +108,18 @@ export function CheckoutPage() {
       subCounty: orderData.subCounty,
       totalAmount
     }
-    
-    console.log('Order submitted:', order_data);
+    console.log('order data', order_data)
+    createOrderMutate.mutate(order_data, {
+      onSuccess: (data) => {
+        console.log('success data', data)
+        setIsSubmitting(false);
+        setOrderSuccess(true);
+      },
+      onError: (error) => {
+        console.error('error message', error)
+        toast.error('an error occured')
+      }
+    })
   };
 
   if (cartItems.length === 0 && !orderSuccess) {
