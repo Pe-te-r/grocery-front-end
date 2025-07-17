@@ -1,5 +1,6 @@
 import { getAccessTokenHelper } from "@/lib/authHelper"
 import { url } from "./url"
+import type { OrderStatus } from "@/routes/dashboard/orders/vendor-orders"
 
 // For query parameters if needed
 function buildOrderQueryParams(params: Record<string, any>): string {
@@ -111,4 +112,20 @@ export const getOrdersByUserIdFn = async (userId: string, params: Record<string,
   })
 
   return await response.json()
+}
+
+export const updateOrderItemFn = async (id: string,
+  { itemStatus }: { itemStatus: OrderStatus }) => {
+  const token = await getAccessTokenHelper();
+  const fullUrl = `${url}/orders/items/${id}`;
+  const response = await fetch(fullUrl, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ itemStatus })
+  });
+
+  return await response.json();
 }

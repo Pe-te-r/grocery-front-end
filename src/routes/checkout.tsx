@@ -27,6 +27,7 @@ export function CheckoutPage() {
     county: '',
     subCounty: '',
     pickStation: null,
+    pickupStationId:'',
     deliveryOption: 'pickup' as 'pickup' | 'delivery',
     deliveryInstructions: '',
     paymentMethod: 'mpesa' as 'mpesa' | 'wallet' | 'card',
@@ -90,6 +91,12 @@ export function CheckoutPage() {
         store_id: item.store_id
       })
     })
+    let location_id: string ='';
+    if (orderData.deliveryOption == 'delivery') {
+      location_id = orderData.subCounty
+    } else if (orderData.deliveryOption == 'pickup') {
+      location_id = orderData.pickupStationId
+    }
     const order_data = {
       customer_id: getUserIdHelper() ?? '',
       delivery: {
@@ -97,7 +104,6 @@ export function CheckoutPage() {
         instructions: orderData.deliveryInstructions,
         fee: orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee
       },
-      location: { orderData },
       products,
       payment: {
         method: orderData.paymentMethod,
@@ -105,7 +111,7 @@ export function CheckoutPage() {
           phone: orderData.useSystemNumber ? 'SYSTEM_NUMBER' : orderData.phoneNumber
         })
       },
-      subCounty: orderData.subCounty,
+      subCounty: location_id,
       totalAmount
     }
     console.log('order data', order_data)

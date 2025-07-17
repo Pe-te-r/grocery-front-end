@@ -5,10 +5,12 @@ import {
   createOrderFn,
   updateOrderFn,
   deleteOrderFn,
-  getOrdersByUserIdFn
+  getOrdersByUserIdFn,
+  updateOrderItemFn
 } from "@/api/orders"
 import type { ApiResponse } from "@/util/types"
 import toast from "react-hot-toast"
+import type { OrderStatus } from "@/routes/dashboard/orders/vendor-orders"
 
 // Get all orders with optional filters
 export const useOrders = (params: Record<string, any> = {}) => {
@@ -99,3 +101,13 @@ export const useOrdersByUserId = (userId: string, params: Record<string, any> = 
     enabled: !!userId, // Only fetch if userId exists
   })
 }
+
+export const useUpdateOrderItem = () => {
+  return useMutation({
+    mutationFn: ({ id, itemStatus }: { id: string; itemStatus: OrderStatus }) =>
+      updateOrderItemFn(id, { itemStatus }),
+    onError: (error) => {
+      console.error('Mutation error:', error);
+    }
+  });
+};

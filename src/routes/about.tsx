@@ -1,4 +1,3 @@
-import { ParentComponent } from '@/components/codes/ParentCode';
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { Leaf, Store, HeartHandshake, Users, Phone, Mail, MapPin } from 'lucide-react';
 
@@ -11,7 +10,6 @@ export const Route = createFileRoute('/about')({
 function AboutUsPage(){
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      <ParentComponent/>
       {/* Hero Section */}
       <section className="text-center mb-16">
         <h1 className="text-4xl font-bold text-green-700 mb-4">About <span className="text-orange-500">GroceryStore</span></h1>

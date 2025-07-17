@@ -1,6 +1,6 @@
 import { useOrderById } from '@/hooks/ordersHook';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Package, CreditCard,  Phone, Mail, MapPin, Loader2, AlertCircle } from 'lucide-react';
+import { X, User, Package, CreditCard, Phone, Mail, MapPin, Loader2, AlertCircle, Home, Store } from 'lucide-react';
 
 interface OrderDetailsModalProps {
   orderId: string;
@@ -78,8 +78,8 @@ export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) 
                       <p className="flex items-center gap-2">
                         <span className="font-medium">Status:</span>
                         <span className={`px-2 py-1 text-xs rounded-full ${data.data.customer.account_status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
                           }`}>
                           {data.data.customer.account_status}
                         </span>
@@ -102,10 +102,10 @@ export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) 
                       <p>
                         <span className="font-medium">Status:</span>
                         <span className={`ml-2 px-2 py-1 text-xs rounded-full ${data.data.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : data.data.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : data.data.status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
                           }`}>
                           {data.data.status}
                         </span>
@@ -125,14 +125,50 @@ export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) 
                       <p>
                         <span className="font-medium">Payment Method:</span> {data.data.paymentMethod}
                       </p>
-                      <p>
-                        <span className="font-medium">Delivery:</span> {data.data.deliveryOption}
+                      <p className="flex items-start gap-2">
+                        <span className="font-medium">Delivery:</span>
+                        <span className="capitalize">{data.data.deliveryOption}</span>
                       </p>
                       <p>
                         <span className="font-medium">Delivery Fee:</span> KSh {data.data.deliveryFee}
                       </p>
+
+                      {/* Enhanced Delivery/Pickup Details */}
+                      <div className="mt-2 border-t pt-2">
+                        {data.data.deliveryOption === 'pickup' && data.data.pickupDetails ? (
+                          <div className="flex items-start gap-2">
+                            <Store className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" />
+                            <div>
+                              <p className="font-medium">Pickup Station</p>
+                              <p className="text-sm">{data.data.pickupDetails.name}</p>
+                              {data.data.pickupDetails.location && (
+                                <p className="text-sm text-gray-600">{data.data.pickupDetails.location}</p>
+                              )}
+                              {data.data.pickupDetails.contact && (
+                                <p className="text-sm flex items-center gap-1 mt-1">
+                                  <Phone className="w-3 h-3" /> {data.data.pickupDetails.contact}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ) : data.data.deliveryOption === 'delivery' && data.data.deliveryDetails ? (
+                          <div className="flex items-start gap-2">
+                            <Home className="w-4 h-4 mt-0.5 text-green-600 flex-shrink-0" />
+                            <div>
+                              <p className="font-medium">Delivery Area</p>
+                              <p className="text-sm">{data.data.deliveryDetails.name}</p>
+                              {data.data.deliveryDetails.deliveryFee && (
+                                <p className="text-sm text-gray-600">
+                                  Delivery fee: KSh {data.data.deliveryDetails.deliveryFee}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+
                       {data.data.deliveryInstructions && (
-                        <p>
+                        <p className="mt-2">
                           <span className="font-medium">Instructions:</span> {data.data.deliveryInstructions}
                         </p>
                       )}
