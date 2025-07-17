@@ -24,12 +24,14 @@ const VerificationModal = ({
   isOpen,
   onClose,
   onVerify,
-  orderId
+  orderId,
+  onCodeChange
 }: {
   isOpen: boolean
   onClose: () => void
   onVerify: () => void
   orderId: string
+  onCodeChange: (code: string) => void
 }) => {
   return (
     <AnimatePresence>
@@ -60,9 +62,11 @@ const VerificationModal = ({
                   <h4 className="font-medium text-green-700 mb-2">Verification Code</h4>
                   <input
                     type="text"
-                    placeholder="Enter verification code"
+                    placeholder="Enter verification code (1234)"
                     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                    onChange={(e) => onCodeChange(e.target.value)}
                   />
+                  <p className="text-xs text-gray-500 mt-1">Use code: 1234 for verification</p>
                 </div>
               </div>
 
@@ -96,7 +100,8 @@ function VendorOrdersPage() {
   const [activeTab, setActiveTab] = useState<OrderStatus>(OrderStatus.PENDING)
   const [verificationModal, setVerificationModal] = useState({
     isOpen: false,
-    orderId: ''
+    orderId: '',
+    verificationCode: ''
   })
 
   const filteredOrders = orders?.data?.filter((order: any) =>
@@ -120,14 +125,29 @@ function VendorOrdersPage() {
   }
 
   const handleVerifyPickup = (orderId: string) => {
-    setVerificationModal({ isOpen: true, orderId })
+    setVerificationModal({
+      isOpen: true,
+      orderId,
+      verificationCode: ''
+    })
+  }
+
+  const handleCodeChange = (code: string) => {
+    setVerificationModal(prev => ({
+      ...prev,
+      verificationCode: code
+    }))
   }
 
   const confirmVerification = () => {
-    // Here you would typically verify the code
-    // For now, we'll just close the modal and update status
-    setVerificationModal({ isOpen: false, orderId: '' })
-    updateOrderStatus(verificationModal.orderId, OrderStatus.COMPLETED)
+    if (verificationModal.verificationCode === '1234') {
+      // Update to IN_TRANSIT after successful verification
+      updateOrderStatus(verificationModal.orderId, OrderStatus.IN_TRANSIT)
+      setVerificationModal({ isOpen: false, orderId: '', verificationCode: '' })
+      toast.success('Pickup verified! Order is now in transit')
+    } else {
+      toast.error('Invalid verification code. Please try again.')
+    }
   }
 
   const getStatusButton = (orderItem: any) => {
@@ -152,9 +172,23 @@ function VendorOrdersPage() {
             onClick={() => handleVerifyPickup(orderItem.id)}
             className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg flex items-center gap-2 cursor-pointer"
           >
-            <Check className="w-4 h-4" />
-            Confirm Pickup
+            <Truck className="w-4 h-4" />
+            Verify Pickup
           </motion.button>
+        )
+      case OrderStatus.IN_TRANSIT:
+        return (
+          <div className="text-sm text-gray-500">
+            Status will update to completed by delivery team
+          </div>
+        )
+      case OrderStatus.COMPLETED:
+      case OrderStatus.CANCELLED:
+      case OrderStatus.REJECTED:
+        return (
+          <div className="text-sm text-gray-500">
+            Order {orderItem.itemStatus.replace(/_/g, ' ')}
+          </div>
         )
       default:
         return null
@@ -190,9 +224,10 @@ function VendorOrdersPage() {
     <div className="container mx-auto py-8">
       <VerificationModal
         isOpen={verificationModal.isOpen}
-        onClose={() => setVerificationModal({ isOpen: false, orderId: '' })}
+        onClose={() => setVerificationModal({ isOpen: false, orderId: '', verificationCode: '' })}
         onVerify={confirmVerification}
         orderId={verificationModal.orderId}
+        onCodeChange={handleCodeChange}
       />
 
       <motion.div
@@ -253,9 +288,10 @@ function VendorOrdersPage() {
                   <motion.span
                     className={`px-3 py-1 rounded-full text-xs font-medium cursor-default ${orderItem.itemStatus === OrderStatus.PENDING ? 'bg-yellow-100 text-yellow-800' :
                       orderItem.itemStatus === OrderStatus.READY_FOR_PICKUP ? 'bg-purple-100 text-purple-800' :
-                        orderItem.itemStatus === OrderStatus.COMPLETED ? 'bg-green-100 text-green-800' :
-                          orderItem.itemStatus === OrderStatus.CANCELLED ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
+                        orderItem.itemStatus === OrderStatus.IN_TRANSIT ? 'bg-blue-100 text-blue-800' :
+                          orderItem.itemStatus === OrderStatus.COMPLETED ? 'bg-green-100 text-green-800' :
+                            orderItem.itemStatus === OrderStatus.CANCELLED ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
                       }`}
                     whileHover={{ scale: 1.05 }}
                   >
