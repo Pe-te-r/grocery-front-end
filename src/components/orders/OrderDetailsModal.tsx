@@ -10,6 +10,24 @@ interface OrderDetailsModalProps {
 export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) => {
   const { data, isLoading, isError, error } = useOrderById(orderId);
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'ready_for_pickup':
+        return 'bg-blue-100 text-blue-800';
+      case 'in_transit':
+        return 'bg-purple-100 text-purple-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+      case 'rejected':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <AnimatePresence>
       <motion.div
@@ -101,13 +119,8 @@ export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) 
                       </p>
                       <p>
                         <span className="font-medium">Status:</span>
-                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${data.data.status === 'pending'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : data.data.status === 'completed'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                          }`}>
-                          {data.data.status}
+                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getStatusColor(data.data.status)}`}>
+                          {data.data.status.replace(/_/g, ' ')}
                         </span>
                       </p>
                       <p>
@@ -203,6 +216,12 @@ export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) 
                           <h5 className="font-medium">{item.product.name}</h5>
                           <p className="text-sm text-gray-600 line-clamp-2">{item.product.description}</p>
                           <p className="text-green-700 font-medium mt-1">KSh {item.product.price}</p>
+                          <div className="mt-2">
+                            <span className="font-medium">Item Status:</span>
+                            <span className={`ml-2 px-2 py-1 text-xs rounded-full ${getStatusColor(item.itemStatus)}`}>
+                              {item.itemStatus.replace(/_/g, ' ')}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Quantity & Subtotal */}
@@ -238,16 +257,6 @@ export const OrderDetailsModal = ({ orderId, onClose }: OrderDetailsModalProps) 
                     <p className="text-yellow-700">{data.data.specialInstructions}</p>
                   </div>
                 )}
-
-                {/* Actions */}
-                <div className="flex justify-end gap-4 pt-4">
-                  <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition">
-                    Print Invoice
-                  </button>
-                  <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
-                    Update Status
-                  </button>
-                </div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-gray-500">

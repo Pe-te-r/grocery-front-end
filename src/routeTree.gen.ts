@@ -36,6 +36,7 @@ import { Route as DashboardProductsMy_productsRouteImport } from './routes/dashb
 import { Route as DashboardProductsCategoryRouteImport } from './routes/dashboard/products/category'
 import { Route as DashboardProductsAddRouteImport } from './routes/dashboard/products/add'
 import { Route as DashboardOrdersVendorOrdersRouteImport } from './routes/dashboard/orders/vendor-orders'
+import { Route as DashboardDeliveriesAssignedRouteImport } from './routes/dashboard/deliveries/assigned'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -175,6 +176,12 @@ const DashboardOrdersVendorOrdersRoute =
     path: '/orders/vendor-orders',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardDeliveriesAssignedRoute =
+  DashboardDeliveriesAssignedRouteImport.update({
+    id: '/deliveries/assigned',
+    path: '/deliveries/assigned',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/dashboard/deliveries/assigned': typeof DashboardDeliveriesAssignedRoute
   '/dashboard/orders/vendor-orders': typeof DashboardOrdersVendorOrdersRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
   '/dashboard/products/category': typeof DashboardProductsCategoryRoute
@@ -221,6 +229,7 @@ export interface FileRoutesByTo {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
+  '/dashboard/deliveries/assigned': typeof DashboardDeliveriesAssignedRoute
   '/dashboard/orders/vendor-orders': typeof DashboardOrdersVendorOrdersRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
   '/dashboard/products/category': typeof DashboardProductsCategoryRoute
@@ -251,6 +260,7 @@ export interface FileRoutesById {
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/products/': typeof ProductsIndexRoute
+  '/dashboard/deliveries/assigned': typeof DashboardDeliveriesAssignedRoute
   '/dashboard/orders/vendor-orders': typeof DashboardOrdersVendorOrdersRoute
   '/dashboard/products/add': typeof DashboardProductsAddRoute
   '/dashboard/products/category': typeof DashboardProductsCategoryRoute
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/dashboard/'
     | '/products'
+    | '/dashboard/deliveries/assigned'
     | '/dashboard/orders/vendor-orders'
     | '/dashboard/products/add'
     | '/dashboard/products/category'
@@ -310,6 +321,7 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/dashboard'
     | '/products'
+    | '/dashboard/deliveries/assigned'
     | '/dashboard/orders/vendor-orders'
     | '/dashboard/products/add'
     | '/dashboard/products/category'
@@ -339,6 +351,7 @@ export interface FileRouteTypes {
     | '/dashboard/wallet'
     | '/dashboard/'
     | '/products/'
+    | '/dashboard/deliveries/assigned'
     | '/dashboard/orders/vendor-orders'
     | '/dashboard/products/add'
     | '/dashboard/products/category'
@@ -555,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardOrdersVendorOrdersRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/deliveries/assigned': {
+      id: '/dashboard/deliveries/assigned'
+      path: '/deliveries/assigned'
+      fullPath: '/dashboard/deliveries/assigned'
+      preLoaderRoute: typeof DashboardDeliveriesAssignedRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -566,6 +586,7 @@ interface DashboardRouteChildren {
   DashboardShopRoute: typeof DashboardShopRoute
   DashboardWalletRoute: typeof DashboardWalletRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardDeliveriesAssignedRoute: typeof DashboardDeliveriesAssignedRoute
   DashboardOrdersVendorOrdersRoute: typeof DashboardOrdersVendorOrdersRoute
   DashboardProductsAddRoute: typeof DashboardProductsAddRoute
   DashboardProductsCategoryRoute: typeof DashboardProductsCategoryRoute
@@ -587,6 +608,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardShopRoute: DashboardShopRoute,
   DashboardWalletRoute: DashboardWalletRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardDeliveriesAssignedRoute: DashboardDeliveriesAssignedRoute,
   DashboardOrdersVendorOrdersRoute: DashboardOrdersVendorOrdersRoute,
   DashboardProductsAddRoute: DashboardProductsAddRoute,
   DashboardProductsCategoryRoute: DashboardProductsCategoryRoute,
