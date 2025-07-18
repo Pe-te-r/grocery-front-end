@@ -111,9 +111,11 @@ function VendorOrdersPage() {
   const updateOrderStatus = async (orderItemId: string, newStatus: OrderStatus) => {
     try {
       updateItemMutate.mutate({ id: orderItemId, itemStatus: newStatus }, {
-        onSuccess: () => {
-          toast.success(`Order status updated to ${newStatus.replace(/_/g, ' ')}`)
-          refetch()
+        onSuccess: (data) => {
+          if (data && data?.status == 'success') {
+            toast.success(`Order status updated to ${newStatus.replace(/_/g, ' ')}`)
+            refetch()
+          }
         },
         onError: () => {
           toast.error('Failed to update order status')
