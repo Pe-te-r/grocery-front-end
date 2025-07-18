@@ -239,6 +239,7 @@ export const SidebarDashboard = (role: Props) => {
           { name: "Admins", path: "/dashboard/users/admins" },
           { name: "Customers", path: "/dashboard/users/customers" },
           { name: "Vendors", path: "/dashboard/users/vendors" },
+          { name: "Drivers", path: "/dashboard/users/drivers" },
         ]
       },
     ];
