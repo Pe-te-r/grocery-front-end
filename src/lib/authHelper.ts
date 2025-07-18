@@ -79,7 +79,7 @@ export const getAccessTokenHelper =async () => {
 export const getRefreshTokenHelper = () => getRefreshToken();
 export const getUserIdHelper = () => getUserId();
 export const getUserEmailHelper = () => getUserEmail();
-export const getUserRoleHelper = () => getUserRole() || UserRole.GUEST;
+export const getUserRoleHelper = () => getUserRole();
 export const isUserVerifiedHelper = () => isUserVerified();
 export const isAuthenticatedHelper = () => isAuthenticated();
 export const loginUserHelper = (tokens: Tokens, userData: UserAuthType) => loginUser(tokens, userData);

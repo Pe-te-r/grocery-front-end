@@ -13,8 +13,9 @@ export enum UserRole {
   CUSTOMER = 'customer',
   VENDOR = 'vendor',
   SUPERADMIN = 'superadmin',
-  // ADMIN = 'admin',
-  // DRIVER = 'driver'
+  ADMIN = 'admin',
+  PICKUPSTATION = 'pickupstation',
+  DRIVER = 'driver'
 }
 export interface RegisterDataType {
   fist_name: string;
@@ -122,12 +123,6 @@ export type Tokens = {
   refreshToken: string;
 };
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user',
-  GUEST = 'guest',
-  DRIVER = 'driver'
-}
 
 export interface UserAuthType {
   id: string;
@@ -158,6 +153,7 @@ export interface updateSettingProfileType {
   phone?: string;
   first_name?: string;
   last_name?: string;
+  role?: UserRole;
 }
 
 export interface SubcategoryT{

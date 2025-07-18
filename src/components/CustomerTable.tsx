@@ -81,7 +81,7 @@ const CustomerTable = () => {
   return (
     <div className="p-6 bg-white rounded-lg shadow-md">
 
-      <h2 className="text-2xl font-bold text-green-800 mb-6">Active Customers</h2>
+      <h2 className="text-2xl font-bold text-green-800 mb-6">Active users to be drivers</h2>
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -126,14 +126,15 @@ const CustomerTable = () => {
                     {customer.account_status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4  whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleMakeDriver(customer)}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="flex cursor-pointer items-center gap-2 px-5 py-2 rounded-2xl font-semibold shadow-md text-white bg-green-600 hover:bg-green-700 transition duration-300 ease-in-out"
                   >
                     Make Driver
-                    <ChevronRight className="ml-1 h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   </button>
+
                 </td>
               </motion.tr>
             ))}
@@ -147,9 +148,10 @@ const CustomerTable = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={() => setShowDriverForm(false)}
         >
+
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
@@ -209,29 +211,35 @@ const CustomerTable = () => {
             </div>
 
             <div className="mt-6 flex justify-end space-x-3">
+              {/* Cancel Button */}
               <button
                 onClick={() => setShowDriverForm(false)}
-                className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="px-6 py-2 cursor-pointer rounded-2xl font-semibold shadow-sm border border-green-600 text-green-600 hover:bg-green-50 transition duration-300 ease-in-out"
               >
                 Cancel
               </button>
+
+              {/* Submit Button */}
               <button
                 onClick={handleSubmit}
                 disabled={isPending}
-                className="bg-green-600 hover:bg-green-700 text-white"
+                className={`px-6 cursor-pointer py-2 rounded-2xl font-semibold shadow-md flex items-center justify-center gap-2 transition duration-300 ease-in-out
+      ${isPending ? 'bg-green-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'} 
+      text-white`}
               >
                 {isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (
                   <>
-                    <Check className="mr-2 h-4 w-4" />
+                    <Check className="h-4 w-4" />
                     Create Driver
                   </>
                 )}
               </button>
+
             </div>
           </motion.div>
         </motion.div>

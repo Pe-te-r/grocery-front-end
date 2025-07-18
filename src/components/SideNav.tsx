@@ -49,8 +49,7 @@ export const getUserDisplayInfo = (role: UserRole | null): UserDisplayInfo | nul
     [UserRole.VENDOR]: 'Vendor',
     [UserRole.SUPERADMIN]: 'Super Admin',
     [UserRole.DRIVER]: 'Driver',
-    [UserRole.USER]: '',
-    [UserRole.GUEST]: ''
+    [UserRole.PICKUPSTATION]: 'pickupstation'
   };
 
   return {
@@ -364,7 +363,7 @@ export const SidebarDashboard = (role: Props) => {
           <ul className="space-y-1 px-2">
             {navItems.map((item) => (
               <li key={item.name}>
-                {Array.isArray(item.subItems) && item.subItems?.length>0 ? (
+                {Array.isArray(item.subItems) && item.subItems?.length > 0 ? (
                   <>
                     <motion.button
                       onClick={() => toggleMenu(item.name.toLowerCase())}
