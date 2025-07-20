@@ -1,6 +1,6 @@
 import { useOrderById } from '@/hooks/ordersHook'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, User, Package, CreditCard, Phone, Mail, MapPin, Loader2, AlertCircle, Home, Store, Truck, Clock } from 'lucide-react'
+import { X, User, Package, CreditCard, Phone, Mail, Loader2, AlertCircle, Home, Store, Truck, Clock } from 'lucide-react'
 import { useState } from 'react'
 
 interface OrderDetailsModalProps {

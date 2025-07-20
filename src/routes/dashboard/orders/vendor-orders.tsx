@@ -3,7 +3,7 @@ import { useStoreOrderQuery } from '@/hooks/storeHook'
 import { getUserIdHelper } from '@/lib/authHelper'
 import { createFileRoute } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Package, Check, RefreshCw, X, User, Store, Home, Truck, ClipboardCheck, MapPin, ChevronDown, ChevronUp } from 'lucide-react'
+import { Package, Check, RefreshCw, X, User, Store, Home, MapPin, ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -27,7 +27,7 @@ function VendorOrdersPage() {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
 
   // Transform and group the data
-  const groupedOrders = data?.data?.reduce((groups: any[], orderItem: any) => {
+  const groupedOrders = data?.data && data?.data?.reduce((groups: any[], orderItem: any) => {
     // Skip if not matching active tab
     if (orderItem.status !== activeTab) return groups
 
@@ -119,8 +119,8 @@ function VendorOrdersPage() {
               key={status}
               onClick={() => setActiveTab(status)}
               className={`px-3 py-1 rounded-lg text-sm transition-colors ${activeTab === status
-                  ? 'bg-green-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-green-600 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
             >
               {status.replace(/_/g, ' ')}
@@ -139,7 +139,7 @@ function VendorOrdersPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          {groupedOrders.map(group => {
+          {groupedOrders.map((group: any) => {
             const isExpanded = expandedGroups[group.key]
 
             return (
@@ -242,10 +242,10 @@ function VendorOrdersPage() {
                           {/* Actions */}
                           <div className="flex flex-col items-end gap-2">
                             <div className={`px-2 py-1 rounded-full text-xs ${orderItem.status === OrderStatus.PENDING ? 'bg-yellow-100 text-yellow-800' :
-                                orderItem.status === OrderStatus.READY_FOR_PICKUP ? 'bg-purple-100 text-purple-800' :
-                                  orderItem.status === OrderStatus.IN_TRANSIT ? 'bg-blue-100 text-blue-800' :
-                                    orderItem.status === OrderStatus.COMPLETED ? 'bg-green-100 text-green-800' :
-                                      'bg-gray-100 text-gray-800'
+                              orderItem.status === OrderStatus.READY_FOR_PICKUP ? 'bg-purple-100 text-purple-800' :
+                                orderItem.status === OrderStatus.IN_TRANSIT ? 'bg-blue-100 text-blue-800' :
+                                  orderItem.status === OrderStatus.COMPLETED ? 'bg-green-100 text-green-800' :
+                                    'bg-gray-100 text-gray-800'
                               }`}>
                               {orderItem.status.replace(/_/g, ' ')}
                             </div>
