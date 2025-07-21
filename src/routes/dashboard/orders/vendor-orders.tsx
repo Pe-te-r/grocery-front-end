@@ -17,6 +17,7 @@ export enum OrderStatus {
   IN_TRANSIT = 'in_transit',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
+  REJECTED = 'rejected'
 }
 
 function VendorOrdersPage() {
@@ -56,7 +57,7 @@ function VendorOrdersPage() {
   }, []) || []
 
   // Sort groups by county name
-  groupedOrders.sort((a, b) => a.countyName.localeCompare(b.countyName))
+  groupedOrders.sort((a: { countyName: string }, b: { countyName: any }) => a.countyName.localeCompare(b.countyName))
 
   const toggleGroup = (groupKey: string) => {
     setExpandedGroups(prev => ({

@@ -263,10 +263,10 @@ export const SidebarDashboard = (role: Props) => {
         icon: Truck,
         path: "/dashboard/deliveries",
         roles: [UserRole.DRIVER],
-        subItems: [
-          { name: "Assigned", path: "/dashboard/deliveries/assigned" },
-          { name: "History", path: "/dashboard/deliveries/history" },
-        ]
+        // subItems: [
+        //   { name: "Assigned", path: "/dashboard/deliveries/assigned" },
+        //   { name: "History", path: "/dashboard/deliveries/history" },
+        // ]
       },
     ];
 

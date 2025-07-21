@@ -1,6 +1,6 @@
 // src/hooks/useCreateDriver.ts
 
-import { createDriver, type CreateDriverDto } from '@/api/driver';
+import { createDriver, getDriverOrders, type CreateDriverDto } from '@/api/driver';
 import { useMutation } from '@tanstack/react-query';
 
 export const useCreateDriver = () => {
@@ -14,5 +14,14 @@ export const useCreateDriver = () => {
       console.error('Error creating driver:', error);
       // Handle error (e.g., show an error message)
     },
+  });
+};
+
+import { useQuery } from '@tanstack/react-query';
+
+export const useGetDriverOrders = () => {
+  return useQuery({
+    queryKey: ['driver-orders'],
+    queryFn: getDriverOrders,
   });
 };

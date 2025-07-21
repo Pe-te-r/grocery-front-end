@@ -1,6 +1,6 @@
 // src/api/driverApi.ts
 
-import { getAccessTokenHelper } from "@/lib/authHelper";
+import { getAccessTokenHelper, getUserIdHelper } from "@/lib/authHelper";
 import { url } from "./url";
 
 export enum DriverStatus {
@@ -43,3 +43,22 @@ export const createDriver = async (driverData: CreateDriverDto) => {
 
   return response.json();
 };
+
+
+export const getDriverOrders = async () => {
+  const token = await getAccessTokenHelper()
+  const userID = getUserIdHelper()
+  const response = await fetch(`${url}/driver/${userID}/orders`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get driver orders');
+  }
+
+  return response.json();
+}

@@ -16,7 +16,8 @@ export const useProductHook = () => {
 export const useGetProductQuery = () => {
   return useQuery({
     queryKey: ['products'],
-    queryFn: getProductFn
+    queryFn: getProductFn,
+    refetchInterval:  30 * 1000 
   })
   
 }
