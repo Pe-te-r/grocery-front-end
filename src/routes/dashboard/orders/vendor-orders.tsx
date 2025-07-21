@@ -39,6 +39,7 @@ function VendorOrdersPage() {
 
     const groupKey = `${countyId}-${deliveryType}`
 
+
     const existingGroup = groups.find(g => g.key === groupKey)
 
     if (existingGroup) {
@@ -92,6 +93,15 @@ function VendorOrdersPage() {
       toast.error('Failed to update some orders')
     }
   }
+  const [visibleGroupCodes, setVisibleGroupCodes] = useState<Record<string, boolean>>({})
+
+  const toggleGroupCodeVisibility = (groupKey: string) => {
+    setVisibleGroupCodes(prev => ({
+      ...prev,
+      [groupKey]: !prev[groupKey]
+    }))
+  }
+
 
   if (isLoading) {
     return (
@@ -110,6 +120,8 @@ function VendorOrdersPage() {
     )
   }
 
+
+ 
   return (
     <div className="container mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
@@ -250,6 +262,26 @@ function VendorOrdersPage() {
                               }`}>
                               {orderItem.status.replace(/_/g, ' ')}
                             </div>
+                            {/* code toggle */}
+                            {activeTab === OrderStatus.READY_FOR_PICKUP && group.deliveryType === 'pickup' && (
+                              <div className="flex items-center gap-2">
+                                {visibleGroupCodes[orderItem.id] ? (
+                                  <div className="bg-gray-100 px-3 py-1 rounded-md text-sm font-mono">
+                                    {orderItem.randomCode}
+                                  </div>
+                                ) : (
+                                  <div className="bg-gray-100 px-3 py-1 rounded-md text-sm font-mono">
+                                    ••••
+                                  </div>
+                                )}
+                                <button
+                                  onClick={() => toggleGroupCodeVisibility(orderItem.id)}
+                                  className="text-green-600 hover:text-green-800 text-sm"
+                                >
+                                  {visibleGroupCodes[orderItem.id] ? 'Hide' : 'Show'} Code
+                                </button>
+                              </div>
+                            )}
 
                             {activeTab === OrderStatus.PENDING && (
                               <button

@@ -1,5 +1,5 @@
 // export const url = 'http://localhost:4001'
-export const url = 'http://192.168.0.100:4001'
-// export const url = 'http://192.168.137.109:4001'
+// export const url = 'http://192.168.0.100:4001'
+export const url = 'http://192.168.137.40:4001'
 // export const url = 'http://10.42.0.68:4001'
 // export const url = 'http://192.168.0.101:4001' 
