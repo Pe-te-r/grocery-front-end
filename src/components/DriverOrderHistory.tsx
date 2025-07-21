@@ -8,25 +8,17 @@ import {
   XCircle,
   MapPin,
   Phone,
-  Mail,
   ChevronDown,
   ChevronUp,
   Info,
   ShoppingBag,
+  Loader,
   type LucideIcon
 } from 'lucide-react';
 import { useGetDriverOrders } from '@/hooks/driverHook';
 import { useUpdateOrderItem } from '@/hooks/ordersHook';
 import { OrderStatus } from '@/routes/dashboard/orders/vendor-orders';
-
-// enum OrderStatus {
-//   PENDING = 'pending',
-//   READY_FOR_PICKUP = 'ready_for_pickup',
-//   IN_TRANSIT = 'in_transit',
-//   COMPLETED = 'completed',
-//   CANCELLED = 'cancelled',
-//   REJECTED = 'rejected',
-// }
+import { toast } from 'react-hot-toast';
 
 const statusIcons: Record<OrderStatus, LucideIcon> = {
   [OrderStatus.PENDING]: Clock,
@@ -47,15 +39,16 @@ const statusColors: Record<OrderStatus, string> = {
 };
 
 const DriverDeliveriesPage = () => {
-  const { data, isLoading, error } = useGetDriverOrders();
+  const { data, isLoading, error, refetch } = useGetDriverOrders();
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [confirmationModal, setConfirmationModal] = useState<{
     open: boolean;
     type: 'pickup' | 'delivery';
     orderId: string;
-    itemId?: string;
-  }>({ open: false, type: 'pickup', orderId: '' });
+    batchId?: string;
+  }>({ open: false, type: 'pickup', orderId: '', batchId: '' });
   const [confirmationCode, setConfirmationCode] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const updateItemMutate = useUpdateOrderItem();
 
@@ -63,31 +56,67 @@ const DriverDeliveriesPage = () => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
-  const handleStatusUpdate = async (itemId: string, newStatus: OrderStatus) => {
+  const handleStatusUpdate = async (order_id: string, newStatus: OrderStatus) => {
+    setIsUpdating(true);
     try {
-      await updateItemMutate.mutateAsync({ id: itemId, itemStatus: newStatus });
-      setConfirmationModal({ open: false, type: 'pickup', orderId: '' });
+      const order = data?.data.orders.find((o: any) => o.orderId === order_id);
+      const order_ids = order.orderItemIds;
+      if (!order_ids) return;
+
+      for (const id of order_ids) {
+        try {
+          await updateItemMutate.mutateAsync(
+            {
+              id,
+              itemStatus: newStatus
+            }, {
+            onSuccess: () => refetch()
+          }
+          );
+        } catch (error) {
+          toast.error(`Failed to update item`);
+          console.error(`Error updating item:`, error);
+        }
+      }
+
+      toast.success(`All items updated to ${newStatus.replace(/_/g, ' ')}`);
+      setConfirmationModal({ open: false, type: 'pickup', orderId: '', batchId: '' });
       setConfirmationCode('');
     } catch (error) {
-      console.error('Error updating status:', error);
+      console.error('Error in status update process:', error);
+      toast.error('Failed to complete all updates');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
-  const openConfirmationModal = (type: 'pickup' | 'delivery', orderId: string, itemId?: string) => {
-    setConfirmationModal({ open: true, type, orderId, itemId });
+  const openConfirmationModal = (type: 'pickup' | 'delivery', orderId: string, batchId: string) => {
+    setConfirmationModal({ open: true, type, orderId, batchId });
   };
 
-  const submitConfirmation = () => {
-    if (confirmationCode === '1234') {
-      if (confirmationModal.type === 'pickup' && confirmationModal.itemId) {
-        handleStatusUpdate(confirmationModal.itemId, OrderStatus.IN_TRANSIT);
-      } else if (confirmationModal.type === 'delivery' && confirmationModal.itemId) {
-        handleStatusUpdate(confirmationModal.itemId, OrderStatus.COMPLETED);
-      }
-    } else {
-      alert('Invalid confirmation code. Please try again.');
+  const submitConfirmation = async () => {
+    const order = data?.data.orders.find((o: any) => o.orderId === confirmationModal.orderId);
+    if (!order) return;
+
+    const expectedCode = order.verification.pickupCode;
+    if (confirmationCode !== expectedCode) {
+      toast.error('Invalid confirmation code. Please try again.');
+      return;
     }
+
+    const newStatus = confirmationModal.type === 'pickup'
+      ? OrderStatus.IN_TRANSIT
+      : OrderStatus.COMPLETED;
+
+    await handleStatusUpdate(confirmationModal.orderId, newStatus);
   };
+
+  // Sort orders: pending first, completed last
+  const sortedOrders = data?.data.orders?.sort((a: any, b: any) => {
+    if (a.orderStatus === OrderStatus.COMPLETED) return 1;
+    if (b.orderStatus === OrderStatus.COMPLETED) return -1;
+    return 0;
+  });
 
   if (isLoading) {
     return (
@@ -129,14 +158,14 @@ const DriverDeliveriesPage = () => {
         </header>
 
         <div className="space-y-6">
-          {data?.data.orders.length === 0 ? (
+          {sortedOrders?.length === 0 ? (
             <div className="text-center py-12">
               <Package className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-2 text-lg font-medium text-gray-900">No orders assigned</h3>
               <p className="mt-1 text-gray-500">You currently don't have any orders to deliver.</p>
             </div>
           ) : (
-            data?.data.orders.map((order: any) => (
+            sortedOrders?.map((order: any) => (
               <motion.div
                 key={order.orderId}
                 initial={{ opacity: 0, y: 20 }}
@@ -156,7 +185,8 @@ const DriverDeliveriesPage = () => {
                     <div>
                       <h3 className="font-medium">Order #{order.orderId.slice(0, 8)}</h3>
                       <p className="text-sm text-gray-500">
-                        {new Date(order.orderCreatedAt).toLocaleDateString()} • {order.totalQuantity} items
+                        {new Date(order.orderCreatedAt).toLocaleDateString()} • {order.totalQuantity} items •
+                        <span className="ml-1 capitalize">{order.deliveryOption}</span>
                       </p>
                     </div>
                   </div>
@@ -179,156 +209,114 @@ const DriverDeliveriesPage = () => {
                     >
                       <div className="p-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Customer Info */}
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="font-medium text-green-700 mb-3 flex items-center">
-                              <ShoppingBag className="mr-2" size={18} />
-                              Customer Details
-                            </h4>
-                            <div className="space-y-2">
-                              <p className="flex items-center">
-                                <span className="font-medium w-24">Name:</span>
-                                <span>{order.customer.name}</span>
-                              </p>
-                              <p className="flex items-center">
-                                <span className="font-medium w-24">Phone:</span>
-                                <a href={`tel:${order.customer.phone}`} className="flex items-center text-blue-600">
-                                  <Phone className="mr-1" size={14} /> {order.customer.phone}
-                                </a>
-                              </p>
-                              <p className="flex items-center">
-                                <span className="font-medium w-24">Email:</span>
-                                <a href={`mailto:${order.customer.email}`} className="flex items-center text-blue-600">
-                                  <Mail className="mr-1" size={14} /> {order.customer.email}
-                                </a>
-                              </p>
-                            </div>
-                          </div>
-
-                          {/* Order Summary */}
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h4 className="font-medium text-green-700 mb-3 flex items-center">
-                              <Info className="mr-2" size={18} />
-                              Order Summary
-                            </h4>
-                            <div className="space-y-2">
-                              <p className="flex justify-between">
-                                <span>Subtotal:</span>
-                                <span>KSh {(order.totalAmount - parseFloat(order.deliveryFee)).toFixed(2)}</span>
-                              </p>
-                              <p className="flex justify-between">
-                                <span>Delivery Fee:</span>
-                                <span>KSh {order.deliveryFee}</span>
-                              </p>
-                              <p className="flex justify-between font-medium">
-                                <span>Total:</span>
-                                <span>KSh {order.totalAmount.toFixed(2)}</span>
-                              </p>
-                              <p className="flex justify-between">
-                                <span>Payment Method:</span>
-                                <span className="capitalize">{order.paymentMethod}</span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Pickup/Delivery Locations */}
-                        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Pickup Location */}
-                          <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-                            <h4 className="font-medium text-green-700 mb-3 flex items-center">
-                              <MapPin className="mr-2" size={18} />
-                              Pickup Location
-                            </h4>
-                            {order.location.pickupStation ? (
+                          {order.pickupLocations && order.pickupLocations.length > 0 && (
+                            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                              <h4 className="font-medium text-green-700 mb-3 flex items-center">
+                                <MapPin className="mr-2" size={18} />
+                                Pickup From Vendor
+                              </h4>
                               <div className="space-y-2">
-                                <p className="font-medium">{order.location.pickupStation.name}</p>
+                                <p className="font-medium">{order.pickupLocations[0].name}</p>
                                 <p className="flex items-center">
-                                  <Phone className="mr-1" size={14} /> {order.location.pickupStation.contactPhone}
+                                  <Phone className="mr-1" size={14} /> {order.pickupLocations[0].contactPhone}
                                 </p>
-                                <p>
-                                  {order.location.pickupStation.isOpenNow ? (
-                                    <span className="text-green-600">Open now (until {order.location.pickupStation.closingTime})</span>
+                                <p className="text-sm">
+                                  <span className="font-medium">Location:</span> {order.pickupLocations[0].location.constituency}, {order.pickupLocations[0].location.county}
+                                </p>
+                                <p className="text-sm">
+                                  <span className="font-medium">Address:</span> {order.pickupLocations[0].location.fullAddress}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Delivery Station */}
+                          {order.deliveryOption === 'pickup' && order.destination?.station && (
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                              <h4 className="font-medium text-blue-700 mb-3 flex items-center">
+                                <MapPin className="mr-2" size={18} />
+                                Delivery Station
+                              </h4>
+                              <div className="space-y-2">
+                                <p className="font-medium">{order.destination.station.name}</p>
+                                <p className="flex items-center">
+                                  <Phone className="mr-1" size={14} /> {order.destination.station.contactPhone}
+                                </p>
+                                <p className="text-sm">
+                                  {order.destination.station.isOpenNow ? (
+                                    <span className="text-green-600">Open now</span>
                                   ) : (
-                                    <span className="text-red-600">Closed (opens at {order.location.pickupStation.openingTime})</span>
+                                    <span className="text-red-600">Currently closed</span>
                                   )}
                                 </p>
+                                <p className="text-sm">
+                                  <span className="font-medium">Location:</span> {order.destination.station.location.constituency}, {order.destination.station.location.county}
+                                </p>
+                                <p className="text-sm">
+                                  <span className="font-medium">Address:</span> {order.destination.station.location.fullAddress}
+                                </p>
                               </div>
-                            ) : (
-                              <p className="text-gray-500">No pickup station specified</p>
-                            )}
-                          </div>
+                            </div>
+                          )}
 
-                          {/* Delivery Location */}
-                          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                            <h4 className="font-medium text-blue-700 mb-3 flex items-center">
-                              <MapPin className="mr-2" size={18} />
-                              Delivery Location
-                            </h4>
-                            {order.location.deliveryAddress ? (
-                              <div>
-                                <p>{order.location.deliveryAddress}</p>
+                          {/* Customer Info (only for delivery orders) */}
+                          {order.deliveryOption === 'delivery' && (
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <h4 className="font-medium text-green-700 mb-3 flex items-center">
+                                <ShoppingBag className="mr-2" size={18} />
+                                Customer Details
+                              </h4>
+                              <div className="space-y-2">
+                                <p className="flex items-center">
+                                  <span className="font-medium w-24">Name:</span>
+                                  <span>{order.customer.name}</span>
+                                </p>
+                                <p className="flex items-center">
+                                  <span className="font-medium w-24">Phone:</span>
+                                  <a href={`tel:${order.customer.phone}`} className="flex items-center text-blue-600">
+                                    <Phone className="mr-1" size={14} /> {order.customer.phone}
+                                  </a>
+                                </p>
                               </div>
-                            ) : (
-                              <p className="text-gray-500">Pickup only - no delivery address</p>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
 
-                        {/* Products */}
+                        {/* Order Status Information */}
+                        <div className="mt-6 bg-amber-50 p-4 rounded-lg border border-amber-100">
+                          <h4 className="font-medium text-amber-700 mb-2 flex items-center">
+                            <Info className="mr-2" size={18} />
+                            Order Status
+                          </h4>
+                          <p className="text-sm">
+                            {order.orderStatus === OrderStatus.PENDING && 'Order is pending confirmation'}
+                            {order.orderStatus === OrderStatus.READY_FOR_PICKUP && 'Ready for pickup from vendor'}
+                            {order.orderStatus === OrderStatus.IN_TRANSIT && 'Order is in transit to destination'}
+                            {order.orderStatus === OrderStatus.COMPLETED && 'Order has been completed'}
+                          </p>
+                        </div>
+
+                        {/* Action Buttons */}
                         <div className="mt-6">
-                          <h4 className="font-medium text-gray-700 mb-3">Products</h4>
-                          <div className="space-y-4">
-                            {order.products.map((product: any) => (
-                              <div key={product.assignmentId} className="border rounded-lg p-4">
-                                <div className="flex items-start space-x-4">
-                                  <img
-                                    src={product.imageUrl}
-                                    alt={product.name}
-                                    className="w-16 h-16 object-cover rounded"
-                                  />
-                                  <div className="flex-1">
-                                    <div className="flex justify-between">
-                                      <h5 className="font-medium">{product.name}</h5>
-                                      <span className="text-green-600">KSh {product.price}</span>
-                                    </div>
-                                    <p className="text-sm text-gray-500">Qty: {product.quantity}</p>
-                                    <div className="mt-2 flex items-center justify-between">
-                                      <span className={`px-2 py-1 text-xs rounded-full ${statusColors[product.itemStatus as OrderStatus]}`}>
-                                        {product.itemStatus.replace(/_/g, ' ')}
-                                      </span>
-                                      <div className="flex space-x-2">
-                                        {product.itemStatus === OrderStatus.READY_FOR_PICKUP && (
-                                          <button
-                                            onClick={() => openConfirmationModal('pickup', order.orderId, product.assignmentId)}
-                                            className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition"
-                                          >
-                                            Confirm Pickup
-                                          </button>
-                                        )}
-                                        {product.itemStatus === OrderStatus.IN_TRANSIT && (
-                                          <button
-                                            onClick={() => openConfirmationModal('delivery', order.orderId, product.assignmentId)}
-                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition"
-                                          >
-                                            Confirm Delivery
-                                          </button>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                                {product.vendor && (
-                                  <div className="mt-3 pt-3 border-t border-gray-100">
-                                    <p className="text-sm text-gray-500 flex items-center">
-                                      <span className="font-medium mr-2">Vendor:</span>
-                                      {product.vendor.name} • {product.vendor.contactPhone}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
+                          {order.products.some((p: any) => p.itemStatus === OrderStatus.READY_FOR_PICKUP) && (
+                            <button
+                              onClick={() => openConfirmationModal('pickup', order.orderId, order.batchId)}
+                              className="w-full md:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center space-x-2"
+                            >
+                              <Package size={18} />
+                              <span>Confirm Pickup</span>
+                            </button>
+                          )}
+                          {order.products.some((p: any) => p.itemStatus === OrderStatus.IN_TRANSIT) && (
+                            <button
+                              onClick={() => openConfirmationModal('delivery', order.orderId, order.batchId)}
+                              className="w-full md:w-auto mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
+                            >
+                              <CheckCircle size={18} />
+                              <span>Confirm Delivery</span>
+                            </button>
+                          )}
                         </div>
 
                         {/* Timeline */}
@@ -387,8 +375,8 @@ const DriverDeliveriesPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-            onClick={() => setConfirmationModal({ open: false, type: 'pickup', orderId: '' })}
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
+            onClick={() => !isUpdating && setConfirmationModal({ open: false, type: 'pickup', orderId: '', batchId: '' })}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
@@ -400,39 +388,59 @@ const DriverDeliveriesPage = () => {
               <h3 className="text-lg font-medium mb-4">
                 {confirmationModal.type === 'pickup' ? 'Confirm Pickup' : 'Confirm Delivery'}
               </h3>
-              <p className="text-gray-600 mb-4">
-                Please enter the 4-digit confirmation code provided by the {confirmationModal.type === 'pickup' ? 'vendor' : 'customer'}:
-              </p>
 
-              <div className="mb-4">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={4}
-                  value={confirmationCode}
-                  onChange={(e) => setConfirmationCode(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                  placeholder="1234"
-                  autoFocus
-                />
-              </div>
+              {isUpdating ? (
+                <div className="flex flex-col items-center justify-center py-4">
+                  <Loader className="animate-spin text-green-600 mb-4" size={32} />
+                  <p>Updating items...</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-gray-600 mb-4">
+                    Please enter the 4-digit confirmation code provided by the{' '}
+                    {confirmationModal.type === 'pickup' ? 'vendor' : 'customer'}:
+                  </p>
 
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setConfirmationModal({ open: false, type: 'pickup', orderId: '' })}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={submitConfirmation}
-                  disabled={confirmationCode.length !== 4}
-                  className={`px-4 py-2 rounded-lg text-white ${confirmationModal.type === 'pickup' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} transition disabled:opacity-50`}
-                >
-                  Confirm
-                </button>
-              </div>
+                  <div className="mb-4">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={4}
+                      value={confirmationCode}
+                      onChange={(e) => setConfirmationCode(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-center text-xl tracking-widest"
+                      placeholder="____"
+                      autoFocus
+                      disabled={isUpdating}
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => {
+                        setConfirmationModal({ open: false, type: 'pickup', orderId: '', batchId: '' });
+                        setConfirmationCode('');
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer"
+                      disabled={isUpdating}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={submitConfirmation}
+                      disabled={confirmationCode.length !== 4 || isUpdating}
+                      className={`px-4 py-2 rounded-lg text-white ${confirmationModal.type === 'pickup' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} transition disabled:opacity-50 cursor-pointer flex items-center justify-center min-w-20`}
+                    >
+                      {isUpdating ? (
+                        <Loader className="animate-spin" size={18} />
+                      ) : (
+                        'Confirm'
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </motion.div>
         )}
