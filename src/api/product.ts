@@ -18,8 +18,12 @@ export const createProductFn = async (data: ProductForm) => {
   return json_data;
 }
 
-export const getProductFn = async () => {
-  const fullUrl = `${url}/products`
+export const getProductFn = async (category?: string) => {
+  let fullUrl = `${url}/products`;
+  
+  if (category) {
+    fullUrl += `?category=${encodeURIComponent(category)}`;
+  }
 
   const response = await fetch(fullUrl, {
     method: 'GET',
@@ -27,6 +31,6 @@ export const getProductFn = async () => {
       'Content-Type': 'application/json',
     },
   });
-  const data_response = await response.json()
+  const data_response = await response.json();
   return data_response;
 }

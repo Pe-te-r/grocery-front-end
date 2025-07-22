@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useSearch } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/products/')({
   component: ProductsRouteComponent,
@@ -100,8 +100,10 @@ const Pagination = ({
 export function ProductsRouteComponent(){
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 20;
+    const searchParams = useSearch({ from: "/products/" }) as { category?: string };
+  const category = searchParams?.category;
 
-  const { data, isLoading, isError } = useGetProductQuery();
+  const { data, isLoading, isError } = useGetProductQuery(category);
 
   if (isLoading) {
     return (
@@ -163,7 +165,7 @@ export function ProductsRouteComponent(){
             <Leaf className="w-5 h-5 text-green-600 mr-2" />
             <span className="text-green-600 font-medium">GroceryStore</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-green-800 mb-2">Our Fresh Products</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-green-800 mb-2">{category ? `${category}` : "Our Fresh Products"}</h1>
         </motion.div>
 
         {products.length === 0 ? (

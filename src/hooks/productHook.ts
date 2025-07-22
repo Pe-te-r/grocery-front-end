@@ -13,11 +13,10 @@ export const useProductHook = () => {
 };
 
 
-export const useGetProductQuery = () => {
+export const useGetProductQuery = (category?: string) => {
   return useQuery({
-    queryKey: ['products'],
-    queryFn: getProductFn,
-    refetchInterval:  30 * 1000 
+    queryKey: ['products', category], // Include category in queryKey
+    queryFn: () => getProductFn(category),
+    refetchInterval: 30 * 1000 
   })
-  
 }

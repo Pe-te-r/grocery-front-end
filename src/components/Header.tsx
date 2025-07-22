@@ -22,6 +22,17 @@ const GroceryStoreHeader = () => {
     setIsLoggedIn(false)
     navigate({to:'/'})
   }
+  const categories = [
+  'Fruits & Vegetables', 
+  'Dairy & Eggs', 
+  'Meat & Seafood', 
+  'Bakery', 
+  'Pantry', 
+  'Beverages', 
+  'Snacks', 
+  'Household'
+];
+
 
   const { data, isLoading } = useCountyQuery()
   const [counties, setCounty] = useState([])
@@ -213,14 +224,15 @@ const GroceryStoreHeader = () => {
           {/* Categories Navigation - Desktop */}
           <nav className="mt-4 hidden md:block">
             <ul className="flex space-x-6 overflow-x-auto pb-2 scrollbar-hide">
-              {['Fruits & Vegetables', 'Dairy & Eggs', 'Meat & Fish', 'Bakery', 'Pantry', 'Beverages', 'Snacks', 'Household'].map((category) => (
+              {categories.map((category) => (
                 <li key={category}>
-                  <a
-                    href="#"
-                    className="text-gray-700 hover:text-green-600 whitespace-nowrap font-medium text-sm transition-colors hover:underline"
-                  >
-                    {category}
-                  </a>
+                  <Link
+          to="/products"
+          search={{ category }}
+          className="text-gray-700 hover:text-green-600 whitespace-nowrap font-medium text-sm transition-colors hover:underline"
+        >
+          {category}
+        </Link>
                 </li>
               ))}
             </ul>
@@ -276,15 +288,16 @@ const GroceryStoreHeader = () => {
               <nav>
                 <h3 className="font-bold text-gray-700 px-2 py-1">Categories</h3>
                 <ul className="space-y-2">
-                  {['Fruits & Vegetables', 'Dairy & Eggs', 'Meat & Fish', 'Bakery', 'Pantry', 'Beverages', 'Snacks', 'Household'].map((category) => (
+                  {categories.map((category) => (
                     <li key={category}>
-                      <a
-                        href="#"
-                        className="block text-gray-700 hover:text-green-600 p-2 rounded-lg hover:bg-gray-100 text-sm"
-                        onClick={() => setMobileMenuOpen(false)}
-                      >
-                        {category}
-                      </a>
+                          <Link
+        to="/products"
+        search={{ category }}
+        className="block text-gray-700 hover:text-green-600 p-2 rounded-lg hover:bg-gray-100 text-sm"
+        onClick={() => setMobileMenuOpen(false)}
+      >
+        {category}
+      </Link>
                     </li>
                   ))}
                 </ul>
