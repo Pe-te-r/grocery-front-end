@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getProductsByUserId, getUserByIdFn, getUsersFn, updateUserFn } from "@/api/users"
+import { getProductsByUserId, getUserByIdFn, getUserDetailsRoleBasedQuery, getUsersFn, updateUserFn } from "@/api/users"
 import type { allUserQuery, ApiResponse, updateSettingProfileType } from "@/util/types"
 import toast from "react-hot-toast"
 
@@ -43,5 +43,13 @@ export const productsByUserIdHook = (id: string) => {
   return useQuery({
     queryKey: ['user', id, 'products'],
     queryFn: () => getProductsByUserId(id),
+  })
+}
+
+export const useUserDetails = (id: string, role: allUserQuery) => {
+  return useQuery({
+    queryKey: ['user-details', id, role],
+    queryFn: () => getUserDetailsRoleBasedQuery(id, role),
+    enabled: !!id && Object.keys(role).length === 1,
   })
 }

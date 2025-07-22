@@ -95,3 +95,35 @@ export const getProductsByUserId = async (id: string) => {
   const data = await response.json()
   return data
 }
+
+
+
+export const getUserDetailsRoleBasedQuery = async (id: string, role: allUserQuery) => {
+  const token = await getAccessTokenHelper()
+
+  const queryParams = new URLSearchParams()
+  const entries = Object.entries(role)
+  if (entries.length !== 1) {
+    throw new Error('Exactly one role must be provided.')
+  }
+
+  const [key, value] = entries[0]
+  queryParams.append(key, value)
+
+  const fullUrl = `${url}/users/admin/${id}?${queryParams.toString()}`
+  console.log('full url', fullUrl)
+
+  const response = await fetch(fullUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch user details')
+  }
+
+  return await response.json()
+}

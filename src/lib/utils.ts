@@ -90,3 +90,83 @@ export const handleTokenRefresh = async (): Promise<string> => {
     return '';
   }
 };
+
+
+
+// lib/utils.ts
+
+/**
+ * Formats a date string or Date object into a readable format
+ * @param dateInput - Date string or Date object
+ * @param options - Optional formatting configuration
+ * @returns Formatted date string
+ */
+export const formatDate = (
+  dateInput: string | Date,
+  options?: {
+    includeTime?: boolean
+    timeOnly?: boolean
+    shortMonth?: boolean
+    weekday?: boolean
+    timeFormat?: '12' | '24'
+  }
+): string => {
+  const date = new Date(dateInput)
+  
+  // Return empty string if invalid date
+  if (isNaN(date.getTime())) return ''
+
+  const {
+    includeTime = true,
+    timeOnly = false,
+    shortMonth = false,
+    weekday = false,
+    timeFormat = '12'
+  } = options || {}
+
+  // Time formatting
+  let hours = date.getHours()
+  const minutes = date.getMinutes()
+  const ampm = timeFormat === '12' ? hours >= 12 ? 'PM' : 'AM' : ''
+  
+  if (timeFormat === '12') {
+    hours = hours % 12
+    hours = hours ? hours : 12 // the hour '0' should be '12'
+  }
+
+  const formattedTime = `${hours}:${minutes.toString().padStart(2, '0')}${ampm ? ` ${ampm}` : ''}`
+
+  if (timeOnly) return formattedTime
+
+  // Date formatting
+  const weekdayStr = weekday 
+    ? date.toLocaleString('en-US', { weekday: 'short' }) + ', '
+    : ''
+  
+  const month = shortMonth
+    ? date.toLocaleString('en-US', { month: 'short' })
+    : date.toLocaleString('en-US', { month: 'long' })
+
+  const day = date.getDate()
+  const year = date.getFullYear()
+
+  const formattedDate = `${weekdayStr}${month} ${day}, ${year}`
+
+  return includeTime 
+    ? `${formattedDate} at ${formattedTime}`
+    : formattedDate
+}
+
+// Alternative simple version if you don't need customization:
+export const simpleFormatDate = (dateInput: string | Date): string => {
+  const date = new Date(dateInput)
+  if (isNaN(date.getTime())) return ''
+  
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}

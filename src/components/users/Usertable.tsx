@@ -1,5 +1,5 @@
 // components/users/UserTable.tsx
-import type { User, UserRoleEnum } from '@/util/types'
+import type { allUserQuery, User, UserRoleEnum } from '@/util/types'
 import  { AccountStatus } from '@/util/types'
 import {
   flexRender,
@@ -15,12 +15,13 @@ import {
 } from '@tanstack/react-table'
 import { useState } from 'react'
 import { Loading } from '../Loading'
+import { useUserDetailsModal } from './UserDetailsModalContext'
 
 interface UserTableProps {
   data: User[]
   isLoading: boolean
   isError: boolean
-  role: UserRoleEnum
+  role: UserRoleEnum | 'superadmins'
   onRowClick?: (userId: string) => void
 }
 
@@ -29,8 +30,21 @@ export const UserTable = ({
   isLoading,
   isError,
   role,
-  onRowClick,
 }: UserTableProps) => {
+
+    const { openModal } = useUserDetailsModal()
+
+  const handleRowClick = (userId: string) => {
+    // Determine the role query based on the current role
+    const roleQuery: allUserQuery = {}
+    if (role === 'admins') roleQuery.admin = true
+    else if (role === 'superadmins') roleQuery.superadmin = true
+    else if (role === 'vendors') roleQuery.vendor = true
+    else if (role === 'drivers') roleQuery.driver = true
+    else if (role === 'customers') roleQuery.customers = true
+    
+    openModal(userId, roleQuery)
+  }
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
@@ -110,7 +124,7 @@ export const UserTable = ({
       id: 'actions',
       cell: ({ row }) => (
         <button
-          onClick={() => onRowClick?.(row.original.id)}
+          onClick={() => handleRowClick((row.original.id))}
           className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm transition-colors"
         >
           Details
