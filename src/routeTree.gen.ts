@@ -31,6 +31,7 @@ import { Route as DashboardProductsIndexRouteImport } from './routes/dashboard/p
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
 import { Route as DashboardDeliveriesIndexRouteImport } from './routes/dashboard/deliveries/index'
 import { Route as DashboardUsersVendorsRouteImport } from './routes/dashboard/users/vendors'
+import { Route as DashboardUsersSuper_adminRouteImport } from './routes/dashboard/users/super_admin'
 import { Route as DashboardUsersDriversRouteImport } from './routes/dashboard/users/drivers'
 import { Route as DashboardUsersCustomersRouteImport } from './routes/dashboard/users/customers'
 import { Route as DashboardUsersAdminsRouteImport } from './routes/dashboard/users/admins'
@@ -155,6 +156,12 @@ const DashboardUsersVendorsRoute = DashboardUsersVendorsRouteImport.update({
   path: '/vendors',
   getParentRoute: () => DashboardUsersRoute,
 } as any)
+const DashboardUsersSuper_adminRoute =
+  DashboardUsersSuper_adminRouteImport.update({
+    id: '/super_admin',
+    path: '/super_admin',
+    getParentRoute: () => DashboardUsersRoute,
+  } as any)
 const DashboardUsersDriversRoute = DashboardUsersDriversRouteImport.update({
   id: '/drivers',
   path: '/drivers',
@@ -251,6 +258,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
   '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
   '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
+  '/dashboard/users/super_admin': typeof DashboardUsersSuper_adminRoute
   '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/deliveries': typeof DashboardDeliveriesIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
@@ -286,6 +294,7 @@ export interface FileRoutesByTo {
   '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
   '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
   '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
+  '/dashboard/users/super_admin': typeof DashboardUsersSuper_adminRoute
   '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/deliveries': typeof DashboardDeliveriesIndexRoute
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
@@ -323,6 +332,7 @@ export interface FileRoutesById {
   '/dashboard/users/admins': typeof DashboardUsersAdminsRoute
   '/dashboard/users/customers': typeof DashboardUsersCustomersRoute
   '/dashboard/users/drivers': typeof DashboardUsersDriversRoute
+  '/dashboard/users/super_admin': typeof DashboardUsersSuper_adminRoute
   '/dashboard/users/vendors': typeof DashboardUsersVendorsRoute
   '/dashboard/deliveries/': typeof DashboardDeliveriesIndexRoute
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/admins'
     | '/dashboard/users/customers'
     | '/dashboard/users/drivers'
+    | '/dashboard/users/super_admin'
     | '/dashboard/users/vendors'
     | '/dashboard/deliveries'
     | '/dashboard/orders'
@@ -396,6 +407,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/admins'
     | '/dashboard/users/customers'
     | '/dashboard/users/drivers'
+    | '/dashboard/users/super_admin'
     | '/dashboard/users/vendors'
     | '/dashboard/deliveries'
     | '/dashboard/orders'
@@ -432,6 +444,7 @@ export interface FileRouteTypes {
     | '/dashboard/users/admins'
     | '/dashboard/users/customers'
     | '/dashboard/users/drivers'
+    | '/dashboard/users/super_admin'
     | '/dashboard/users/vendors'
     | '/dashboard/deliveries/'
     | '/dashboard/orders/'
@@ -607,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardUsersVendorsRouteImport
       parentRoute: typeof DashboardUsersRoute
     }
+    '/dashboard/users/super_admin': {
+      id: '/dashboard/users/super_admin'
+      path: '/super_admin'
+      fullPath: '/dashboard/users/super_admin'
+      preLoaderRoute: typeof DashboardUsersSuper_adminRouteImport
+      parentRoute: typeof DashboardUsersRoute
+    }
     '/dashboard/users/drivers': {
       id: '/dashboard/users/drivers'
       path: '/drivers'
@@ -698,6 +718,7 @@ interface DashboardUsersRouteChildren {
   DashboardUsersAdminsRoute: typeof DashboardUsersAdminsRoute
   DashboardUsersCustomersRoute: typeof DashboardUsersCustomersRoute
   DashboardUsersDriversRoute: typeof DashboardUsersDriversRoute
+  DashboardUsersSuper_adminRoute: typeof DashboardUsersSuper_adminRoute
   DashboardUsersVendorsRoute: typeof DashboardUsersVendorsRoute
 }
 
@@ -705,6 +726,7 @@ const DashboardUsersRouteChildren: DashboardUsersRouteChildren = {
   DashboardUsersAdminsRoute: DashboardUsersAdminsRoute,
   DashboardUsersCustomersRoute: DashboardUsersCustomersRoute,
   DashboardUsersDriversRoute: DashboardUsersDriversRoute,
+  DashboardUsersSuper_adminRoute: DashboardUsersSuper_adminRoute,
   DashboardUsersVendorsRoute: DashboardUsersVendorsRoute,
 }
 
