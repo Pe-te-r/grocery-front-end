@@ -13,3 +13,17 @@ export const getOrderbyCustomerId = async (id:string) => {
     const json_data = await response.json()
     return json_data
 }
+
+export const getCustomerDashboardStat = async (id:string) => {
+  const token = await getAccessTokenHelper()
+  const response = await fetch(`${url}/customers/${id}/dashboard`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    })
+    const json_data = await response.json()
+    return json_data
+}
+
