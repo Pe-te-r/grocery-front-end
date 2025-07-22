@@ -19,8 +19,6 @@ import {
   Truck,
   ShoppingBag,
   ListOrdered,
-  WalletCards,
-  Heart,
   FileSignature,
   LocationEditIcon,
   ShoppingBagIcon,
@@ -191,6 +189,17 @@ export const SidebarDashboard = (role: Props) => {
         path: "/dashboard/pickstation",
         roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
       },
+           {
+        name: "Orders",
+        icon: ShoppingCart,
+        path: "/dashboard/orders",
+        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+        // subItems: [
+        //   { name: "All Orders", path: "/dashboard/orders" },
+        //   { name: "Pending", path: "/dashboard/orders/pending" },
+        //   { name: "Completed", path: "/dashboard/orders/completed" },
+        // ]
+      },
       {
         name: "Products",
         icon: Package,
@@ -199,17 +208,6 @@ export const SidebarDashboard = (role: Props) => {
         subItems: [
           { name: "All Products", path: "/dashboard/products" },
           { name: "Categories", path: "/dashboard/products/category" },
-        ]
-      },
-      {
-        name: "Orders",
-        icon: ShoppingCart,
-        path: "/dashboard/orders",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-        subItems: [
-          { name: "All Orders", path: "/dashboard/orders" },
-          { name: "Pending", path: "/dashboard/orders/pending" },
-          { name: "Completed", path: "/dashboard/orders/completed" },
         ]
       },
       {

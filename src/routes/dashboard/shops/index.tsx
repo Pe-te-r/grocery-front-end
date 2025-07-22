@@ -1,9 +1,10 @@
 import ShopCard from '@/components/shop/ShopCard';
-import { useAdminShopsdHook } from '@/hooks/storeHook';
+import { useAdminShopsdHook, useGetStoreByIdHook } from '@/hooks/storeHook';
 import { createFileRoute } from '@tanstack/react-router'
 import { motion } from "framer-motion";
 import { useEffect, useState } from 'react';
 import { CheckCircle2, Clock, List, Store } from 'lucide-react';
+import { VendorDetailsModal } from '@/components/shop/VendorDetailsModal';
 
 export const Route = createFileRoute('/dashboard/shops/')({
   component: ShopsPage,
@@ -12,6 +13,13 @@ export const Route = createFileRoute('/dashboard/shops/')({
 type TabType = 'all' | 'approved' | 'pending';
 
 function ShopsPage({ isAdmin = true }: { isAdmin?: boolean }) {
+     const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+    const { data:storeData, isLoading, isError, error } = useGetStoreByIdHook(selectedStoreId || '');
+
+    const saveStoreId = (id: string) => {
+    setSelectedStoreId(id);
+  };
+  
   const { data, refetch } = useAdminShopsdHook();
   const [activeTab, setActiveTab] = useState<TabType>('approved');
   const [sampleShops, setSampleShops] = useState([
@@ -120,7 +128,7 @@ function ShopsPage({ isAdmin = true }: { isAdmin?: boolean }) {
         {filteredShops.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredShops.map((shop) => (
-              <ShopCard key={shop.id} shop={shop} refetch={refetch} isAdmin={isAdmin} />
+              <ShopCard key={shop.id} shop={shop} setSelectedStoreId={saveStoreId} refetch={refetch} isAdmin={isAdmin} />
             ))}
           </div>
         ) : (
@@ -144,6 +152,14 @@ function ShopsPage({ isAdmin = true }: { isAdmin?: boolean }) {
             </p>
           </motion.div>
         )}
+                  <VendorDetailsModal
+        isOpen={!!selectedStoreId}
+        onClose={() => setSelectedStoreId(null)}
+        data={storeData?.data}
+        isLoading={isLoading}
+        isError={isError}
+        error={error}
+      />
       </div>
     </div>
   );

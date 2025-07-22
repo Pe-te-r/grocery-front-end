@@ -1,4 +1,4 @@
-import { useUpdateStoreHook } from "@/hooks/storeHook";
+import {  useUpdateStoreHook } from "@/hooks/storeHook";
 import { motion } from "framer-motion";
 import { CheckCircle2, Clock, MapPin, Phone, Store, User, ArrowRight } from "lucide-react";
 import { useState } from "react";
@@ -22,7 +22,7 @@ interface Shop {
   };
 }
 
-const ShopCard = ({ shop,refetch, isAdmin = false }: { shop: Shop; refetch:()=>void, isAdmin?: boolean }) => {
+const ShopCard = ({ shop,refetch,setSelectedStoreId, isAdmin = false }: { shop: Shop;setSelectedStoreId:(id:string)=>void, refetch:()=>void, isAdmin?: boolean }) => {
   const [isApproved, setIsApproved] = useState(shop.approved);
   const updateMutate = useUpdateStoreHook()
   const handleApprove = () => {
@@ -38,6 +38,7 @@ const ShopCard = ({ shop,refetch, isAdmin = false }: { shop: Shop; refetch:()=>v
       }
     })
   };
+
 
   return (
     <motion.div
@@ -123,6 +124,7 @@ const ShopCard = ({ shop,refetch, isAdmin = false }: { shop: Shop; refetch:()=>v
           )}
 
           <motion.button
+          onClick={() => setSelectedStoreId(shop.id)}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`py-2 px-3 border border-green-600 text-green-600 hover:bg-green-50 rounded-md transition-colors text-sm font-medium flex items-center justify-center gap-1 ${isAdmin && !isApproved ? "w-1/3" : "w-full"}`}
