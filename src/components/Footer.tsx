@@ -1,5 +1,16 @@
 import { Link } from '@tanstack/react-router'
+import { motion } from 'framer-motion'
 import { Phone, Mail, MapPin, ShoppingBag, Clock, Shield } from 'lucide-react'
+  const categories = [
+  'Fruits & Vegetables', 
+  'Dairy & Eggs', 
+  'Meat & Seafood', 
+  'Bakery', 
+  'Pantry', 
+  'Beverages', 
+  'Snacks', 
+  'Household'
+];
 
 export const AppFooter = () => {
   return (
@@ -62,44 +73,28 @@ export const AppFooter = () => {
                   Contact
                 </Link>
               </li>
-              <li>
-                <Link to="/faq" className="text-green-200 hover:text-white transition">
-                  FAQ
-                </Link>
-              </li>
+
             </ul>
           </div>
 
           {/* Categories */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold">Categories</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/category/fruits" className="text-green-200 hover:text-white transition">
-                  Fruits & Vegetables
-                </Link>
-              </li>
-              <li>
-                <Link to="/category/dairy" className="text-green-200 hover:text-white transition">
-                  Dairy & Eggs
-                </Link>
-              </li>
-              <li>
-                <Link to="/category/meat" className="text-green-200 hover:text-white transition">
-                  Meat & Fish
-                </Link>
-              </li>
-              <li>
-                <Link to="/category/bakery" className="text-green-200 hover:text-white transition">
-                  Bakery
-                </Link>
-              </li>
-              <li>
-                <Link to="/category/beverages" className="text-green-200 hover:text-white transition">
-                  Beverages
-                </Link>
-              </li>
-            </ul>
+           <ul>
+  {categories.map((category) => (
+    <li key={category}>
+      <motion.div whileHover={{ scale: 1.05 }}>
+        <Link 
+              to="/products" 
+              search={{ category }}
+          className="text-green-200 hover:text-white transition block"
+        >
+          {category}
+        </Link>
+      </motion.div>
+    </li>
+  ))}
+</ul>
           </div>
 
           {/* Contact Info */}

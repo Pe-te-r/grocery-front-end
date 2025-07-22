@@ -45,7 +45,7 @@ export const getUserRole = (): UserRole | null =>
   useAuthStore.getState().user?.role || null;
 
 export const isUserVerified = (): string | null =>
-  useAuthStore.getState().user?.email ?? null;
+  useAuthStore.getState().user?.email || null;
 
 export const isAuthenticated = (): boolean =>
   useAuthStore.getState().isAuthenticated;

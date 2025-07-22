@@ -26,6 +26,7 @@ import { Route as DashboardApplicationsRouteImport } from './routes/dashboard/ap
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as DashboardUsersIndexRouteImport } from './routes/dashboard/users/index'
 import { Route as DashboardShopsIndexRouteImport } from './routes/dashboard/shops/index'
 import { Route as DashboardProductsIndexRouteImport } from './routes/dashboard/products/index'
 import { Route as DashboardOrdersIndexRouteImport } from './routes/dashboard/orders/index'
@@ -129,6 +130,11 @@ const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   id: '/(auth)/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardUsersIndexRoute = DashboardUsersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardUsersRoute,
 } as any)
 const DashboardShopsIndexRoute = DashboardShopsIndexRouteImport.update({
   id: '/shops/',
@@ -264,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
   '/dashboard/products': typeof DashboardProductsIndexRoute
   '/dashboard/shops': typeof DashboardShopsIndexRoute
+  '/dashboard/users/': typeof DashboardUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -278,7 +285,6 @@ export interface FileRoutesByTo {
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
   '/dashboard/shop': typeof DashboardShopRoute
-  '/dashboard/users': typeof DashboardUsersRouteWithChildren
   '/dashboard/wallet': typeof DashboardWalletRoute
   '/dashboard': typeof DashboardIndexRoute
   '/products': typeof ProductsIndexRoute
@@ -300,6 +306,7 @@ export interface FileRoutesByTo {
   '/dashboard/orders': typeof DashboardOrdersIndexRoute
   '/dashboard/products': typeof DashboardProductsIndexRoute
   '/dashboard/shops': typeof DashboardShopsIndexRoute
+  '/dashboard/users': typeof DashboardUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -338,6 +345,7 @@ export interface FileRoutesById {
   '/dashboard/orders/': typeof DashboardOrdersIndexRoute
   '/dashboard/products/': typeof DashboardProductsIndexRoute
   '/dashboard/shops/': typeof DashboardShopsIndexRoute
+  '/dashboard/users/': typeof DashboardUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -377,6 +385,7 @@ export interface FileRouteTypes {
     | '/dashboard/orders'
     | '/dashboard/products'
     | '/dashboard/shops'
+    | '/dashboard/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -391,7 +400,6 @@ export interface FileRouteTypes {
     | '/dashboard/pickstation'
     | '/dashboard/settings'
     | '/dashboard/shop'
-    | '/dashboard/users'
     | '/dashboard/wallet'
     | '/dashboard'
     | '/products'
@@ -413,6 +421,7 @@ export interface FileRouteTypes {
     | '/dashboard/orders'
     | '/dashboard/products'
     | '/dashboard/shops'
+    | '/dashboard/users'
   id:
     | '__root__'
     | '/'
@@ -450,6 +459,7 @@ export interface FileRouteTypes {
     | '/dashboard/orders/'
     | '/dashboard/products/'
     | '/dashboard/shops/'
+    | '/dashboard/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -584,6 +594,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/forgot-password'
       preLoaderRoute: typeof authForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/users/': {
+      id: '/dashboard/users/'
+      path: '/'
+      fullPath: '/dashboard/users/'
+      preLoaderRoute: typeof DashboardUsersIndexRouteImport
+      parentRoute: typeof DashboardUsersRoute
     }
     '/dashboard/shops/': {
       id: '/dashboard/shops/'
@@ -720,6 +737,7 @@ interface DashboardUsersRouteChildren {
   DashboardUsersDriversRoute: typeof DashboardUsersDriversRoute
   DashboardUsersSuper_adminRoute: typeof DashboardUsersSuper_adminRoute
   DashboardUsersVendorsRoute: typeof DashboardUsersVendorsRoute
+  DashboardUsersIndexRoute: typeof DashboardUsersIndexRoute
 }
 
 const DashboardUsersRouteChildren: DashboardUsersRouteChildren = {
@@ -728,6 +746,7 @@ const DashboardUsersRouteChildren: DashboardUsersRouteChildren = {
   DashboardUsersDriversRoute: DashboardUsersDriversRoute,
   DashboardUsersSuper_adminRoute: DashboardUsersSuper_adminRoute,
   DashboardUsersVendorsRoute: DashboardUsersVendorsRoute,
+  DashboardUsersIndexRoute: DashboardUsersIndexRoute,
 }
 
 const DashboardUsersRouteWithChildren = DashboardUsersRoute._addFileChildren(

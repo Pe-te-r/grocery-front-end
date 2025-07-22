@@ -17,15 +17,14 @@ import veg2 from '../../assets/home/category/vegetables/img2.jpeg'
 // dairy
 import dairy1 from '../../assets/home/category/dairy/img1.jpeg'
 import dairy2 from '../../assets/home/category/dairy/img2.jpeg'
-// pastary
-import pastry1 from '../../assets/home/category/dairy/img1.jpeg'
-import pastry2 from '../../assets/home/category/dairy/img2.jpeg'
+
 // Snacks
 import snacks1 from '../../assets/home/category/snacks/img1.jpeg'
 import snacks2 from '../../assets/home/category/snacks/img2.jpeg'
 // Household
 import house1 from '../../assets/home/category/house/img1.jpeg'
 import house2 from '../../assets/home/category/house/img2.jpeg'
+import { Link } from "@tanstack/react-router";
 
 
 
@@ -47,7 +46,7 @@ export const CategorySection = () => {
     },
     // Add more categories with multiple images
     {
-      name: "Meat & Fish",
+      name: "Meat & Seafood",
       images: [
         fish1,
         fish2,
@@ -59,13 +58,6 @@ export const CategorySection = () => {
         bakery1,
         bakery2,
         bakery3,
-      ]
-    },
-    {
-      name: "Pantry Staples",
-      images: [
-        pastry1,
-        pastry2
       ]
     },
     {
@@ -82,13 +74,6 @@ export const CategorySection = () => {
         snacks2
       ]
     },
-    {
-      name: "Household",
-      images: [
-        house1,
-        house2
-      ]
-    }
   ];
 
   return (
@@ -97,9 +82,11 @@ export const CategorySection = () => {
         <h2 className="text-3xl font-bold text-center mb-12 text-green-700">
           Shop by Category
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           {categories.map((category, index) => (
+            <Link to='/products' search={{ category: category.name }} className="group" key={index}>
             <CategoryCard key={index} {...category} />
+            </Link>
           ))}
         </div>
       </div>

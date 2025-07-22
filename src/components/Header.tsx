@@ -1,11 +1,12 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut, Loader } from 'lucide-react';
+import { ShoppingCart, User, Phone, MapPin, Search, Menu, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AccountModal } from './AccountModal';
-import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
+import { isAuthenticatedHelper, isUserVerifiedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
 import { useCart } from '@/lib/cartHelper';
 import { CartModal } from './CartModal';
 import { useCountyQuery } from '@/hooks/countyHook';
+import { useMatchRoute } from '@tanstack/react-router';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -22,6 +23,9 @@ const GroceryStoreHeader = () => {
     setIsLoggedIn(false)
     navigate({to:'/'})
   }
+  const matchRoute = useMatchRoute();
+  const param_url =! isUserVerifiedHelper() ?( '/products') : ('/dashboard/shop')
+  
   const categories = [
   'Fruits & Vegetables', 
   'Dairy & Eggs', 
@@ -227,7 +231,7 @@ const GroceryStoreHeader = () => {
               {categories.map((category) => (
                 <li key={category}>
                   <Link
-          to="/products"
+          to={param_url}
           search={{ category }}
           className="text-gray-700 hover:text-green-600 whitespace-nowrap font-medium text-sm transition-colors hover:underline"
         >

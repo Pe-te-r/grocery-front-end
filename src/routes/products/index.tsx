@@ -1,4 +1,4 @@
-import { createFileRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute, useMatch, useMatchRoute, useSearch } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/products/')({
   component: ProductsRouteComponent,
@@ -98,10 +98,19 @@ const Pagination = ({
 
 // Main ProductsPage component
 export function ProductsRouteComponent(){
+
+
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 20;
-    const searchParams = useSearch({ from: "/products/" }) as { category?: string };
-  const category = searchParams?.category;
+const matchRoute = useMatchRoute();
+const isProducts = matchRoute({ to: '/products' });
+const param_url = isProducts ? '/products/' : '/dashboard/shop'
+
+const searchParams = useSearch({
+  from: param_url,      
+}) as { category?: string };
+
+const category = searchParams.category;
 
   const { data, isLoading, isError } = useGetProductQuery(category);
 
