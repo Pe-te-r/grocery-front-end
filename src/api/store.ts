@@ -71,3 +71,17 @@ export const updateStore = async (updateData: any) => {
   const data = response.json()
   return data
 }
+
+export const getStoreById = async (id: string) => {
+  const token = await getAccessTokenHelper()
+  const response = await fetch(`${url}/stores/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+
+  })
+  const data =await response.json()
+  return data
+}
