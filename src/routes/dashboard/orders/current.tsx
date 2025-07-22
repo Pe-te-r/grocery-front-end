@@ -378,7 +378,7 @@ const OrderTrackingPage = () => {
                           <Package className="w-4 h-4" /> Items in this order
                         </h3>
                         <div className="divide-y divide-green-100">
-                          {order.items.map((item: any, index) => (
+                          {order.items.map((item: any, index: number) => (
                             <div key={item.id} className="px-6 py-4">
                               <div 
                                 className="flex justify-between items-start cursor-pointer"

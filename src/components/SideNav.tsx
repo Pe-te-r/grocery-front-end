@@ -141,26 +141,9 @@ export const SidebarDashboard = (role: Props) => {
       {
         name: "My Orders",
         icon: ListOrdered,
-        path: "/dashboard/orders",
+        path: "/dashboard/orders/current",
         roles: [UserRole.CUSTOMER],
-        subItems: [
-          { name: "Current Orders", path: "/dashboard/orders/current" },
-          { name: "Order History", path: "/dashboard/orders/history" },
-          { name: "Saved Items", path: "/dashboard/orders/saved" },
-        ]
       },
-      // {
-      //   name: "Payment Methods",
-      //   icon: WalletCards,
-      //   path: "/dashboard/payments",
-      //   roles: [UserRole.CUSTOMER]
-      // },
-      // {
-      //   name: "Favorites",
-      //   icon: Heart,
-      //   path: "/dashboard/favorites",
-      //   roles: [UserRole.CUSTOMER]
-      // },
       {
         name: "Vendor Applications",
         icon: FileSignature,
