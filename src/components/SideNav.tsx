@@ -110,157 +110,166 @@ export const SidebarDashboard = (role: Props) => {
     }
   };
 
-  // Role-based navigation items
-  const getNavItems = () => {
-    const commonItems = [
-      {
-        name: "Dashboard",
-        icon: LayoutDashboard,
-        path: "/dashboard",
-        roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
-        subItems: []
-      },
-      {
-        name: "Profile",
-        icon: User,
-        path: "/dashboard/settings",
-        roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
-        subItems: []
-      },
-    ];
+const sharedUserSubItems = [
+  { name: "Admins", path: "/dashboard/users/admins" },
+  { name: "Customers", path: "/dashboard/users/customers" },
+  { name: "Vendors", path: "/dashboard/users/vendors" },
+  { name: "Drivers", path: "/dashboard/users/drivers" },
+];
 
-    const customerItems = [
-      {
-        name: "Shop",
-        icon: ShoppingBag,
-        path: "/dashboard/shop",
-        roles: [UserRole.CUSTOMER]
-      },
-      {
-        name: "My Orders",
-        icon: ListOrdered,
-        path: "/dashboard/orders/current",
-        roles: [UserRole.CUSTOMER],
-      },
-      {
-        name: "Vendor Applications",
-        icon: FileSignature,
-        path: "/dashboard/applications",
-        roles: [UserRole.CUSTOMER]
-      },
-    ];
+const sharedSystemSubItems = [
+  { name: "Admins", path: "/dashboard/system/admins" },
+  { name: "Drivers", path: "/dashboard/system/drivers" },
+];
 
-    const vendorItems = [
-      {
-        name: "Orders",
-        icon: ShoppingCart,
-        path: "/dashboard/orders/vendor-orders",
-        roles: [UserRole.VENDOR],
-      },
-      {
-        name: "My Shop",
-        icon: LucideShoppingBag,
-        path: "/dashboard/products",
-        roles: [UserRole.VENDOR],
-        subItems: [
-          { name: "My Products", path: "/dashboard/products/my_products" },
-          { name: "Add Product", path: "/dashboard/products/add" },
-        ]
-      },
-    ];
+const getNavItems = () => {
+  const commonItems = [
+    {
+      name: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+      roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
+    },
+    {
+      name: "Profile",
+      icon: User,
+      path: "/dashboard/settings",
+      roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
+    },
+  ];
 
-    const adminItems = [
-      {
+  const customerItems = [
+    {
+      name: "Shop",
+      icon: ShoppingBag,
+      path: "/dashboard/shop",
+      roles: [UserRole.CUSTOMER],
+    },
+    {
+      name: "My Orders",
+      icon: ListOrdered,
+      path: "/dashboard/orders/current",
+      roles: [UserRole.CUSTOMER],
+    },
+    {
+      name: "Vendor Applications",
+      icon: FileSignature,
+      path: "/dashboard/applications",
+      roles: [UserRole.CUSTOMER],
+    },
+  ];
 
-        name: "Locations",
-        icon: LocationEditIcon,
-        path: "/dashboard/locations",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-      },
-      {
-        name: "Shops",
-        icon: ShoppingBagIcon,
-        path: "/dashboard/shops",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-      },
-      {
-        name: "Pickup Stations",
-        icon: PickaxeIcon,
-        path: "/dashboard/pickstation",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-      },
-           {
-        name: "Orders",
-        icon: ShoppingCart,
-        path: "/dashboard/orders",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-        // subItems: [
-        //   { name: "All Orders", path: "/dashboard/orders" },
-        //   { name: "Pending", path: "/dashboard/orders/pending" },
-        //   { name: "Completed", path: "/dashboard/orders/completed" },
-        // ]
-      },
-      {
-        name: "Products",
-        icon: Package,
-        path: "/dashboard/products",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-        subItems: [
-          { name: "All Products", path: "/dashboard/products" },
-          { name: "Categories", path: "/dashboard/products/category" },
-        ]
-      },
-      {
-        name: "Users",
-        icon: Users,
-        path: "/dashboard/users",
-        roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
-        subItems: [
-          { name: "Admins", path: "/dashboard/users/admins" },
-          { name: "Customers", path: "/dashboard/users/customers" },
-          { name: "Vendors", path: "/dashboard/users/vendors" },
-          { name: "Drivers", path: "/dashboard/users/drivers" },
-        ]
-      },
-    ];
+  const vendorItems = [
+    {
+      name: "Orders",
+      icon: ShoppingCart,
+      path: "/dashboard/orders/vendor-orders",
+      roles: [UserRole.VENDOR],
+    },
+    {
+      name: "My Shop",
+      icon: LucideShoppingBag,
+      path: "/dashboard/products",
+      roles: [UserRole.VENDOR],
+      subItems: [
+        { name: "My Products", path: "/dashboard/products/my_products" },
+        { name: "Add Product", path: "/dashboard/products/add" },
+      ],
+    },
+  ];
 
-    const superAdminItems = [
-      {
-        name: "System",
-        icon: Settings,
-        path: "/dashboard/system",
-        roles: [UserRole.SUPERADMIN],
-        subItems: [
-          { name: "Admins", path: "/dashboard/system/admins" },
-          { name: "Drivers", path: "/dashboard/system/drivers" },
-          { name: "Settings", path: "/dashboard/system/settings" },
-        ]
-      },
-    ];
+  const adminItems = [
+    {
+      name: "Locations",
+      icon: LocationEditIcon,
+      path: "/dashboard/locations",
+      roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+    },
+    {
+      name: "Shops",
+      icon: ShoppingBagIcon,
+      path: "/dashboard/shops",
+      roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+    },
+    {
+      name: "Pickup Stations",
+      icon: PickaxeIcon,
+      path: "/dashboard/pickstation",
+      roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+    },
+    {
+      name: "Orders",
+      icon: ShoppingCart,
+      path: "/dashboard/orders",
+      roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+    },
+    {
+      name: "Products",
+      icon: Package,
+      path: "/dashboard/products",
+      roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
+      subItems: [
+        { name: "All Products", path: "/dashboard/products" },
+        { name: "Categories", path: "/dashboard/products/category" },
+      ],
+    },
+    {
+      name: "Users",
+      icon: Users,
+      path: "/dashboard/users",
+      roles: [UserRole.ADMIN],
+      subItems: sharedUserSubItems,
+    },
+    {
+      name: "System",
+      icon: Settings,
+      roles: [UserRole.ADMIN],
+      subItems: sharedSystemSubItems,
+    }
+  ];
 
-    const driverItems = [
-      {
-        name: "Deliveries",
-        icon: Truck,
-        path: "/dashboard/deliveries",
-        roles: [UserRole.DRIVER],
-        // subItems: [
-        //   { name: "Assigned", path: "/dashboard/deliveries/assigned" },
-        //   { name: "History", path: "/dashboard/deliveries/history" },
-        // ]
-      },
-    ];
+  const superAdminExtraItems = [
+    {
+      name: "Users",
+      icon: Users,
+      path: "/dashboard/users",
+      roles: [UserRole.SUPERADMIN],
+      subItems: [
+        { name: "SuperAdmin", path: "/dashboard/users/super_admin" },
+        ...sharedUserSubItems,
+      ],
+    },
+    {
+      name: "System",
+      icon: Settings,
+      path: "/dashboard/system",
+      roles: [UserRole.SUPERADMIN],
+      subItems: [
+        { name: "Super Admin", path: "/dashboard/system/super_admin" },
+        ...sharedSystemSubItems,
+      ],
+    },
+  ];
 
-    return [
-      ...commonItems,
-      ...customerItems,
-      ...vendorItems,
-      ...adminItems,
-      ...superAdminItems,
-      ...driverItems
-    ].filter(item => item.roles.includes(role.role));
-  };
+  const driverItems = [
+    {
+      name: "Deliveries",
+      icon: Truck,
+      path: "/dashboard/deliveries",
+      roles: [UserRole.DRIVER],
+    },
+  ];
 
+  // Combine all
+  return [
+    ...commonItems,
+    ...customerItems,
+    ...vendorItems,
+    ...adminItems,
+    ...superAdminExtraItems,
+    ...driverItems,
+  ].filter(item => item.roles.includes(role.role));
+};
   const navItems = getNavItems();
 
   // Role-based add button action

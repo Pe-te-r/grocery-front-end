@@ -119,10 +119,7 @@ function CustomersComponent() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const handleRowClick = (userId: string) => {
-    console.log('Vendor ID:', userId)
-    // Navigate to vendor details: `/dashboard/users/vendors/${userId}`
-  }
+ 
 
   const table = useReactTable({
     data: customers || [],
@@ -167,7 +164,6 @@ function CustomersComponent() {
         isLoading={isLoading}
         isError={isError}
         role="admins"
-        onRowClick={handleRowClick}
       />
 
 
