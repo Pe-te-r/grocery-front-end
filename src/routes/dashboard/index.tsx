@@ -1,3 +1,4 @@
+import AdminDashboard from '@/components/dashboard/AdminDashboard'
 import CustomerDashboard from '@/components/dashboard/CustomerDashboard'
 import { getUserRoleHelper } from '@/lib/authHelper'
 import { UserRole } from '@/util/types'
@@ -17,10 +18,11 @@ function DashboardPage() {
       case UserRole.CUSTOMER:
         return <CustomerDashboard />
       case UserRole.ADMIN:
-        // return <AdminDashboard />
+        return <AdminDashboard />
       case UserRole.VENDOR:
         // return <VendorDashboard />
       case UserRole.SUPERADMIN:
+        return <AdminDashboard />
         // return <SuperAdminDashboard />
       case UserRole.DRIVER:
         // return <DriverDashboard />

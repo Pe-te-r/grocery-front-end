@@ -6,7 +6,6 @@ import { isAuthenticatedHelper, isUserVerifiedHelper, loginUserHelper, logoutUse
 import { useCart } from '@/lib/cartHelper';
 import { CartModal } from './CartModal';
 import { useCountyQuery } from '@/hooks/countyHook';
-import { useMatchRoute } from '@tanstack/react-router';
 
 const GroceryStoreHeader = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -23,7 +22,6 @@ const GroceryStoreHeader = () => {
     setIsLoggedIn(false)
     navigate({to:'/'})
   }
-  const matchRoute = useMatchRoute();
   const param_url =! isUserVerifiedHelper() ?( '/products') : ('/dashboard/shop')
   
   const categories = [

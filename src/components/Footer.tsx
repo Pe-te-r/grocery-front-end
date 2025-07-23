@@ -1,3 +1,4 @@
+import { isUserVerifiedHelper } from '@/lib/authHelper';
 import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { Phone, Mail, MapPin, ShoppingBag, Clock, Shield } from 'lucide-react'
@@ -13,6 +14,8 @@ import { Phone, Mail, MapPin, ShoppingBag, Clock, Shield } from 'lucide-react'
 ];
 
 export const AppFooter = () => {
+  const param_url =! isUserVerifiedHelper() ?( '/products') : ('/dashboard/shop')
+
   return (
     <footer className="bg-green-800 text-white pt-12 pb-8">
       <div className="container mx-auto px-4">
@@ -85,7 +88,7 @@ export const AppFooter = () => {
     <li key={category}>
       <motion.div whileHover={{ scale: 1.05 }}>
         <Link 
-              to="/products" 
+              to={param_url}
               search={{ category }}
           className="text-green-200 hover:text-white transition block"
         >
