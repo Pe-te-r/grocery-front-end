@@ -62,3 +62,20 @@ export const getDriverOrders = async () => {
 
   return response.json();
 }
+
+export const getDriverDashboard = async (id:string) => {
+  const token = await getAccessTokenHelper()
+  const response = await fetch(`${url}/driver/dashboard/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get driver dashboard');
+  }
+
+  return response.json();
+}

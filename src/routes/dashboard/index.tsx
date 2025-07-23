@@ -1,5 +1,7 @@
 import AdminDashboard from '@/components/dashboard/AdminDashboard'
 import CustomerDashboard from '@/components/dashboard/CustomerDashboard'
+import DriverDashboard from '@/components/dashboard/DriverDashboard'
+import VendorDashboard from '@/components/dashboard/VendorDashboard'
 import { getUserRoleHelper } from '@/lib/authHelper'
 import { UserRole } from '@/util/types'
 import { createFileRoute } from '@tanstack/react-router'
@@ -20,14 +22,11 @@ function DashboardPage() {
       case UserRole.ADMIN:
         return <AdminDashboard />
       case UserRole.VENDOR:
-        // return <VendorDashboard />
+        return <VendorDashboard />
       case UserRole.SUPERADMIN:
         return <AdminDashboard />
-        // return <SuperAdminDashboard />
       case UserRole.DRIVER:
-        // return <DriverDashboard />
-      default:
-        // return <Unauthorized />
+        return <DriverDashboard />
     }
   }
 

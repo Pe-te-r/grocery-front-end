@@ -1,6 +1,6 @@
 // src/hooks/useCreateDriver.ts
 
-import { createDriver, getDriverOrders, type CreateDriverDto } from '@/api/driver';
+import { createDriver, getDriverDashboard, getDriverOrders, type CreateDriverDto } from '@/api/driver';
 import { useMutation } from '@tanstack/react-query';
 
 export const useCreateDriver = () => {
@@ -25,3 +25,12 @@ export const useGetDriverOrders = () => {
     queryFn: getDriverOrders,
   });
 };
+
+
+export const useGetDriverDashboard = (id:string) => {
+  return useQuery({
+    queryKey: ['driver-dashboard',id],
+    queryFn:()=> getDriverDashboard(id),
+    enabled: !!id
+  })
+}
