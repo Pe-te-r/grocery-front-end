@@ -22,7 +22,7 @@ const GroceryStoreHeader = () => {
     setIsLoggedIn(false)
     navigate({to:'/'})
   }
-  const param_url =! isUserVerifiedHelper() ?( '/products') : ('/dashboard/shop')
+  const param_url =! isUserVerifiedHelper() ?( '/products') : ('/dashboard/products')
   
   const categories = [
   'Fruits & Vegetables', 

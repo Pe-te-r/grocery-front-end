@@ -104,7 +104,7 @@ export function ProductsRouteComponent(){
   const productsPerPage = 20;
 const matchRoute = useMatchRoute();
 const isProducts = matchRoute({ to: '/products' });
-const param_url = isProducts ? '/products/' : '/dashboard/shop'
+const param_url = isProducts ? '/products/' : '/dashboard/products/'
 
 const searchParams = useSearch({
   from: param_url,      

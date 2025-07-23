@@ -13,9 +13,7 @@ export const Route = createFileRoute('/dashboard/products/my_products')({
 // Product Card Component
 function ProductCard({
   product,
-  onUpdateStock,
   onDelete,
-  onToggleAvailability,
   onSaveChanges
 }: {
   product: any;
