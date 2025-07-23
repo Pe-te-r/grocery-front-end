@@ -1,5 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Maximize2, Minimize2, MessageSquareText, ArrowLeft, ArrowRight } from 'lucide-react';
+import {   getGeminiResponse } from '@/api/chat';
+import ReactMarkdown from 'react-markdown';
+
 
 type Position = {
   x: number;
@@ -20,6 +23,7 @@ const ChatbotSystem = () => {
   const [userMessageSide, setUserMessageSide] = useState<'left' | 'right'>('right');
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   
   const chatRef = useRef<HTMLDivElement>(null);
   const iconRef = useRef<HTMLDivElement>(null);
@@ -162,40 +166,81 @@ const ChatbotSystem = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim()) return;
-    
-    const newMessage: Message = {
-      id: Date.now(),
-      text: inputMessage,
-      sender: 'user',
-      side: userMessageSide
-    };
-    
-    setMessages([...messages, newMessage]);
-    setInputMessage('');
-    
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
+  const handleAIResponse = useCallback(async (userMessage: string) => {
+    try {
+      // Add the user message to the chat immediately
+      const newUserMessage: Message = {
+        id: Date.now(),
+        text: userMessage,
+        sender: 'user',
+        side: userMessageSide
+      };
+      
+      setMessages(prev => [...prev, newUserMessage]);
+      setInputMessage('');
+      
+      // Show a loading message while waiting for the AI response
+      const loadingMessage: Message = {
         id: Date.now() + 1,
-        text: `I received your message: "${inputMessage}". This is a simulated response from the AI.`,
+        text: "Thinking...",
         sender: 'ai',
         side: userMessageSide === 'right' ? 'left' : 'right'
       };
-      setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
+      setMessages(prev => [...prev, loadingMessage]);
+      
+      setIsTyping(true);
+      
+      // Get the AI response from your API
+      const aiResponse = await getGeminiResponse(userMessage, 
+        messages.map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.text
+        }))
+      );
+      
+      setIsTyping(false);
+      
+      // Remove the loading message and add the real response
+      setMessages(prev => [
+        ...prev.filter(msg => msg.id !== loadingMessage.id),
+        {
+          id: Date.now() + 2,
+          text: aiResponse,
+          sender: 'ai',
+          side: userMessageSide === 'right' ? 'left' : 'right'
+        }
+      ]);
+      
+    } catch (error) {
+      setIsTyping(false);
+      console.error('Error getting AI response:', error);
+      setMessages(prev => [
+        ...prev.filter(msg => msg.text !== "Thinking..."),
+        {
+          id: Date.now() + 2,
+          text: "Sorry, I encountered an error. Please try again.",
+          sender: 'ai',
+          side: userMessageSide === 'right' ? 'left' : 'right'
+        }
+      ]);
+    }
+  }, [messages, userMessageSide]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputMessage.trim()) return;
+    
+    await handleAIResponse(inputMessage);
   };
 
   const getChatSizeClasses = () => {
     switch (chatSize) {
       case 'small':
-        return 'w-80 h-80';
+        return 'w-120 h-100';
       case 'large':
-        return 'w-100 h-[28rem]';
+        return 'w-160 h-[38rem]';
       default:
-        return 'w-96 h-104';
+        return 'w-140 h-124';
     }
   };
 
@@ -286,10 +331,26 @@ const ChatbotSystem = () => {
                           : 'bg-gray-200 text-gray-800'
                       }`}
                     >
-                      {message.text}
-                    </div>
+    {message.sender === 'ai' ? (
+        <ReactMarkdown >
+          {message.text}
+        </ReactMarkdown>
+      ) : (
+        message.text
+      )}                    </div>
                   </div>
                 ))}
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[80%] p-2 rounded-lg bg-gray-200 text-gray-800">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"></div>
+                        <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -303,10 +364,12 @@ const ChatbotSystem = () => {
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type your message..."
                 className="flex-1 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+                disabled={isTyping}
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
+                disabled={isTyping || !inputMessage.trim()}
               >
                 Send
               </button>

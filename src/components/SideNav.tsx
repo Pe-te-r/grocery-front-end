@@ -28,6 +28,7 @@ import {
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserRole } from '@/util/types';
+import { useNavigate } from '@tanstack/react-router';
 
 
 // Role-based user display info
@@ -271,22 +272,12 @@ const getNavItems = () => {
   ].filter(item => item.roles.includes(role.role));
 };
   const navItems = getNavItems();
+const navigate = useNavigate();
+const handleLogout = () => {
+  logoutUserHelper()
+    navigate({to:'/'})
 
-  // Role-based add button action
-  const getAddButtonAction = () => {
-    switch (role.role) {
-      case UserRole.VENDOR:
-        return { label: "Add Product", path: "/dashboard/products/add" };
-      case UserRole.ADMIN:
-      case UserRole.SUPERADMIN:
-        return { label: "Add User", path: "/dashboard/users/add" };
-      default:
-        return { label: "New Order", path: "/shop" };
-    }
-  };
-
-  const addButton = getAddButtonAction();
-
+}
 
 
   const userInfo = getUserDisplayInfo(getUserRoleHelper());
@@ -429,21 +420,7 @@ const getNavItems = () => {
           </ul>
         </nav>
 
-        {/* Add New Button */}
-        {role.role !== UserRole.CUSTOMER && (
-          <div className="px-4 pb-4">
-            <motion.button
-              className="w-full flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Link to={addButton.path} className="flex items-center space-x-2">
-                <Plus size={18} />
-                {!collapsed && <span>{addButton.label}</span>}
-              </Link>
-            </motion.button>
-          </div>
-        )}
+  
 
         {/* User & Help Section */}
         <div className="border-t border-gray-200 p-4">
@@ -487,7 +464,7 @@ const getNavItems = () => {
                 </motion.button>
                 <motion.button
                   className="p-2 hover:bg-gray-100 rounded-lg"
-                  onClick={() => logoutUserHelper()}
+                  onClick={() => handleLogout()}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
