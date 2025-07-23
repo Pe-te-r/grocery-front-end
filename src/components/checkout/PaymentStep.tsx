@@ -14,7 +14,6 @@ export function PaymentStep({
 }) {
   const [paymentReference, setPaymentReference] = useState<string | null>(
   );
-  const [paymentInitiated, setPaymentInitiated] = useState(false);
   
   // Convert amount to the smallest currency unit (kobo for NGN)
   const paystackAmount = Math.round(totalAmount * 100);
@@ -28,7 +27,6 @@ export function PaymentStep({
   // Handle payment creation
   const handleProceedToPayment = async () => {
     try {
-      setPaymentInitiated(true);
       const paymentData = await createPaymentMutation.mutateAsync();
       
       if (paymentData?.status && paymentData.data?.data.authorization_url) {

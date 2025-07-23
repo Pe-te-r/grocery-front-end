@@ -20,10 +20,7 @@ import { LocationStep } from '@/components/checkout/LocationStep';
 import { useCreateOrder } from '@/hooks/ordersHook';
 import toast from 'react-hot-toast';
 
-export function CheckoutPage() {
-  const { cartItems, totalPrice, clearCart } = useCart();
-  const [currentStep, setCurrentStep] = useState<'products' | 'location' | 'delivery' | 'payment'>('products');
-  const [orderData, setOrderData] = useState({
+const initialState ={
     county: '',
     subCounty: '',
     pickStation: null,
@@ -34,7 +31,12 @@ export function CheckoutPage() {
     phoneNumber: '',
     useSystemNumber: true,
     store: ''
-  });
+  }
+
+export function CheckoutPage() {
+  const { cartItems, totalPrice, clearCart } = useCart();
+  const [currentStep, setCurrentStep] = useState<'products' | 'location' | 'delivery' | 'payment'>('products');
+  const [orderData, setOrderData] = useState(initialState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
@@ -120,6 +122,7 @@ export function CheckoutPage() {
         console.log('success data', data)
         setIsSubmitting(false);
         setOrderSuccess(true);
+        clearCart()
       },
       onError: (error) => {
         console.error('error message', error)
@@ -185,12 +188,8 @@ export function CheckoutPage() {
 
           {currentStep === 'payment' && (
             <PaymentStep
-              orderData={orderData}
-              setOrderData={setOrderData}
-              totalAmount={totalAmount}
-              deliveryOption={orderData.deliveryOption}
-              deliveryFee={orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee}
-              onBack={() => setCurrentStep('delivery')}
+              //  add fee based on delivery option
+              totalAmount={totalAmount + (orderData.deliveryOption === 'pickup' ? pickupFee : deliveryFee)}
               onSubmit={handleSubmitOrder}
               isSubmitting={isSubmitting}
             />
