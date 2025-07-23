@@ -2,10 +2,7 @@ import { SidebarDashboard } from '@/components/SideNav';
 import { getUserRoleHelper, isAuthenticatedHelper } from '@/lib/authHelper';
 import { UserRole } from '@/util/types';
 import { createFileRoute,  Outlet, redirect } from '@tanstack/react-router';
-import {
-  Bell,
-  Search,
-} from 'lucide-react';
+
 
 export const Route = createFileRoute('/dashboard')({
   beforeLoad: async() => {
