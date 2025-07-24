@@ -1,12 +1,87 @@
 import { createFileRoute } from '@tanstack/react-router'
-
 import { useQuery } from '@tanstack/react-query'
 import { getUsersFn } from '@/api/users'
 import { motion } from 'framer-motion'
-import { Loader2, Check, X, UserCog } from 'lucide-react'
+import { Loader2, Check, X, UserCog, Search, ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { UserRole } from '@/util/types'
 import { useUpdateUserHook } from '@/hooks/userHook'
+
+const PromoteButton = ({
+  userId,
+  isPending,
+  promotingId,
+  onClick,
+}: {
+  userId: string
+  isPending: boolean
+  promotingId: string | null
+  onClick: (userId: string) => void
+}) => {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => onClick(userId)}
+      disabled={isPending && promotingId === userId}
+      className={`flex items-center cursor-pointer gap-2 px-4 py-2 rounded-md ${
+        isPending && promotingId === userId
+          ? 'bg-gray-200 text-gray-700'
+          : 'bg-green-600 text-white hover:bg-green-700'
+      }`}
+    >
+      {isPending && promotingId === userId ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Promoting...
+        </>
+      ) : (
+        <>
+          <UserCog className="w-4 h-4" />
+          Promote to SuperAdmin
+        </>
+      )}
+    </motion.button>
+  )
+}
+
+const DemoteButton = ({
+  userId,
+  isPending,
+  promotingId,
+  onClick,
+}: {
+  userId: string
+  isPending: boolean
+  promotingId: string | null
+  onClick: (userId: string) => void
+}) => {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => onClick(userId)}
+      disabled={isPending && promotingId === userId}
+      className={`flex items-center cursor-pointer gap-2 px-4 py-2 rounded-md ${
+        isPending && promotingId === userId
+          ? 'bg-gray-200 text-gray-700'
+          : 'bg-red-300 text-white hover:bg-red-500'
+      }`}
+    >
+      {isPending && promotingId === userId ? (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          Demoting...
+        </>
+      ) : (
+        <>
+          <ArrowLeft className="w-4 h-4" />
+          Demote to Customer
+        </>
+      )}
+    </motion.button>
+  )
+}
 
 const AdminToSuperAdminPage = () => {
   // Fetch admins data
@@ -14,12 +89,23 @@ const AdminToSuperAdminPage = () => {
     queryKey: ['admins'],
     queryFn: () => getUsersFn({ admin: true }),
   })
-  const admins = data?.data || []
+  
+  // Search state
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  // Filter admins based on search term
+  const filteredAdmins = (data?.data || []).filter((admin: any) => {
+    const searchLower = searchTerm.toLowerCase()
+    return (
+      admin.email.toLowerCase().includes(searchLower) ||
+      admin.first_name.toLowerCase().includes(searchLower) ||
+      (admin.last_name && admin.last_name.toLowerCase().includes(searchLower))
+  )})
 
   // Mutation for updating user role
   const { mutate, isPending, error } = useUpdateUserHook()
 
-  // State for tracking promotion status
+  // State for tracking promotion/demotion status
   const [promotingId, setPromotingId] = useState<string | null>(null)
   const [promotionStatus, setPromotionStatus] = useState<{
     success: boolean
@@ -42,6 +128,32 @@ const AdminToSuperAdminPage = () => {
           setPromotionStatus({
             success: false,
             message: error?.message || 'Promotion failed',
+          })
+        },
+        onSettled: () => {
+          setPromotingId(null)
+          setTimeout(() => setPromotionStatus(null), 3000)
+        },
+      }
+    )
+  }
+
+  // Handle demotion to customer
+  const handleDemoteToCustomer = (userId: string) => {
+    setPromotingId(userId)
+    setPromotionStatus(null)
+    
+    mutate(
+      { id: userId, role: UserRole.CUSTOMER },
+      {
+        onSuccess: () => {
+          setPromotionStatus({ success: true, message: 'Demotion to Customer successful!' })
+          refetch()
+        },
+        onError: () => {
+          setPromotionStatus({
+            success: false,
+            message: error?.message || 'Demotion failed',
           })
         },
         onSettled: () => {
@@ -105,7 +217,7 @@ const AdminToSuperAdminPage = () => {
           <UserCog className="w-8 h-8" /> Admin Management
         </h1>
         <p className="text-gray-600 mt-2">
-          Promote admins to superadmin roles with elevated privileges
+          Manage admin roles and permissions
         </p>
       </motion.div>
 
@@ -127,6 +239,26 @@ const AdminToSuperAdminPage = () => {
           <span>{promotionStatus.message}</span>
         </motion.div>
       )}
+
+      {/* Search Bar */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="mb-6"
+      >
+        <div className="relative max-w-md">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search admins by name or email..."
+            className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </motion.div>
 
       <motion.div
         variants={containerVariants}
@@ -151,25 +283,25 @@ const AdminToSuperAdminPage = () => {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">
                   Joined
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">
-                  Action
+                  Demote to customer
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">
+                  Promote to admin
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {admins.length === 0 ? (
+              {filteredAdmins.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
-                    No admins found
+                  <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                    {searchTerm ? 'No matching admins found' : 'No admins found'}
                   </td>
                 </tr>
               ) : (
-                admins.map((admin:any) => (
+                filteredAdmins.map((admin: any) => (
                   <motion.tr
                     key={admin.id}
                     variants={itemVariants}
@@ -206,37 +338,23 @@ const AdminToSuperAdminPage = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                        {admin.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(admin.created_at).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handlePromoteToSuperAdmin(admin.id)}
-                        disabled={isPending && promotingId === admin.id}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-md ${
-                          isPending && promotingId === admin.id
-                            ? 'bg-gray-200 text-gray-700'
-                            : 'bg-green-600 text-white hover:bg-green-700'
-                        }`}
-                      >
-                        {isPending && promotingId === admin.id ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Promoting...
-                          </>
-                        ) : (
-                          <>
-                            <UserCog className="w-4 h-4" />
-                            Promote to SuperAdmin
-                          </>
-                        )}
-                      </motion.button>
+                    <td>
+                      <DemoteButton
+                        userId={admin.id}
+                        isPending={isPending}
+                        promotingId={promotingId}
+                        onClick={handleDemoteToCustomer}
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                      <PromoteButton
+                        userId={admin.id}
+                        isPending={isPending}
+                        promotingId={promotingId}
+                        onClick={handlePromoteToSuperAdmin}
+                      />
                     </td>
                   </motion.tr>
                 ))
@@ -252,4 +370,3 @@ const AdminToSuperAdminPage = () => {
 export const Route = createFileRoute('/dashboard/system/super_admin')({
   component: AdminToSuperAdminPage,
 })
-

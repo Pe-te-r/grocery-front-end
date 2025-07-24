@@ -103,7 +103,8 @@ export function ProductsRouteComponent(){
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 20;
 const matchRoute = useMatchRoute();
-const isProducts = matchRoute({ to: '/products' }) 
+const isProducts = matchRoute({ to: '/products' }) && !matchRoute({ to: '/dashboard/products/category' });
+console.log('isProducts:', isProducts);
 const param_url = isProducts ? '/products/' : '/dashboard/products/'
 
 
