@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { ChatbotProvider } from '@/components/ChatbotProvider.tsx'
+import { ThemeProvider } from '@/context/theme-context.tsx'
 
 // Lazy load components that aren't immediately needed
 const LazyDevtools = lazy(() => import('@tanstack/react-router-devtools').then(m => ({
@@ -34,7 +35,9 @@ function RouteComponent() {
 
   return (
     <>
-      <Header />
+    <ThemeProvider>   
+
+          <Header />
       
       <Outlet />
       
@@ -61,6 +64,7 @@ function RouteComponent() {
           />
         </ChatbotProvider>
       </Suspense>
+      </ThemeProvider>
     </>
   )
 }

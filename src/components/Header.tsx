@@ -106,14 +106,14 @@ const GroceryStoreHeader = () => {
       </motion.div>
 
       {/* Main Header */}
-      <motion.header 
-        className={`bg-white shadow-md z-50 transition-transform duration-300 
-          ${headerVisible ? 'translate-y-0' : '-translate-y-full'} 
-          sticky top-0`}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: 'spring', stiffness: 100 }}
-      >
+    <motion.header 
+      className={`bg-white shadow-md z-50 transition-transform duration-300 
+        ${headerVisible ? 'translate-y-0' : '-translate-y-full'} 
+        sticky top-0`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: 'spring', stiffness: 100 }}
+    >
         <div className="container mx-auto px-4 py-3">
           {/* Mobile Top Row */}
           <div className="flex items-center justify-between md:hidden mb-3">

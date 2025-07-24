@@ -132,3 +132,31 @@ code {
     @apply bg-background text-foreground;
   }
 }
+
+/* In your global CSS file */
+:root {
+  --color-bg: #f0fdf4;
+  --color-surface: #dcfce7;
+  --color-text: #14532d;
+  --color-text-secondary: #166534;
+  --color-border: #86efac;
+  --color-accent: #15803d;
+}
+
+[data-theme="light"] {
+  --color-bg: #ffffff;
+  --color-surface: #f8fafc;
+  --color-text: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-border: #e2e8f0;
+  --color-accent: #22c55e;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-text: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-border: #334155;
+  --color-accent: #4ade80;
+}
