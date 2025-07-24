@@ -143,7 +143,7 @@ const getNavItems = () => {
     {
       name: "Shop",
       icon: ShoppingBag,
-      path: "/dashboard/shop",
+      path: "/dashboard/products",
       roles: [UserRole.CUSTOMER],
     },
     {
