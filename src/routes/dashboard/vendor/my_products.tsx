@@ -5,6 +5,7 @@ import { Edit, Trash2, Plus, Minus, RotateCw, AlertCircle, Package, PackageCheck
 import { Link } from '@tanstack/react-router';
 import { productsByUserIdHook } from '@/hooks/userHook';
 import { getUserIdHelper } from '@/lib/authHelper';
+import { useUpdateProductHook } from '@/hooks/productHook';
 
 export const Route = createFileRoute('/dashboard/vendor/my_products')({
   component: VendorProductsPage,
@@ -33,8 +34,12 @@ function ProductCard({
     }));
   };
 
+  const updateMutate = useUpdateProductHook();
+
   const handleSave = () => {
     onSaveChanges(editedProduct);
+    console.log('Saving changes for product:', editedProduct);
+    updateMutate.mutate({ id: product.id, data:editedProduct});
     setIsEditing(false);
   };
 

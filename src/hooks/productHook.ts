@@ -1,4 +1,4 @@
-import { createProductFn, getProductFn } from "@/api/product";
+import { createProductFn, getProductFn, updateProductFn } from "@/api/product";
 import type { ProductForm } from "@/util/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -19,4 +19,15 @@ export const useGetProductQuery = (category?: string) => {
     queryFn: () => getProductFn(category),
     refetchInterval: 30 * 1000 
   })
+}
+
+
+export const useUpdateProductHook = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: ProductForm }) => updateProductFn(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
 }

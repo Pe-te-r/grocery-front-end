@@ -34,3 +34,21 @@ export const getProductFn = async (category?: string) => {
   const data_response = await response.json();
   return data_response;
 }
+
+export const updateProductFn = async (id: string, data:any) => {
+  console.log('Updating product with ID:', id, 'and data:', data);
+  const token = await getAccessTokenHelper();
+
+  const response = await fetch(`${url}/products/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+  
+  const json_data = await response.json();
+  console.log('data response',json_data);
+  return json_data;
+}

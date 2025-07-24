@@ -4,6 +4,7 @@ import { Leaf, Plus, Minus, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 
 export const ProductCard = ({ product }: { product: any }) => {
+  console.log('Rendering ProductCard for:', product);
   const { addToCart, removeFromCart, getItemQuantity } = useCart();
   const quantityInCart = getItemQuantity(product.id);
   const [isHovered, setIsHovered] = useState(false);
