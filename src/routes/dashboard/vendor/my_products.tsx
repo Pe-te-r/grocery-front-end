@@ -6,7 +6,7 @@ import { Link } from '@tanstack/react-router';
 import { productsByUserIdHook } from '@/hooks/userHook';
 import { getUserIdHelper } from '@/lib/authHelper';
 
-export const Route = createFileRoute('/dashboard/products/my_products')({
+export const Route = createFileRoute('/dashboard/vendor/my_products')({
   component: VendorProductsPage,
 })
 
@@ -272,7 +272,7 @@ function VendorProductsPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-800">My Products</h1>
         <Link
-          to="/dashboard/products/add"
+          to="/dashboard/vendor/add"
           className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center"
         >
           <Plus className="mr-2" size={16} />

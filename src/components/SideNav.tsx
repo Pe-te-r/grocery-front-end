@@ -173,8 +173,8 @@ const getNavItems = () => {
       path: "/dashboard/products",
       roles: [UserRole.VENDOR],
       subItems: [
-        { name: "My Products", path: "/dashboard/products/my_products" },
-        { name: "Add Product", path: "/dashboard/products/add" },
+        { name: "My Products", path: "/dashboard/vendor/my_products" },
+        { name: "Add Product", path: "/dashboard/vendor/add" },
       ],
     },
   ];

@@ -693,6 +693,6 @@ function AddProductPage() {
   )
 }
 
-export const Route = createFileRoute('/dashboard/products/add')({
+export const Route = createFileRoute('/dashboard/vendor/add')({
   component: AddProductPage,
 })
