@@ -22,6 +22,7 @@ import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settin
 import { Route as DashboardProductsRouteImport } from './routes/dashboard/products'
 import { Route as DashboardPickstationRouteImport } from './routes/dashboard/pickstation'
 import { Route as DashboardLocationsRouteImport } from './routes/dashboard/locations'
+import { Route as DashboardCategoryRouteImport } from './routes/dashboard/category'
 import { Route as DashboardApplicationsRouteImport } from './routes/dashboard/applications'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
@@ -41,7 +42,6 @@ import { Route as DashboardUsersAdminsRouteImport } from './routes/dashboard/use
 import { Route as DashboardSystemSuper_adminRouteImport } from './routes/dashboard/system/super_admin'
 import { Route as DashboardSystemDriversRouteImport } from './routes/dashboard/system/drivers'
 import { Route as DashboardSystemAdminsRouteImport } from './routes/dashboard/system/admins'
-import { Route as DashboardProductsCategoryRouteImport } from './routes/dashboard/products/category'
 import { Route as DashboardOrdersVendorOrdersRouteImport } from './routes/dashboard/orders/vendor-orders'
 import { Route as DashboardOrdersCurrentRouteImport } from './routes/dashboard/orders/current'
 import { Route as DashboardDeliveriesAssignedRouteImport } from './routes/dashboard/deliveries/assigned'
@@ -109,6 +109,11 @@ const DashboardPickstationRoute = DashboardPickstationRouteImport.update({
 const DashboardLocationsRoute = DashboardLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCategoryRoute = DashboardCategoryRouteImport.update({
+  id: '/category',
+  path: '/category',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardApplicationsRoute = DashboardApplicationsRouteImport.update({
@@ -210,12 +215,6 @@ const DashboardSystemAdminsRoute = DashboardSystemAdminsRouteImport.update({
   path: '/system/admins',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardProductsCategoryRoute =
-  DashboardProductsCategoryRouteImport.update({
-    id: '/category',
-    path: '/category',
-    getParentRoute: () => DashboardProductsRoute,
-  } as any)
 const DashboardOrdersVendorOrdersRoute =
   DashboardOrdersVendorOrdersRouteImport.update({
     id: '/orders/vendor-orders',
@@ -244,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
+  '/dashboard/category': typeof DashboardCategoryRoute
   '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
@@ -255,7 +255,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/deliveries/assigned': typeof DashboardDeliveriesAssignedRoute
   '/dashboard/orders/current': typeof DashboardOrdersCurrentRoute
   '/dashboard/orders/vendor-orders': typeof DashboardOrdersVendorOrdersRoute
-  '/dashboard/products/category': typeof DashboardProductsCategoryRoute
   '/dashboard/system/admins': typeof DashboardSystemAdminsRoute
   '/dashboard/system/drivers': typeof DashboardSystemDriversRoute
   '/dashboard/system/super_admin': typeof DashboardSystemSuper_adminRoute
@@ -281,6 +280,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
+  '/dashboard/category': typeof DashboardCategoryRoute
   '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -290,7 +290,6 @@ export interface FileRoutesByTo {
   '/dashboard/deliveries/assigned': typeof DashboardDeliveriesAssignedRoute
   '/dashboard/orders/current': typeof DashboardOrdersCurrentRoute
   '/dashboard/orders/vendor-orders': typeof DashboardOrdersVendorOrdersRoute
-  '/dashboard/products/category': typeof DashboardProductsCategoryRoute
   '/dashboard/system/admins': typeof DashboardSystemAdminsRoute
   '/dashboard/system/drivers': typeof DashboardSystemDriversRoute
   '/dashboard/system/super_admin': typeof DashboardSystemSuper_adminRoute
@@ -318,6 +317,7 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
+  '/dashboard/category': typeof DashboardCategoryRoute
   '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
@@ -329,7 +329,6 @@ export interface FileRoutesById {
   '/dashboard/deliveries/assigned': typeof DashboardDeliveriesAssignedRoute
   '/dashboard/orders/current': typeof DashboardOrdersCurrentRoute
   '/dashboard/orders/vendor-orders': typeof DashboardOrdersVendorOrdersRoute
-  '/dashboard/products/category': typeof DashboardProductsCategoryRoute
   '/dashboard/system/admins': typeof DashboardSystemAdminsRoute
   '/dashboard/system/drivers': typeof DashboardSystemDriversRoute
   '/dashboard/system/super_admin': typeof DashboardSystemSuper_adminRoute
@@ -358,6 +357,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard/applications'
+    | '/dashboard/category'
     | '/dashboard/locations'
     | '/dashboard/pickstation'
     | '/dashboard/products'
@@ -369,7 +369,6 @@ export interface FileRouteTypes {
     | '/dashboard/deliveries/assigned'
     | '/dashboard/orders/current'
     | '/dashboard/orders/vendor-orders'
-    | '/dashboard/products/category'
     | '/dashboard/system/admins'
     | '/dashboard/system/drivers'
     | '/dashboard/system/super_admin'
@@ -395,6 +394,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/dashboard/applications'
+    | '/dashboard/category'
     | '/dashboard/locations'
     | '/dashboard/pickstation'
     | '/dashboard/settings'
@@ -404,7 +404,6 @@ export interface FileRouteTypes {
     | '/dashboard/deliveries/assigned'
     | '/dashboard/orders/current'
     | '/dashboard/orders/vendor-orders'
-    | '/dashboard/products/category'
     | '/dashboard/system/admins'
     | '/dashboard/system/drivers'
     | '/dashboard/system/super_admin'
@@ -431,6 +430,7 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/register'
     | '/dashboard/applications'
+    | '/dashboard/category'
     | '/dashboard/locations'
     | '/dashboard/pickstation'
     | '/dashboard/products'
@@ -442,7 +442,6 @@ export interface FileRouteTypes {
     | '/dashboard/deliveries/assigned'
     | '/dashboard/orders/current'
     | '/dashboard/orders/vendor-orders'
-    | '/dashboard/products/category'
     | '/dashboard/system/admins'
     | '/dashboard/system/drivers'
     | '/dashboard/system/super_admin'
@@ -563,6 +562,13 @@ declare module '@tanstack/react-router' {
       path: '/locations'
       fullPath: '/dashboard/locations'
       preLoaderRoute: typeof DashboardLocationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/category': {
+      id: '/dashboard/category'
+      path: '/category'
+      fullPath: '/dashboard/category'
+      preLoaderRoute: typeof DashboardCategoryRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/applications': {
@@ -698,13 +704,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSystemAdminsRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/products/category': {
-      id: '/dashboard/products/category'
-      path: '/category'
-      fullPath: '/dashboard/products/category'
-      preLoaderRoute: typeof DashboardProductsCategoryRouteImport
-      parentRoute: typeof DashboardProductsRoute
-    }
     '/dashboard/orders/vendor-orders': {
       id: '/dashboard/orders/vendor-orders'
       path: '/orders/vendor-orders'
@@ -730,12 +729,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface DashboardProductsRouteChildren {
-  DashboardProductsCategoryRoute: typeof DashboardProductsCategoryRoute
   DashboardProductsIndexRoute: typeof DashboardProductsIndexRoute
 }
 
 const DashboardProductsRouteChildren: DashboardProductsRouteChildren = {
-  DashboardProductsCategoryRoute: DashboardProductsCategoryRoute,
   DashboardProductsIndexRoute: DashboardProductsIndexRoute,
 }
 
@@ -766,6 +763,7 @@ const DashboardUsersRouteWithChildren = DashboardUsersRoute._addFileChildren(
 
 interface DashboardRouteChildren {
   DashboardApplicationsRoute: typeof DashboardApplicationsRoute
+  DashboardCategoryRoute: typeof DashboardCategoryRoute
   DashboardLocationsRoute: typeof DashboardLocationsRoute
   DashboardPickstationRoute: typeof DashboardPickstationRoute
   DashboardProductsRoute: typeof DashboardProductsRouteWithChildren
@@ -788,6 +786,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardApplicationsRoute: DashboardApplicationsRoute,
+  DashboardCategoryRoute: DashboardCategoryRoute,
   DashboardLocationsRoute: DashboardLocationsRoute,
   DashboardPickstationRoute: DashboardPickstationRoute,
   DashboardProductsRoute: DashboardProductsRouteWithChildren,

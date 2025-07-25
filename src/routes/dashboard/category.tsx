@@ -9,7 +9,7 @@ import { CategoryTable } from '@/components/category/CategoryTable'
 import { EditCategoryModal } from '@/components/category/EditCategory'
 import { CreateCategoryModal } from '@/components/category/CreateCategory'
 
-export const Route = createFileRoute('/dashboard/products/category')({
+export const Route = createFileRoute('/dashboard/category')({
   component: CategoryManagement,
 })
 

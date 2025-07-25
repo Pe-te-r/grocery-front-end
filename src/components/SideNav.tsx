@@ -211,7 +211,7 @@ const getNavItems = () => {
       roles: [UserRole.ADMIN, UserRole.SUPERADMIN],
       subItems: [
         { name: "All Products", path: "/dashboard/products" },
-        { name: "Categories", path: "/dashboard/products/category" },
+        { name: "Categories", path: "/dashboard/category" },
       ],
     },
     {
