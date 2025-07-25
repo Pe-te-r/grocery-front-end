@@ -10,113 +10,176 @@ import {
   Phone,
   ChevronDown,
   ChevronUp,
-  Info,
   ShoppingBag,
   Loader,
-  type LucideIcon
+  type LucideIcon,
+  Home,
+  Store
 } from 'lucide-react';
 import { useGetDriverOrders } from '@/hooks/driverHook';
+import { toast } from 'react-hot-toast';
+import { AssignmentStatus } from '@/api/driver';
 import { useUpdateOrderItem } from '@/hooks/ordersHook';
 import { OrderStatus } from '@/routes/dashboard/orders/vendor-orders';
-import { toast } from 'react-hot-toast';
 
-const statusIcons: Record<OrderStatus, LucideIcon> = {
-  [OrderStatus.PENDING]: Clock,
-  [OrderStatus.READY_FOR_PICKUP]: Package,
-  [OrderStatus.IN_TRANSIT]: Truck,
-  [OrderStatus.COMPLETED]: CheckCircle,
-  [OrderStatus.CANCELLED]: XCircle,
-  [OrderStatus.REJECTED]: XCircle,
+const statusIcons: Record<AssignmentStatus, LucideIcon> = {
+  [AssignmentStatus.ACCEPTED]: Clock,
+  [AssignmentStatus.COMPLETED]: CheckCircle,
+  [AssignmentStatus.REJECTED]: XCircle,
+  [AssignmentStatus.IN_PROGRESS]: Truck,
 };
 
-const statusColors: Record<OrderStatus, string> = {
-  [OrderStatus.PENDING]: 'bg-amber-100 text-amber-800',
-  [OrderStatus.READY_FOR_PICKUP]: 'bg-blue-100 text-blue-800',
-  [OrderStatus.IN_TRANSIT]: 'bg-indigo-100 text-indigo-800',
-  [OrderStatus.COMPLETED]: 'bg-green-100 text-green-800',
-  [OrderStatus.CANCELLED]: 'bg-red-100 text-red-800',
-  [OrderStatus.REJECTED]: 'bg-red-100 text-red-800',
+const statusColors: Record<AssignmentStatus, string> = {
+  [AssignmentStatus.ACCEPTED]: 'bg-amber-100 text-amber-800',
+  [AssignmentStatus.COMPLETED]: 'bg-green-100 text-green-800',
+  [AssignmentStatus.REJECTED]: 'bg-red-100 text-red-800',
+  [AssignmentStatus.IN_PROGRESS]: 'bg-blue-100 text-blue-800',
 };
 
 const DriverDeliveriesPage = () => {
-  const { data, isLoading, error, refetch } = useGetDriverOrders();
+  const { data, isLoading, error, refetch } = useGetDriverOrders(AssignmentStatus.ACCEPTED);
+  const [expandedAssignment, setExpandedAssignment] = useState<string | null>(null);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [confirmationModal, setConfirmationModal] = useState<{
     open: boolean;
     type: 'pickup' | 'delivery';
-    orderId: string;
-    batchId?: string;
-  }>({ open: false, type: 'pickup', orderId: '', batchId: '' });
+    orderId?: string;
+    assignmentId?: string;
+    itemId?: string;
+  }>({ open: false, type: 'pickup' });
   const [confirmationCode, setConfirmationCode] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
 
   const updateItemMutate = useUpdateOrderItem();
+  // const updateAssignmentMutate = updateItemMutate();
+
+  const toggleAssignment = (assignmentId: string) => {
+    setExpandedAssignment(expandedAssignment === assignmentId ? null : assignmentId);
+  };
 
   const toggleOrder = (orderId: string) => {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
-  const handleStatusUpdate = async (order_id: string, newStatus: OrderStatus) => {
+  const handleItemStatusUpdate = async (itemId: string, newStatus: OrderStatus) => {
     setIsUpdating(true);
     try {
-      const order = data?.data.orders.find((o: any) => o.orderId === order_id);
-      const order_ids = order.orderItemIds;
-      if (!order_ids) return;
-
-      for (const id of order_ids) {
-        try {
-          await updateItemMutate.mutateAsync(
-            {
-              id,
-              itemStatus: newStatus
-            }, {
-            onSuccess: () => refetch()
-          }
-          );
-        } catch (error) {
-          toast.error(`Failed to update item`);
-          console.error(`Error updating item:`, error);
-        }
-      }
-
-      toast.success(`All items updated to ${newStatus.replace(/_/g, ' ')}`);
-      setConfirmationModal({ open: false, type: 'pickup', orderId: '', batchId: '' });
-      setConfirmationCode('');
+      await updateItemMutate.mutateAsync({
+        id: itemId,
+        itemStatus: newStatus
+      });
+      toast.success(`Item status updated to ${newStatus.replace(/_/g, ' ')}`);
+      refetch();
     } catch (error) {
-      console.error('Error in status update process:', error);
-      toast.error('Failed to complete all updates');
+      toast.error('Failed to update item status');
+      console.error('Error updating item:', error);
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const openConfirmationModal = (type: 'pickup' | 'delivery', orderId: string, batchId: string) => {
-    setConfirmationModal({ open: true, type, orderId, batchId });
+  const handleAssignmentStatusUpdate = async (assignmentId: string, newStatus: AssignmentStatus) => {
+    setIsUpdating(true);
+    try {
+      // await updateAssignmentMutate.mutateAsync({
+      //   id: assignmentId,
+      //   status: newStatus
+      // });
+      toast.success(`Assignment status updated to ${newStatus.replace(/_/g, ' ')}`);
+      refetch();
+    } catch (error) {
+      toast.error('Failed to update assignment status');
+      console.error('Error updating assignment:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const openConfirmationModal = (
+    type: 'pickup' | 'delivery',
+    options: { orderId?: string; assignmentId?: string; itemId?: string }
+  ) => {
+    setConfirmationModal({ open: true, type, ...options });
   };
 
   const submitConfirmation = async () => {
-    const order = data?.data.orders.find((o: any) => o.orderId === confirmationModal.orderId);
-    if (!order) return;
-
-    const expectedCode = order.verification.pickupCode;
-    if (confirmationCode !== expectedCode) {
-      toast.error('Invalid confirmation code. Please try again.');
-      return;
+    try {
+      if (confirmationModal.type === 'pickup') {
+        if (confirmationModal.itemId) {
+          // Single item pickup
+          await handleItemStatusUpdate(confirmationModal.itemId, OrderStatus.IN_TRANSIT);
+        } else if (confirmationModal.orderId) {
+          // Whole order pickup
+          // Find all items in the order that are ready for pickup
+          const assignment = data?.data.assignments.find((a:any) => 
+            a.orders.some((o:any) => o.orderId === confirmationModal.orderId)
+          );
+          const order = assignment?.orders.find((o:any) => o.orderId === confirmationModal.orderId);
+          const itemsToUpdate = order?.items.filter((i:any) => i.itemStatus === 'ready_for_pickup');
+          
+          if (itemsToUpdate && itemsToUpdate.length > 0) {
+            for (const item of itemsToUpdate) {
+              await handleItemStatusUpdate(item.id, OrderStatus.IN_TRANSIT);
+            }
+          }
+        } else if (confirmationModal.assignmentId) {
+          // Whole assignment pickup
+          const assignment = data?.data.assignments.find((a:any) => a.assignmentId === confirmationModal.assignmentId);
+          const itemsToUpdate = assignment?.orders.flatMap((o:any) => 
+            o.items.filter((i:any) => i.itemStatus === 'ready_for_pickup')
+          );
+          
+          if (itemsToUpdate && itemsToUpdate.length > 0) {
+            for (const item of itemsToUpdate) {
+              await handleItemStatusUpdate(item.id, OrderStatus.IN_TRANSIT);
+            }
+          }
+          
+          // Update assignment status to in_progress
+          await handleAssignmentStatusUpdate(confirmationModal.assignmentId, AssignmentStatus.IN_PROGRESS);
+        }
+      } else {
+        // Delivery confirmation
+        if (confirmationModal.itemId) {
+          await handleItemStatusUpdate(confirmationModal.itemId, OrderStatus.COMPLETED);
+        } else if (confirmationModal.orderId) {
+          // Whole order delivery
+          const assignment = data?.data.assignments.find((a: any) => 
+            a.orders.some((o: any) => o.orderId === confirmationModal.orderId)
+          );
+          const order = assignment?.orders.find((o:any) => o.orderId === confirmationModal.orderId);
+          const itemsToUpdate = order?.items.filter((i:any) => i.itemStatus === 'in_transit');
+          
+          if (itemsToUpdate && itemsToUpdate.length > 0) {
+            for (const item of itemsToUpdate) {
+              await handleItemStatusUpdate(item.id, OrderStatus.COMPLETED);
+            }
+          }
+        } else if (confirmationModal.assignmentId) {
+          // Whole assignment delivery
+          const assignment = data?.data.assignments.find((a:any) => a.assignmentId === confirmationModal.assignmentId);
+          const itemsToUpdate = assignment?.orders.flatMap((o: any) => 
+            o.items.filter((i: any) => i.itemStatus === 'in_transit')
+          );
+          
+          if (itemsToUpdate && itemsToUpdate.length > 0) {
+            for (const item of itemsToUpdate) {
+              await handleItemStatusUpdate(item.id, OrderStatus.COMPLETED);
+            }
+          }
+          
+          // Update assignment status to completed
+          await handleAssignmentStatusUpdate(confirmationModal.assignmentId, AssignmentStatus.COMPLETED);
+        }
+      }
+      
+      setConfirmationModal({ open: false, type: 'pickup' });
+      setConfirmationCode('');
+    } catch (error) {
+      console.error('Error in confirmation process:', error);
+      toast.error('Failed to complete confirmation');
     }
-
-    const newStatus = confirmationModal.type === 'pickup'
-      ? OrderStatus.IN_TRANSIT
-      : OrderStatus.COMPLETED;
-
-    await handleStatusUpdate(confirmationModal.orderId, newStatus);
   };
-
-  // Sort orders: pending first, completed last
-  const sortedOrders = data?.data.orders?.sort((a: any, b: any) => {
-    if (a.orderStatus === OrderStatus.COMPLETED) return 1;
-    if (b.orderStatus === OrderStatus.COMPLETED) return -1;
-    return 0;
-  });
 
   if (isLoading) {
     return (
@@ -158,16 +221,16 @@ const DriverDeliveriesPage = () => {
         </header>
 
         <div className="space-y-6">
-          {sortedOrders?.length === 0 ? (
+          {data?.data.assignments?.length === 0 ? (
             <div className="text-center py-12">
               <Package className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-lg font-medium text-gray-900">No orders assigned</h3>
-              <p className="mt-1 text-gray-500">You currently don't have any orders to deliver.</p>
+              <h3 className="mt-2 text-lg font-medium text-gray-900">No assignments</h3>
+              <p className="mt-1 text-gray-500">You currently don't have any assignments.</p>
             </div>
           ) : (
-            sortedOrders?.map((order: any) => (
+            data?.data.assignments?.map((assignment: any) => (
               <motion.div
-                key={order.orderId}
+                key={assignment.assignmentId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -175,31 +238,30 @@ const DriverDeliveriesPage = () => {
               >
                 <div
                   className="p-4 cursor-pointer flex justify-between items-center"
-                  onClick={() => toggleOrder(order.orderId)}
+                  onClick={() => toggleAssignment(assignment.assignmentId)}
                 >
                   <div className="flex items-center space-x-4">
-                    <div className={`p-2 rounded-full ${statusColors[order.orderStatus as OrderStatus]}`}>
-                      {statusIcons[order.orderStatus as OrderStatus] &&
-                        React.createElement(statusIcons[order.orderStatus as OrderStatus], { size: 20 })}
+                    <div className={`p-2 rounded-full ${statusColors[assignment.assignmentStatus as AssignmentStatus]}`}>
+                      {statusIcons[assignment.assignmentStatus as AssignmentStatus] &&
+                        React.createElement(statusIcons[assignment.assignmentStatus as AssignmentStatus], { size: 20 })}
                     </div>
                     <div>
-                      <h3 className="font-medium">Order #{order.orderId.slice(0, 8)}</h3>
+                      <h3 className="font-medium">Assignment #{assignment.assignmentId.slice(0, 8)}</h3>
                       <p className="text-sm text-gray-500">
-                        {new Date(order.orderCreatedAt).toLocaleDateString()} • {order.totalQuantity} items •
-                        <span className="ml-1 capitalize">{order.deliveryOption}</span>
+                        Vendor: {assignment.vendor.name} • {assignment.orders.length} orders
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 text-xs rounded-full ${statusColors[order.orderStatus as OrderStatus]}`}>
-                      {order.orderStatus.replace(/_/g, ' ')}
+                    <span className={`px-2 py-1 text-xs rounded-full ${statusColors[assignment.assignmentStatus as AssignmentStatus]}`}>
+                      {assignment.assignmentStatus.replace(/_/g, ' ')}
                     </span>
-                    {expandedOrder === order.orderId ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    {expandedAssignment === assignment.assignmentId ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </div>
                 </div>
 
                 <AnimatePresence>
-                  {expandedOrder === order.orderId && (
+                  {expandedAssignment === assignment.assignmentId && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
@@ -208,155 +270,188 @@ const DriverDeliveriesPage = () => {
                       className="border-t border-gray-200"
                     >
                       <div className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Pickup Location */}
-                          {order.pickupLocations && order.pickupLocations.length > 0 && (
-                            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-                              <h4 className="font-medium text-green-700 mb-3 flex items-center">
-                                <MapPin className="mr-2" size={18} />
-                                Pickup From Vendor
-                              </h4>
-                              <div className="space-y-2">
-                                <p className="font-medium">{order.pickupLocations[0].name}</p>
-                                <p className="flex items-center">
-                                  <Phone className="mr-1" size={14} /> {order.pickupLocations[0].contactPhone}
-                                </p>
-                                <p className="text-sm">
-                                  <span className="font-medium">Location:</span> {order.pickupLocations[0].location.constituency}, {order.pickupLocations[0].location.county}
-                                </p>
-                                <p className="text-sm">
-                                  <span className="font-medium">Address:</span> {order.pickupLocations[0].location.fullAddress}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Delivery Station */}
-                          {order.deliveryOption === 'pickup' && order.destination?.station && (
-                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                              <h4 className="font-medium text-blue-700 mb-3 flex items-center">
-                                <MapPin className="mr-2" size={18} />
-                                Delivery Station
-                              </h4>
-                              <div className="space-y-2">
-                                <p className="font-medium">{order.destination.station.name}</p>
-                                <p className="flex items-center">
-                                  <Phone className="mr-1" size={14} /> {order.destination.station.contactPhone}
-                                </p>
-                                <p className="text-sm">
-                                  {order.destination.station.isOpenNow ? (
-                                    <span className="text-green-600">Open now</span>
-                                  ) : (
-                                    <span className="text-red-600">Currently closed</span>
-                                  )}
-                                </p>
-                                <p className="text-sm">
-                                  <span className="font-medium">Location:</span> {order.destination.station.location.constituency}, {order.destination.station.location.county}
-                                </p>
-                                <p className="text-sm">
-                                  <span className="font-medium">Address:</span> {order.destination.station.location.fullAddress}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Customer Info (only for delivery orders) */}
-                          {order.deliveryOption === 'delivery' && (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                              <h4 className="font-medium text-green-700 mb-3 flex items-center">
-                                <ShoppingBag className="mr-2" size={18} />
-                                Customer Details
-                              </h4>
-                              <div className="space-y-2">
-                                <p className="flex items-center">
-                                  <span className="font-medium w-24">Name:</span>
-                                  <span>{order.customer.name}</span>
-                                </p>
-                                <p className="flex items-center">
-                                  <span className="font-medium w-24">Phone:</span>
-                                  <a href={`tel:${order.customer.phone}`} className="flex items-center text-blue-600">
-                                    <Phone className="mr-1" size={14} /> {order.customer.phone}
-                                  </a>
-                                </p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Order Status Information */}
-                        <div className="mt-6 bg-amber-50 p-4 rounded-lg border border-amber-100">
-                          <h4 className="font-medium text-amber-700 mb-2 flex items-center">
-                            <Info className="mr-2" size={18} />
-                            Order Status
+                        {/* Vendor Information */}
+                        <div className="bg-green-50 p-4 rounded-lg border border-green-100 mb-4">
+                          <h4 className="font-medium text-green-700 mb-3 flex items-center">
+                            <Store className="mr-2" size={18} />
+                            Vendor Information
                           </h4>
-                          <p className="text-sm">
-                            {order.orderStatus === OrderStatus.PENDING && 'Order is pending confirmation'}
-                            {order.orderStatus === OrderStatus.READY_FOR_PICKUP && 'Ready for pickup from vendor'}
-                            {order.orderStatus === OrderStatus.IN_TRANSIT && 'Order is in transit to destination'}
-                            {order.orderStatus === OrderStatus.COMPLETED && 'Order has been completed'}
-                          </p>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="mt-6">
-                          {order.products.some((p: any) => p.itemStatus === OrderStatus.READY_FOR_PICKUP) && (
-                            <button
-                              onClick={() => openConfirmationModal('pickup', order.orderId, order.batchId)}
-                              className="w-full md:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center justify-center space-x-2"
-                            >
-                              <Package size={18} />
-                              <span>Confirm Pickup</span>
-                            </button>
-                          )}
-                          {order.products.some((p: any) => p.itemStatus === OrderStatus.IN_TRANSIT) && (
-                            <button
-                              onClick={() => openConfirmationModal('delivery', order.orderId, order.batchId)}
-                              className="w-full md:w-auto mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
-                            >
-                              <CheckCircle size={18} />
-                              <span>Confirm Delivery</span>
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Timeline */}
-                        <div className="mt-6">
-                          <h4 className="font-medium text-gray-700 mb-3">Order Timeline</h4>
-                          <div className="relative">
-                            <div className="absolute left-4 h-full w-0.5 bg-gray-200"></div>
-                            <div className="space-y-4">
-                              <TimelineItem
-                                date={order.timeline.created}
-                                status="Order created"
-                                icon={Clock}
-                                active
-                              />
-                              {order.timeline.readyForPickup && (
-                                <TimelineItem
-                                  date={order.timeline.readyForPickup}
-                                  status="Ready for pickup"
-                                  icon={Package}
-                                  active
-                                />
-                              )}
-                              {order.timeline.pickedUp && (
-                                <TimelineItem
-                                  date={order.timeline.pickedUp}
-                                  status="Picked up"
-                                  icon={Truck}
-                                  active
-                                />
-                              )}
-                              {order.timeline.delivered && (
-                                <TimelineItem
-                                  date={order.timeline.delivered}
-                                  status="Delivered"
-                                  icon={CheckCircle}
-                                  active
-                                />
-                              )}
-                            </div>
+                          <div className="space-y-2">
+                            <p className="font-medium">{assignment.vendor.name}</p>
+                            <p className="flex items-center">
+                              <Phone className="mr-1" size={14} /> {assignment.vendor.contactPhone}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">Location:</span> {assignment.vendor.location.constituency}, {assignment.vendor.location.county}
+                            </p>
+                            <p className="text-sm">
+                              <span className="font-medium">Address:</span> {assignment.vendor.location.fullAddress}
+                            </p>
                           </div>
+                        </div>
+
+                        {/* Orders */}
+                        <div className="space-y-4">
+                          {assignment.orders.map((order: any) => (
+                            <div key={order.orderId} className="border rounded-lg overflow-hidden">
+                              <div
+                                className="p-3 cursor-pointer flex justify-between items-center bg-gray-50"
+                                onClick={() => toggleOrder(order.orderId)}
+                              >
+                                <div className="flex items-center space-x-3">
+                                  <div className="p-1.5 rounded-full bg-gray-200">
+                                    <ShoppingBag size={16} className="text-gray-600" />
+                                  </div>
+                                  <div>
+                                    <h4 className="font-medium">Order #{order.orderId.slice(0, 8)}</h4>
+                                    <p className="text-xs text-gray-500">
+                                      {order.items.length} items • {order.deliveryOption}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div>
+                                  {expandedOrder === order.orderId ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </div>
+                              </div>
+
+                              <AnimatePresence>
+                                {expandedOrder === order.orderId && (
+                                  <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="border-t"
+                                  >
+                                    <div className="p-3">
+                                      {/* Customer/Destination Info */}
+                                      <div className="mb-4">
+                                        {order.deliveryOption === 'pickup' && order.destination.station ? (
+                                          <div className="bg-blue-50 p-3 rounded-lg">
+                                            <h5 className="font-medium text-blue-700 flex items-center mb-2">
+                                              <MapPin className="mr-2" size={16} />
+                                              Pickup Station
+                                            </h5>
+                                            <p className="font-medium">{order.destination.station.name}</p>
+                                            <p className="text-sm">{order.destination.station.location.fullAddress}</p>
+                                            <p className="text-sm flex items-center">
+                                              <Phone className="mr-1" size={14} /> {order.destination.station.contactPhone}
+                                            </p>
+                                          </div>
+                                        ) : (
+                                          <div className="bg-purple-50 p-3 rounded-lg">
+                                            <h5 className="font-medium text-purple-700 flex items-center mb-2">
+                                              <Home className="mr-2" size={16} />
+                                              Delivery Address
+                                            </h5>
+                                            <p className="font-medium">{order.customer.name}</p>
+                                            <p className="text-sm flex items-center">
+                                              <Phone className="mr-1" size={14} /> {order.customer.phone}
+                                            </p>
+                                            <p className="text-sm">{order.destination.location.fullAddress}</p>
+                                          </div>
+                                        )}
+                                      </div>
+
+                                      {/* Order Items */}
+                                      <div className="space-y-3">
+                                        {order.items.map((item: any) => (
+                                          <div key={item.id} className="flex items-start border-b pb-3 last:border-0 last:pb-0">
+                                            <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-md overflow-hidden mr-3">
+                                              {item.imageUrl && (
+                                                <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover" />
+                                              )}
+                                            </div>
+                                            <div className="flex-1">
+                                              <p className="font-medium">{item.productName}</p>
+                                              <p className="text-sm text-gray-600">KSh {item.price} × {item.quantity}</p>
+                                              <div className="flex items-center justify-between mt-1">
+                                                <span className={`text-xs px-2 py-1 rounded-full ${
+                                                  item.itemStatus === 'ready_for_pickup' ? 'bg-blue-100 text-blue-800' :
+                                                  item.itemStatus === 'in_transit' ? 'bg-indigo-100 text-indigo-800' :
+                                                  item.itemStatus === 'completed' ? 'bg-green-100 text-green-800' :
+                                                  'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                  {item.itemStatus.replace(/_/g, ' ')}
+                                                </span>
+                                                {item.randomCode && (
+                                                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                                                    Code: {item.randomCode}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </div>
+                                            <div className="ml-2">
+                                              {item.itemStatus === 'ready_for_pickup' && (
+                                                <button
+                                                  onClick={() => openConfirmationModal('pickup', { itemId: item.id })}
+                                                  className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                                                >
+                                                  Pickup
+                                                </button>
+                                              )}
+                                              {item.itemStatus === 'in_transit' && (
+                                                <button
+                                                  onClick={() => openConfirmationModal('delivery', { itemId: item.id })}
+                                                  className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                                                >
+                                                  Deliver
+                                                </button>
+                                              )}
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+
+                                      {/* Order Actions */}
+                                      <div className="mt-4 flex flex-wrap gap-2">
+                                        {order.items.some((i: any) => i.itemStatus === 'ready_for_pickup') && (
+                                          <button
+                                            onClick={() => openConfirmationModal('pickup', { orderId: order.orderId })}
+                                            className="text-sm bg-green-600 text-white px-3 py-1.5 rounded hover:bg-green-700 flex items-center"
+                                          >
+                                            <Package size={16} className="mr-1" />
+                                            Pickup Entire Order
+                                          </button>
+                                        )}
+                                        {order.items.some((i: any) => i.itemStatus === 'in_transit') && (
+                                          <button
+                                            onClick={() => openConfirmationModal('delivery', { orderId: order.orderId })}
+                                            className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded hover:bg-blue-700 flex items-center"
+                                          >
+                                            <CheckCircle size={16} className="mr-1" />
+                                            Deliver Entire Order
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Assignment Actions */}
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {assignment.assignmentStatus === AssignmentStatus.ACCEPTED && (
+                            <button
+                              onClick={() => openConfirmationModal('pickup', { assignmentId: assignment.assignmentId })}
+                              className="text-sm bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 flex items-center"
+                            >
+                              <Package size={16} className="mr-1" />
+                              Pickup Entire Assignment
+                            </button>
+                          )}
+                          {assignment.assignmentStatus === AssignmentStatus.IN_PROGRESS && (
+                            <button
+                              onClick={() => openConfirmationModal('delivery', { assignmentId: assignment.assignmentId })}
+                              className="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex items-center"
+                            >
+                              <CheckCircle size={16} className="mr-1" />
+                              Complete Entire Assignment
+                            </button>
+                          )}
                         </div>
                       </div>
                     </motion.div>
@@ -376,7 +471,7 @@ const DriverDeliveriesPage = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4"
-            onClick={() => !isUpdating && setConfirmationModal({ open: false, type: 'pickup', orderId: '', batchId: '' })}
+            onClick={() => !isUpdating && setConfirmationModal({ open: false, type: 'pickup' })}
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
@@ -392,7 +487,7 @@ const DriverDeliveriesPage = () => {
               {isUpdating ? (
                 <div className="flex flex-col items-center justify-center py-4">
                   <Loader className="animate-spin text-green-600 mb-4" size={32} />
-                  <p>Updating items...</p>
+                  <p>Processing...</p>
                 </div>
               ) : (
                 <>
@@ -419,7 +514,7 @@ const DriverDeliveriesPage = () => {
                   <div className="flex justify-end space-x-3">
                     <button
                       onClick={() => {
-                        setConfirmationModal({ open: false, type: 'pickup', orderId: '', batchId: '' });
+                        setConfirmationModal({ open: false, type: 'pickup' });
                         setConfirmationCode('');
                       }}
                       className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition cursor-pointer"
@@ -445,22 +540,6 @@ const DriverDeliveriesPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-};
-
-const TimelineItem = ({ date, status, icon: Icon, active }: { date: string | null; status: string; icon: LucideIcon; active: boolean }) => {
-  if (!date) return null;
-
-  return (
-    <div className="flex items-start">
-      <div className={`relative z-10 flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-        <Icon size={16} />
-      </div>
-      <div className="ml-4">
-        <p className={`text-sm ${active ? 'text-gray-900' : 'text-gray-500'}`}>{status}</p>
-        <p className="text-xs text-gray-500">{new Date(date).toLocaleString()}</p>
-      </div>
     </div>
   );
 };

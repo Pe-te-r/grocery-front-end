@@ -44,11 +44,19 @@ export const createDriver = async (driverData: CreateDriverDto) => {
   return response.json();
 };
 
+export enum AssignmentStatus {
+  ACCEPTED = 'accepted',
+  COMPLETED = 'completed',
+  REJECTED = 'rejected',
+  IN_PROGRESS = 'in_progress',
+}
 
-export const getDriverOrders = async () => {
+
+export const getDriverOrders = async (status:AssignmentStatus) => {
   const token = await getAccessTokenHelper()
   const userID = getUserIdHelper()
-  const response = await fetch(`${url}/driver/${userID}/orders`, {
+  const fullStatus = status ? `?status=${status}` : '';
+  const response = await fetch(`${url}/driver/${userID}/orders${fullStatus}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
