@@ -102,10 +102,11 @@ export const useOrdersByUserId = (userId: string, params: Record<string, any> = 
   })
 }
 
+// check if id is available before sending the request
 export const useUpdateOrderItem = () => {
   return useMutation({
     mutationFn: ({ id, itemStatus }: { id: string; itemStatus: OrderStatus }) =>
-      updateOrderItemFn(id, { itemStatus }),
+      updateOrderItemFn(id, { itemStatus:itemStatus }),
     onError: (error) => {
       console.error('Mutation error:', error);
     }

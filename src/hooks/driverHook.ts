@@ -1,6 +1,7 @@
 // src/hooks/useCreateDriver.ts
 
-import { AssignmentStatus, createDriver, getDriverDashboard, getDriverOrders, type CreateDriverDto } from '@/api/driver';
+import { AssignmentStatus, createDriver, getDriverDashboard, getDriverOrders, updateDriverOrderItem, type CreateDriverDto } from '@/api/driver';
+import type { AssignmentUpdate } from '@/util/types';
 import { useMutation } from '@tanstack/react-query';
 
 export const useCreateDriver = () => {
@@ -19,7 +20,7 @@ export const useCreateDriver = () => {
 
 import { useQuery } from '@tanstack/react-query';
 
-export const useGetDriverOrders = (status:AssignmentStatus) => {
+export const useGetDriverOrders = (status?:AssignmentStatus) => {
   return useQuery({
     queryKey: ['driver-orders'],
     queryFn: ()=>getDriverOrders(status),
@@ -33,4 +34,18 @@ export const useGetDriverDashboard = (id:string) => {
     queryFn:()=> getDriverDashboard(id),
     enabled: !!id
   })
+}
+
+export const useUpdateDriverOrderItem = () => {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: AssignmentUpdate[] }) => updateDriverOrderItem(id, data),
+    onSuccess: (data) => {
+      console.log('Order item updated successfully:', data);
+      // Additional success logic can be added here
+    },
+    onError: (error) => {
+      console.error('Error updating order item:', error);
+      // Handle error (e.g., show an error message)
+    },
+  });
 }

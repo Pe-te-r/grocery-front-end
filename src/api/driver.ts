@@ -2,6 +2,7 @@
 
 import { getAccessTokenHelper, getUserIdHelper } from "@/lib/authHelper";
 import { url } from "./url";
+import type { AssignmentUpdate } from "@/util/types";
 
 export enum DriverStatus {
   OFFLINE = 'offline',
@@ -52,10 +53,10 @@ export enum AssignmentStatus {
 }
 
 
-export const getDriverOrders = async (status:AssignmentStatus) => {
+export const getDriverOrders = async (itemStatus?:AssignmentStatus) => {
   const token = await getAccessTokenHelper()
   const userID = getUserIdHelper()
-  const fullStatus = status ? `?status=${status}` : '';
+  const fullStatus = itemStatus ? `?status=${itemStatus}` : '';
   const response = await fetch(`${url}/driver/${userID}/orders${fullStatus}`, {
     method: 'GET',
     headers: {
@@ -83,6 +84,26 @@ export const getDriverDashboard = async (id:string) => {
 
   if (!response.ok) {
     throw new Error('Failed to get driver dashboard');
+  }
+
+  return response.json();
+}
+
+
+// happening
+export const updateDriverOrderItem = async(id: string, data:AssignmentUpdate[])=>{
+  const token = await getAccessTokenHelper()
+  const response = await fetch(`${url}/assignment/${id}/order-items`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update driver order item');
   }
 
   return response.json();

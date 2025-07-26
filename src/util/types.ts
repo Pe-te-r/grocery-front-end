@@ -1,3 +1,5 @@
+import { AssignmentStatus } from "@/api/driver";
+import type { OrderStatus } from "@/routes/dashboard/orders/vendor-orders";
 
 export interface CategoryItem {
   name: string;
@@ -128,6 +130,11 @@ export interface UserAuthType {
   id: string;
   email: string;
   role: UserRole;
+}
+
+export interface  AssignmentUpdate{
+  orderItemId: string
+  status: OrderStatus
 }
 
 export type AuthState = {

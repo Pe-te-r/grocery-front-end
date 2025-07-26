@@ -16,6 +16,7 @@ export enum OrderStatus {
   READY_FOR_PICKUP = 'ready_for_pickup',
   IN_TRANSIT = 'in_transit',
   COMPLETED = 'completed',
+  DELIVERED = 'delivered',
   CANCELLED = 'cancelled',
   REJECTED = 'rejected'
 }
