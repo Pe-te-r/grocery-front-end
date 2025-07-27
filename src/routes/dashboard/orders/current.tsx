@@ -1,161 +1,106 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Package, 
-  Clock, 
-  Truck, 
-  CheckCircle, 
-  XCircle,
-  MapPin,
-  CreditCard,
-  ShoppingBasket,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Leaf,
-  Box,
-  ShoppingCart,
-  List
+import {
+  LucideLoader2,
+  LucidePackage,
+  LucidePackageCheck,
+  LucidePackageX,
+  LucidePackageSearch,
+  LucideTruck,
+  LucideList,
+  LucideGrid,
+  LucideChevronDown,
+  LucideInfo,
+  LucideClock,
 } from 'lucide-react';
-import { useGetCustomerOrders } from '@/hooks/customerHook';
+import {  useGetCustomerOrders } from '@/hooks/customerHook';
 import { getUserIdHelper } from '@/lib/authHelper';
+import OrderDetailsModal from '@/components/OrderDetailsModal';
 
-enum OrderStatus {
+export enum OrderStatus {
   PENDING = 'pending',
   READY_FOR_PICKUP = 'ready_for_pickup',
   IN_TRANSIT = 'in_transit',
+  DELIVERED = 'delivered',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
   REJECTED = 'rejected',
 }
 
-interface Product {
-  id: string;
-  name: string;
-  price: string;
-}
-
-interface Vendor {
-  id: string;
-  businessName: string;
-  location: string;
-}
-
-interface OrderItem {
-  id: string;
-  quantity: number;
-  itemStatus: string;
-  product: Product;
-  vendor: Vendor;
-  randomCode: string;
-}
-
-interface PickUpLocation {
-  id: string;
-  name: string;
-  contactPhone: string;
-  openingTime: string;
-  closingTime: string;
-  isOpenNow: boolean;
-  constituency: string;
-  country: string;
-}
-
-interface Order {
-  id: string;
-  status: OrderStatus;
-  totalAmount: string;
-  deliveryOption: string;
-  deliveryFee: string;
-  deliveryInstructions: string;
-  paymentMethod: string;
-  paymentPhone: string;
-  createdAt: string;
-  itemCount: number;
-  pickUpLocation: PickUpLocation;
-  constituency: string | null;
-  items: OrderItem[];
-}
-
 const OrderTrackingPage = () => {
   const userId = getUserIdHelper() ?? '';
   const { data: orderData, isLoading } = useGetCustomerOrders(userId);
-  const [activeTab, setActiveTab] = useState<OrderStatus | 'all'>('all');
-  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const toggleOrderExpand = (orderId: string) => {
-    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  const filteredOrders = orderData?.data
+    ? selectedStatus === 'all'
+      ? orderData.data
+      : orderData.data.filter((order:any) => order.status === selectedStatus)
+    : [];
+
+  const handleOrderClick = (orderId: string) => {
+    setSelectedOrder(orderId);
+    setIsModalOpen(true);
   };
 
-  const toggleItemExpand = (itemId: string) => {
-    setExpandedItems(prev => ({
-      ...prev,
-      [itemId]: !prev[itemId]
-    }));
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedOrder(null);
   };
 
-  const getStatusIcon = (status: OrderStatus) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case OrderStatus.PENDING:
-        return <Package className="w-5 h-5" />;
+        return <LucideClock className="text-amber-500" />;
       case OrderStatus.READY_FOR_PICKUP:
-        return <Clock className="w-5 h-5" />;
+        return <LucidePackageSearch className="text-blue-500" />;
       case OrderStatus.IN_TRANSIT:
-        return <Truck className="w-5 h-5" />;
+        return <LucideTruck className="text-indigo-500" />;
+      case OrderStatus.DELIVERED:
       case OrderStatus.COMPLETED:
-        return <CheckCircle className="w-5 h-5" />;
+        return <LucidePackageCheck className="text-green-500" />;
       case OrderStatus.CANCELLED:
       case OrderStatus.REJECTED:
-        return <XCircle className="w-5 h-5" />;
+        return <LucidePackageX className="text-red-500" />;
       default:
-        return <Info className="w-5 h-5" />;
+        return <LucidePackage className="text-gray-500" />;
     }
   };
 
-  const getOrderStatusText = (status: OrderStatus) => {
+  const getStatusText = (status: string) => {
     switch (status) {
       case OrderStatus.PENDING:
-        return 'Packaging';
+        return 'Processing';
       case OrderStatus.READY_FOR_PICKUP:
-        return 'Waiting for transportation';
+        return 'Waiting for transport';
       case OrderStatus.IN_TRANSIT:
-        return 'In transit to pickup location';
-      case OrderStatus.COMPLETED:
+        return 'On the Way';
+      case OrderStatus.DELIVERED:
         return 'Ready for pickup';
+      case OrderStatus.COMPLETED:
+        return 'Completed';
       case OrderStatus.CANCELLED:
-        return 'Order Cancelled';
+        return 'Cancelled';
       case OrderStatus.REJECTED:
-        return 'Order Rejected';
+        return 'Rejected';
       default:
         return status;
     }
   };
 
-  const getItemStatusText = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'Ready';
-      case 'pending':
-        return 'Preparing';
-      default:
-        return status;
-    }
-  };
-
-  const getStatusColor = (status: OrderStatus | string) => {
-    if (typeof status === 'string' && !Object.values(OrderStatus).includes(status as OrderStatus)) {
-      return status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800';
-    }
-    
+  const getStatusColor = (status: string) => {
     switch (status) {
       case OrderStatus.PENDING:
         return 'bg-amber-100 text-amber-800';
       case OrderStatus.READY_FOR_PICKUP:
         return 'bg-blue-100 text-blue-800';
       case OrderStatus.IN_TRANSIT:
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-indigo-100 text-indigo-800';
+      case OrderStatus.DELIVERED:
       case OrderStatus.COMPLETED:
         return 'bg-green-100 text-green-800';
       case OrderStatus.CANCELLED:
@@ -166,294 +111,213 @@ const OrderTrackingPage = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const filteredOrders = orderData?.data?.filter((order: any) => 
-    activeTab === 'all' || order.status === activeTab
-  ) || [];
-
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-green-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      <div className="flex items-center justify-center h-screen">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        >
+          <LucideLoader2 className="w-12 h-12 text-green-500" />
+        </motion.div>
       </div>
     );
   }
 
-  if (!orderData || !orderData.data || orderData.data.length === 0) {
+  if (!orderData || orderData.data.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-green-50">
-        <div className="text-center">
-          <ShoppingCart className="mx-auto h-12 w-12 text-green-400" />
-          <h3 className="mt-2 text-lg font-medium text-gray-900">No orders found</h3>
-          <p className="mt-1 text-gray-500">You don't have any orders yet.</p>
-        </div>
+      <div className="flex flex-col items-center justify-center h-screen text-center p-4">
+        <LucidePackage className="w-16 h-16 text-gray-400 mb-4" />
+        <h2 className="text-2xl font-semibold text-gray-700">No Orders Found</h2>
+        <p className="text-gray-500 mt-2">You haven't placed any orders yet.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-green-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="mb-8"
-        >
-          <h1 className="text-3xl font-bold text-green-800 mb-2 flex items-center gap-2">
-            <Leaf className="text-green-600" /> Your Order History
-          </h1>
-          <p className="text-green-700">Track your orders and their current status</p>
-        </motion.div>
-
-        {/* Status Tabs */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setActiveTab('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === 'all' ? 'bg-green-600 text-white' : 'bg-white text-green-700 border border-green-200'}`}
-            >
-              <List className="w-4 h-4" /> All Orders
-            </button>
-            {Object.values(OrderStatus).map((status) => (
-              <button
-                key={status}
-                onClick={() => setActiveTab(status)}
-                className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${activeTab === status ? 'bg-green-600 text-white' : 'bg-white text-green-700 border border-green-200'}`}
-              >
-                {getStatusIcon(status)} {getOrderStatusText(status)}
-              </button>
-            ))}
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-7xl mx-auto"
+      >
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">Your Orders</h1>
+            <p className="text-gray-600">Track and manage your orders</p>
           </div>
-        </motion.div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <div className="relative w-full sm:w-48">
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full px-4 py-2 pr-8 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 appearance-none bg-white"
+              >
+                <option value="all">All Statuses</option>
+                {Object.values(OrderStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {getStatusText(status)}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                <LucideChevronDown className="w-5 h-5 text-gray-400" />
+              </div>
+            </div>
+            
+            <div className="flex rounded-lg overflow-hidden border border-gray-300 bg-white">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-green-100 text-green-800' : 'text-gray-700'}`}
+              >
+                <LucideGrid className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-2 ${viewMode === 'list' ? 'bg-green-100 text-green-800' : 'text-gray-700'}`}
+              >
+                <LucideList className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
 
-        {/* Orders List */}
-        <div className="space-y-6">
-          <AnimatePresence>
+        {filteredOrders.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex flex-col items-center justify-center py-12 bg-white rounded-lg shadow-sm"
+          >
+            <LucidePackageSearch className="w-16 h-16 text-gray-400 mb-4" />
+            <h3 className="text-xl font-medium text-gray-700">No orders with this status</h3>
+            <p className="text-gray-500 mt-2">Try selecting a different status</p>
+          </motion.div>
+        ) : viewMode === 'grid' ? (
+          <motion.div
+            layout
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
             {filteredOrders.map((order: any) => (
               <motion.div
                 key={order.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
-                className="bg-white shadow-lg rounded-lg overflow-hidden border border-green-100"
+                whileHover={{ y: -5 }}
+                className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow"
               >
-                {/* Order Header */}
-                <div 
-                  className="px-6 py-4 border-b border-green-200 flex justify-between items-center cursor-pointer hover:bg-green-50 transition-colors"
-                  onClick={() => toggleOrderExpand(order.id)}
-                >
-                  <div>
-                    <h2 className="text-lg font-semibold text-green-900 flex items-center gap-2">
-                      <Box className="text-green-600" />
-                      Order #{order.id.slice(0, 8).toUpperCase()}
-                    </h2>
-                    <p className="text-sm text-green-700">
-                      Placed on {formatDate(order.createdAt)} • {order.itemCount} items • KES {order.totalAmount}
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(order.status)}
+                      <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getStatusColor(order.status)}`}>
+                        {getStatusText(order.status)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h3 className="text-lg font-semibold text-gray-800">Order #{order.id.slice(0, 8)}</h3>
+                    <p className="text-gray-500 text-sm mt-1">
+                      {order.itemCount} item{order.itemCount !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)} flex items-center gap-2`}>
-                      {getStatusIcon(order.status)}
-                      {getOrderStatusText(order.status)}
+                  
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <p className="text-xs text-gray-500">Total Amount</p>
+                      <p className="font-medium">KES {order.totalAmount}</p>
                     </div>
-                    {expandedOrder === order.id ? (
-                      <ChevronUp className="w-5 h-5 text-green-600" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-green-600" />
-                    )}
+                    <div>
+                      <p className="text-xs text-gray-500">Delivery</p>
+                      <p className="font-medium capitalize">
+                        {order.deliveryOption === 'pickup' ? 'Pickup' : 'Delivery'}
+                      </p>
+                    </div>
                   </div>
+                  
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleOrderClick(order.id)}
+                    className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                  >
+                    <LucideInfo className="w-4 h-4" />
+                    View Details
+                  </motion.button>
                 </div>
-                
-                {/* Order Details - Collapsible */}
-                <AnimatePresence>
-                  {expandedOrder === order.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 py-4 grid grid-cols-1 md:grid-cols-3 gap-6 bg-green-50">
-                        {/* Delivery Info */}
-                        <div className="space-y-4">
-                          <h3 className="font-medium text-green-900 flex items-center gap-2">
-                            <MapPin className="w-5 h-5 text-green-600" />
-                            Delivery Information
-                          </h3>
-                          <div className="space-y-2 text-sm text-green-800">
-                            <p>
-                              <span className="font-medium">Method:</span> {order.deliveryOption === 'pickup' ? 'Pickup' : 'Delivery'}
-                            </p>
-                            {order.deliveryOption === 'pickup' && order.pickUpLocation && (
-                              <div className="mt-2 p-3 bg-white rounded-lg border border-green-200">
-                                <p className="font-medium">Pickup Location:</p>
-                                <p>{order.pickUpLocation.name}</p>
-                                <p>{order.pickUpLocation.constituency}, {order.pickUpLocation.country}</p>
-                                <p className="mt-2">
-                                  <span className="font-medium">Hours:</span> {order.pickUpLocation.openingTime} - {order.pickUpLocation.closingTime}
-                                </p>
-                                <p className={order.pickUpLocation.isOpenNow ? 'text-green-600' : 'text-red-600'}>
-                                  {order.pickUpLocation.isOpenNow ? 'Currently Open' : 'Currently Closed'}
-                                </p>
-                                <p className="mt-2">
-                                  <span className="font-medium">Contact:</span> {order.pickUpLocation.contactPhone}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Payment Info */}
-                        <div className="space-y-4">
-                          <h3 className="font-medium text-green-900 flex items-center gap-2">
-                            <CreditCard className="w-5 h-5 text-green-600" />
-                            Payment Information
-                          </h3>
-                          <div className="space-y-2 text-sm text-green-800">
-                            <div className="p-3 bg-white rounded-lg border border-green-200">
-                              <p>
-                                <span className="font-medium">Method:</span> {order.paymentMethod === 'mpesa' ? 'M-Pesa' : order.paymentMethod}
-                              </p>
-                              <p>
-                                <span className="font-medium">Phone:</span> {order.paymentPhone}
-                              </p>
-                              <p className="mt-2">
-                                <span className="font-medium">Subtotal:</span> KES {(parseFloat(order.totalAmount) - parseFloat(order.deliveryFee)).toFixed(2)}
-                              </p>
-                              <p>
-                                <span className="font-medium">Delivery Fee:</span> KES {order.deliveryFee}
-                              </p>
-                              <p className="font-medium mt-2">
-                                <span className="font-medium">Total:</span> KES {order.totalAmount}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Order Summary */}
-                        <div className="space-y-4">
-                          <h3 className="font-medium text-green-900 flex items-center gap-2">
-                            <ShoppingBasket className="w-5 h-5 text-green-600" />
-                            Order Summary
-                          </h3>
-                          <div className="space-y-2 text-sm text-green-800">
-                            <div className="p-3 bg-white rounded-lg border border-green-200">
-                              <p>
-                                <span className="font-medium">Items:</span> {order.itemCount}
-                              </p>
-                              {order.deliveryInstructions && (
-                                <p className="mt-2">
-                                  <span className="font-medium">Instructions:</span> {order.deliveryInstructions}
-                                </p>
-                              )}
-                              <p className="mt-2">
-                                <span className="font-medium">Status:</span> {getOrderStatusText(order.status)}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Order Items */}
-                      <div className="border-t border-green-200">
-                        <h3 className="px-6 py-3 bg-green-50 text-sm font-medium text-green-900 flex items-center gap-2">
-                          <Package className="w-4 h-4" /> Items in this order
-                        </h3>
-                        <div className="divide-y divide-green-100">
-                          {order.items.map((item: any, index: number) => (
-                            <div key={item.id} className="px-6 py-4">
-                              <div 
-                                className="flex justify-between items-start cursor-pointer"
-                                onClick={() => toggleItemExpand(item.id)}
-                              >
-                                <div className="flex items-start space-x-4">
-                                  <div className={`flex-shrink-0 rounded-md p-2 ${item.itemStatus === 'completed' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
-                                    <Package className="h-5 w-5" />
-                                  </div>
-                                  <div>
-                                    <h4 className="text-sm font-medium text-green-900">{item.product.name}</h4>
-                                    <p className="text-sm text-green-700">Vendor: {item.vendor.businessName}</p>
-                                    <p className="text-sm text-green-700">Location: {item.vendor.location}</p>
-                                  </div>
-                                </div>
-                                <div className="text-right flex items-center gap-4">
-                                  <div>
-                                    <p className="text-sm font-medium text-green-900">KES {item.product.price}</p>
-                                    <p className="text-sm text-green-700">Qty: {item.quantity}</p>
-                                    <div className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.itemStatus)}`}>
-                                      {getItemStatusText(item.itemStatus)}
-                                    </div>
-                                  </div>
-                                  {expandedItems[item.id] ? (
-                                    <ChevronUp className="w-5 h-5 text-green-600" />
-                                  ) : (
-                                    <ChevronDown className="w-5 h-5 text-green-600" />
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {/* Item Details - Collapsible */}
-                              <AnimatePresence>
-                                {expandedItems[item.id] && (
-                                  <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="overflow-hidden"
-                                  >
-                                    <div className="mt-4 pl-14 pr-4 py-3 bg-green-50 rounded-lg">
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-800">
-                                        <div>
-                                          <p className="font-medium">Product Details:</p>
-                                          <p>Name: {item.product.name}</p>
-                                          <p>Price: KES {item.product.price}</p>
-                                          <p>Quantity: {item.quantity}</p>
-                                          <p>Total: KES {(parseFloat(item.product.price) * item.quantity).toFixed(2)}</p>
-                                        </div>
-                                        <div>
-                                          <p className="font-medium">Vendor Information:</p>
-                                          <p>Business: {item.vendor.businessName}</p>
-                                          <p>Location: {item.vendor.location}</p>
-                                          <div className={`mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.itemStatus)}`}>
-                                            Status: {getItemStatusText(item.itemStatus)}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </motion.div>
             ))}
-          </AnimatePresence>
-        </div>
-      </div>
+          </motion.div>
+        ) : (
+          <motion.div layout className="space-y-4">
+            {filteredOrders.map((order: any) => (
+              <motion.div
+                key={order.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100"
+              >
+                <div className="p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      {getStatusIcon(order.status)}
+                      <div>
+                        <h3 className="font-semibold text-gray-800">Order #{order.id.slice(0, 8)}</h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getStatusColor(order.status)}`}>
+                            {getStatusText(order.status)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(order.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+                      <div className="text-center sm:text-right">
+                        <p className="text-gray-500">Items</p>
+                        <p className="font-medium">{order.itemCount}</p>
+                      </div>
+                      <div className="text-center sm:text-right">
+                        <p className="text-gray-500">Total</p>
+                        <p className="font-medium">KES {order.totalAmount}</p>
+                      </div>
+                      <div className="col-span-2 sm:col-span-1">
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleOrderClick(order.id)}
+                          className="w-full py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        >
+                          <LucideInfo className="w-4 h-4" />
+                          Details
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </motion.div>
+
+      <AnimatePresence>
+        {isModalOpen && selectedOrder && (
+          <OrderDetailsModal
+            orderId={selectedOrder}
+            onClose={closeModal}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
