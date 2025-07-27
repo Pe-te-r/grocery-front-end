@@ -185,6 +185,7 @@ const DriverInfo = ({ driver }: { driver: Driver }) => {
   );
 };
 
+
 const AssignmentCard = ({ 
   assignment, 
   refetch,
@@ -196,10 +197,88 @@ const AssignmentCard = ({
   isExpanded: boolean;
   onToggle: () => void;
 }) => {
-  const updateOrderItemStatus = useUpdateDriverOrderItem()
-  const updateStatusItem =async (data:AssignmentUpdate[] )=>{
-    await updateOrderItemStatus.mutate({id: assignment.assignmentId,data:data})
-  }
+  const updateOrderItemStatus = useUpdateDriverOrderItem();
+  const [expandedDestinations, setExpandedDestinations] = useState<Record<string, boolean>>({});
+  const [showPickupModal, setShowPickupModal] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+  const [confirmedPickups, setConfirmedPickups] = useState<Set<string>>(new Set());
+  
+  // Group orders by delivery destination
+  const groupedOrders = assignment.orders.reduce((acc, order) => {
+    const destinationKey = order.deliveryOption === 'pickup' 
+      ? `pickup-${order.destination.station?.id}` 
+      : `delivery-${order.destination.location?.fullAddress}`;
+    
+    if (!acc[destinationKey]) {
+      acc[destinationKey] = {
+        destination: order.destination,
+        deliveryOption: order.deliveryOption,
+        orders: []
+      };
+    }
+    acc[destinationKey].orders.push(order);
+    return acc;
+  }, {} as Record<string, { destination: Destination; deliveryOption: 'pickup' | 'delivery'; orders: Order[] }>);
+
+  // Get all items ready for pickup across all orders in this assignment
+  const itemsReadyForPickup = assignment.orders.flatMap(order => 
+    order.items.filter(item => item.itemStatus === OrderStatus.READY_FOR_PICKUP)
+  );
+
+  // Get vendor locations for pickup
+  const pickupLocations = assignment.vendor.location.county 
+  const pickupCons = assignment.vendor.location.constituency 
+
+
+  const toggleDestination = (destinationKey: string) => {
+    setExpandedDestinations(prev => ({
+      ...prev,
+      [destinationKey]: !prev[destinationKey]
+    }));
+  };
+
+  const updateStatusItem = async (data: AssignmentUpdate[]) => {
+    await updateOrderItemStatus.mutate({id: assignment.assignmentId, data: data});
+    refetch();
+  };
+
+  const handleConfirmPickup = () => {
+    setShowPickupModal(true);
+  };
+
+  const verifyAndUpdate = async () => {
+    // Find an item that matches the verification code
+    const matchingItem = itemsReadyForPickup.find(
+      item => item.randomCode === verificationCode
+    );
+
+    if (!matchingItem) {
+      setVerificationError('Invalid verification code');
+      return;
+    }
+
+    // Update all ready-for-pickup items to IN_TRANSIT
+    const updates = itemsReadyForPickup.map(item => ({
+      orderItemId: item.id,
+      status: OrderStatus.IN_TRANSIT
+    }));
+
+    try {
+      await updateStatusItem(updates);
+      // Mark these orders as confirmed for pickup
+      const newConfirmed = new Set(confirmedPickups);
+      itemsReadyForPickup.forEach(item => newConfirmed.add(item.id));
+      setConfirmedPickups(newConfirmed);
+      
+      setShowPickupModal(false);
+      setVerificationCode('');
+      setVerificationError('');
+    } catch (error) {
+      setVerificationError('Failed to update orders. Please try again.');
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -213,8 +292,9 @@ const AssignmentCard = ({
         <div className="flex items-center space-x-4">
           <Package className="text-blue-600" size={24} />
           <div className="text-left">
-            <h3 className="text-xl font-medium text-gray-800">{assignment.vendor.name}</h3>
+            <h3 className="text-xl font-medium text-gray-800">{assignment.vendor.name} - {(assignment.vendor.contactPhone)}</h3>
             <p className="text-gray-600">
+              {Object.keys(groupedOrders).length} destination{Object.keys(groupedOrders).length !== 1 ? 's' : ''} • 
               {assignment.orders.length} order{assignment.orders.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -231,6 +311,41 @@ const AssignmentCard = ({
         </div>
       </button>
 
+      {/* Pickup Locations Information (visible before confirmation) */}
+      {itemsReadyForPickup.length > 0 && !confirmedPickups.size && (
+        <div className="px-5 py-3 border-b border-gray-100">
+          <h4 className="font-medium text-gray-700 mb-2 flex items-center">
+            <MapPin className="text-blue-600 mr-2" size={18} />
+            Vendor Locations 
+          </h4>
+          <ul className="space-y-1">
+            {/* {pickupLocations.map((location, index) => ( */}
+              <li  className="text-gray-600 text-sm">
+                • {pickupLocations}
+              </li>
+              <li>
+                • {pickupCons} 
+              </li>
+            {/* ))} */}
+          </ul>
+        </div>
+      )}
+
+      {/* Add Confirm Pickup button if there are items ready for pickup */}
+      {itemsReadyForPickup.length > 0 && !confirmedPickups.size && (
+        <div className="px-5 pb-3">
+          <motion.button
+            onClick={handleConfirmPickup}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium flex items-center justify-center space-x-2"
+          >
+            <CheckCircle size={18} />
+            <span>Confirm Pickup ({itemsReadyForPickup.length} items)</span>
+          </motion.button>
+        </div>
+      )}
+
       <AnimatePresence>
         {isExpanded && (
           <motion.div
@@ -240,13 +355,184 @@ const AssignmentCard = ({
             transition={{ duration: 0.3 }}
             className="divide-y divide-gray-100"
           >
-            {assignment.orders.map((order) => (
-              <OrderCard key={order.orderId} order={order} refetch={refetch} updateOrderItems={updateStatusItem} />
+            {Object.entries(groupedOrders).map(([destinationKey, group]) => (
+              <DestinationGroup
+                key={destinationKey}
+                destinationKey={destinationKey}
+                group={group}
+                isExpanded={!!expandedDestinations[destinationKey]}
+                onToggle={() => toggleDestination(destinationKey)}
+                refetch={refetch}
+                updateOrderItems={updateStatusItem}
+                showDeliveryDetails={confirmedPickups.size > 0}
+              />
             ))}
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Pickup Verification Modal */}
+      <AnimatePresence>
+        {showPickupModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowPickupModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white rounded-lg p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold mb-4">Verify Pickup</h3>
+              
+              <div className="mb-4 bg-blue-50 p-3 rounded-lg">
+                <h4 className="font-medium text-gray-700 mb-1">Pickup Locations:</h4>
+                <ul className="text-sm text-gray-600">
+                  {/* {pickupLocations.map((location, index) => ( */}
+                    <li >
+                      • {pickupLocations}
+                      </li>
+                      • {pickupCons}
+                      <li></li>
+                  {/* ))} */}
+                </ul>
+              </div>
+              
+              <p className="mb-4">
+                Please enter the 4-digit verification code from one of the {itemsReadyForPickup.length} items ready for pickup.
+              </p>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">
+                  Verification Code
+                </label>
+                <input
+                  type="text"
+                  value={verificationCode}
+                  onChange={(e) => {
+                    setVerificationCode(e.target.value);
+                    setVerificationError('');
+                  }}
+                  maxLength={4}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter 4-digit code"
+                />
+                {verificationError && (
+                  <p className="mt-1 text-sm text-red-600">{verificationError}</p>
+                )}
+              </div>
+              
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowPickupModal(false);
+                    setVerificationError('');
+                  }}
+                  className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={verifyAndUpdate}
+                  disabled={verificationCode.length !== 4}
+                  className={`px-4 py-2 rounded-lg text-white ${
+                    verificationCode.length === 4 
+                      ? 'bg-blue-600 hover:bg-blue-700' 
+                      : 'bg-blue-300 cursor-not-allowed'
+                  }`}
+                >
+                  Confirm Pickup
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
+  );
+};
+
+interface DestinationGroupProps {
+  destinationKey: string;
+  group: {
+    destination: Destination;
+    deliveryOption: 'pickup' | 'delivery';
+    orders: Order[];
+  };
+  isExpanded: boolean;
+  onToggle: () => void;
+  refetch: () => void;
+  updateOrderItems: (data: AssignmentUpdate[]) => Promise<void>;
+  showDeliveryDetails?: boolean;
+}
+
+const DestinationGroup = ({
+  group,
+  isExpanded,
+  onToggle,
+  refetch,
+  updateOrderItems,
+  showDeliveryDetails = false
+}: DestinationGroupProps) => {
+  const { destination, deliveryOption, orders } = group;
+  const isPickup = deliveryOption === 'pickup';
+  const locationName = isPickup 
+    ? destination.station?.name 
+    : destination.location?.fullAddress;
+
+  // Only show delivery destinations after confirmation
+  if (showDeliveryDetails && isPickup) return null;
+
+  return (
+    <div className="border-b border-gray-200 last:border-b-0">
+      <button
+        onClick={onToggle}
+        className="w-full p-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex items-center space-x-3">
+          {isPickup ? (
+            <MapPin className="text-blue-600" size={20} />
+          ) : (
+            <Navigation className="text-blue-600" size={20} />
+          )}
+          <div className="text-left">
+            <h4 className="font-medium text-gray-800">
+              {isPickup ? 'Pickup Station' : 'Delivery Address'}
+            </h4>
+            <p className="text-gray-600 text-sm">
+              {locationName} • {orders.length} order{orders.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        </div>
+        {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="pl-14 pr-4 pb-4 space-y-4"
+          >
+            {orders.map((order) => (
+              <OrderCard 
+                key={order.orderId} 
+                order={order} 
+                refetch={refetch} 
+                updateOrderItems={updateOrderItems} 
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
