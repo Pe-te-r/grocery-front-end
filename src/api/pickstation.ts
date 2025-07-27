@@ -108,3 +108,24 @@ export const fetchPickupStationsByCounty = async (id: string) => {
 
   return response.json();
 };
+
+
+export const getPickupStationsOrders = async(ownerId:string)=>{
+  const token = await getAccessTokenHelper()
+  let url = `${BASE_URL}/pickup-stations/${ownerId}`;
+
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch pickup stations');
+  }
+
+  return response.json();
+}

@@ -46,6 +46,7 @@ import { Route as DashboardSystemAdminsRouteImport } from './routes/dashboard/sy
 import { Route as DashboardOrdersVendorOrdersRouteImport } from './routes/dashboard/orders/vendor-orders'
 import { Route as DashboardOrdersCurrentRouteImport } from './routes/dashboard/orders/current'
 import { Route as DashboardDeliveriesAssignedRouteImport } from './routes/dashboard/deliveries/assigned'
+import { Route as DashboardPickup_stationTsxIndexRouteImport } from './routes/dashboard/pickup_station.tsx/index'
 
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
@@ -239,6 +240,12 @@ const DashboardDeliveriesAssignedRoute =
     path: '/deliveries/assigned',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardPickup_stationTsxIndexRoute =
+  DashboardPickup_stationTsxIndexRouteImport.update({
+    id: '/pickup_station/tsx/',
+    path: '/pickup_station/tsx/',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/products/': typeof DashboardProductsIndexRoute
   '/dashboard/shops': typeof DashboardShopsIndexRoute
   '/dashboard/users/': typeof DashboardUsersIndexRoute
+  '/dashboard/pickup_station/tsx': typeof DashboardPickup_stationTsxIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -314,6 +322,7 @@ export interface FileRoutesByTo {
   '/dashboard/products': typeof DashboardProductsIndexRoute
   '/dashboard/shops': typeof DashboardShopsIndexRoute
   '/dashboard/users': typeof DashboardUsersIndexRoute
+  '/dashboard/pickup_station/tsx': typeof DashboardPickup_stationTsxIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -354,6 +363,7 @@ export interface FileRoutesById {
   '/dashboard/products/': typeof DashboardProductsIndexRoute
   '/dashboard/shops/': typeof DashboardShopsIndexRoute
   '/dashboard/users/': typeof DashboardUsersIndexRoute
+  '/dashboard/pickup_station/tsx/': typeof DashboardPickup_stationTsxIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/dashboard/products/'
     | '/dashboard/shops'
     | '/dashboard/users/'
+    | '/dashboard/pickup_station/tsx'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/dashboard/products'
     | '/dashboard/shops'
     | '/dashboard/users'
+    | '/dashboard/pickup_station/tsx'
   id:
     | '__root__'
     | '/'
@@ -470,6 +482,7 @@ export interface FileRouteTypes {
     | '/dashboard/products/'
     | '/dashboard/shops/'
     | '/dashboard/users/'
+    | '/dashboard/pickup_station/tsx/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -745,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDeliveriesAssignedRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/pickup_station/tsx/': {
+      id: '/dashboard/pickup_station/tsx/'
+      path: '/pickup_station/tsx'
+      fullPath: '/dashboard/pickup_station/tsx'
+      preLoaderRoute: typeof DashboardPickup_stationTsxIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
@@ -804,6 +824,7 @@ interface DashboardRouteChildren {
   DashboardDeliveriesIndexRoute: typeof DashboardDeliveriesIndexRoute
   DashboardOrdersIndexRoute: typeof DashboardOrdersIndexRoute
   DashboardShopsIndexRoute: typeof DashboardShopsIndexRoute
+  DashboardPickup_stationTsxIndexRoute: typeof DashboardPickup_stationTsxIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -827,6 +848,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDeliveriesIndexRoute: DashboardDeliveriesIndexRoute,
   DashboardOrdersIndexRoute: DashboardOrdersIndexRoute,
   DashboardShopsIndexRoute: DashboardShopsIndexRoute,
+  DashboardPickup_stationTsxIndexRoute: DashboardPickup_stationTsxIndexRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

@@ -24,6 +24,7 @@ import {
   ShoppingBagIcon,
   LucideShoppingBag,
   PickaxeIcon,
+  Mailbox,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -130,15 +131,24 @@ const getNavItems = () => {
       name: "Dashboard",
       icon: LayoutDashboard,
       path: "/dashboard",
-      roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
+      roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER, UserRole.PICKUPSTATION],
     },
     {
       name: "Profile",
       icon: User,
       path: "/dashboard/settings",
-      roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER],
+      roles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.VENDOR, UserRole.SUPERADMIN, UserRole.DRIVER,UserRole.PICKUPSTATION],
     },
   ];
+
+  const pickstationItems=[
+    {
+      name:'Deliveries',
+      icon: Mailbox,
+      path:'/dashboard/pickup_station/tsx',
+      roles:[UserRole.PICKUPSTATION]
+    }
+  ]
 
   const customerItems = [
     {
@@ -266,6 +276,7 @@ const getNavItems = () => {
   return [
     ...commonItems,
     ...customerItems,
+    ...pickstationItems,
     ...vendorItems,
     ...adminItems,
     ...superAdminExtraItems,
@@ -343,9 +354,9 @@ const handleLogout = () => {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4">
           <ul className="space-y-1 px-2">
-            {navItems.map((item) => (
+            {navItems.map((item: any) => (
               <li key={item.name}>
-                {Array.isArray(item.subItems) && item.subItems?.length > 0 ? (
+                {Array.isArray(item?.subItems) && item.subItems?.length > 0 ? (
                   <>
                     <motion.button
                       onClick={() => toggleMenu(item.name.toLowerCase())}
@@ -377,7 +388,7 @@ const handleLogout = () => {
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
                           >
-                            {Array.isArray(item.subItems) && item.subItems.map((subItem) => (
+                            {Array.isArray(item?.subItems) && item.subItems.map((subItem: any) => (
                               <motion.li
                                 key={subItem.name}
                                 whileHover={{ x: 5 }}
