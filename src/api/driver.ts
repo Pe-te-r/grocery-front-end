@@ -91,7 +91,7 @@ export const getDriverDashboard = async (id:string) => {
 
 
 // happening
-export const updateDriverOrderItem = async(id: string, data:AssignmentUpdate[])=>{
+export const updateDriverOrderItem = async(id: string, assignments:AssignmentUpdate[])=>{
   const token = await getAccessTokenHelper()
   const response = await fetch(`${url}/assignment/${id}/order-items`, {
     method: 'PATCH',
@@ -99,7 +99,7 @@ export const updateDriverOrderItem = async(id: string, data:AssignmentUpdate[])=
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({assignments}),
   });
 
   if (!response.ok) {
