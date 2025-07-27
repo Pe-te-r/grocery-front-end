@@ -22,7 +22,7 @@ interface UserTableProps {
   data: User[]
   isLoading: boolean
   isError: boolean
-  role: UserRoleEnum | 'superadmins'
+  role: UserRoleEnum | 'superadmins' |'pickupstation'
   onRowClick?: (userId: string) => void
 }
 
@@ -90,6 +90,7 @@ export const UserTable = ({
     else if (role === 'vendors') roleQuery.vendor = true
     else if (role === 'drivers') roleQuery.driver = true
     else if (role === 'customers') roleQuery.customers = true
+    else if(role==='pickupstation') roleQuery.pickupstation=true
     
     openModal(userId, roleQuery)
   }

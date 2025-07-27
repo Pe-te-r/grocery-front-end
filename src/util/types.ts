@@ -71,6 +71,7 @@ export interface allUserQuery {
   vendor?: boolean
   superadmin?: boolean
   driver?: boolean
+  pickupstation?:boolean
 }
 
 // types/users.ts

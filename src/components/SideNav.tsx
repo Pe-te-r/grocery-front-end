@@ -116,6 +116,7 @@ const sharedUserSubItems = [
   { name: "Customers", path: "/dashboard/users/customers" },
   { name: "Vendors", path: "/dashboard/users/vendors" },
   { name: "Drivers", path: "/dashboard/users/drivers" },
+  {name: "PickUpStations", path:'/dashboard/users/pickupstations'}
 ];
 
 const sharedSystemSubItems = [
