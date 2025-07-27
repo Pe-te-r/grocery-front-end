@@ -1,114 +1,159 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useGetPickUpStations } from '@/hooks/pickStationHook'
-import { getUserIdHelper } from '@/lib/authHelper'
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  User, 
+  Package, 
+  Phone, 
+  Mail, 
+  List, 
+  LayoutGrid,
+  ChevronDown,
+  X
+} from 'lucide-react';
+import { getUserIdHelper } from '@/lib/authHelper';
+import { useGetPickUpStations } from '@/hooks/pickStationHook';
 
-export const Route = createFileRoute('/dashboard/pickup_station/tsx/')({
-  component: RouteComponent,
-})
-
-function RouteComponent() {
-  const userId = getUserIdHelper() ?? ''
-  const { data:dataDetails } = useGetPickUpStations(userId)
-  const data= dataDetails?.data
-  console.log('data: ', data);
-  const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
-  const [selectedOrder, setSelectedOrder] = useState<string | null>(null)
+const PickupStationView = ({ data }:{data:any}) => {
+  console.log('data',data)
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
 
   const toggleViewMode = () => {
-    setViewMode(prev => prev === 'list' ? 'card' : 'list')
-  }
+    setViewMode(prev => prev === 'list' ? 'grid' : 'list');
+  };
 
-  const openOrderModal = (orderId: string) => {
-    setSelectedOrder(orderId)
-  }
+  const toggleOrderExpansion = (orderId: string) => {
+    setExpandedOrder(prev => prev === orderId ? null : orderId);
+  };
+
+  const openOrderModal = (order:any) => {
+    setSelectedOrder(order);
+  };
 
   const closeOrderModal = () => {
-    setSelectedOrder(null)
-  }
-
-  if (!data) return <div>Loading...</div>
+    setSelectedOrder(null);
+  };
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-green-800">{data.name}</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600">View Mode:</span>
-         <button
-  onClick={toggleViewMode}
-  className={`relative w-16 h-9 rounded-full transition-colors duration-300 border-2 ${
-    viewMode === 'card' ? 'bg-green-500 border-green-600' : 'bg-gray-300 border-gray-400'
-  }`}
->
-  <motion.span
-    className="absolute top-0.5 left-0.5 w-7 h-7 bg-white rounded-full shadow-md"
-    animate={{
-      x: viewMode === 'card' ? 28 : 0
-    }}
-    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-  />
-  <span className="sr-only">Toggle view mode</span>
-</button>
-          <span className="text-gray-700 capitalize">{viewMode} view</span>
-        </div>
+        <h1 className="text-3xl font-bold text-green-800">{data.name} Orders</h1>
+        
+        <button
+          onClick={toggleViewMode}
+          className="flex items-center gap-2 px-4 py-2 bg-green-100 hover:bg-green-200 rounded-lg transition-colors"
+        >
+          {viewMode === 'list' ? (
+            <>
+              <LayoutGrid size={18} />
+              <span>Grid View</span>
+            </>
+          ) : (
+            <>
+              <List size={18} />
+              <span>List View</span>
+            </>
+          )}
+        </button>
       </div>
 
-      <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-100">
-        <h2 className="text-xl font-semibold text-green-700 mb-2">Station Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-3 rounded shadow-sm">
-            <p className="text-gray-500">Contact Phone</p>
-            <p className="text-green-800 font-medium">{data.contactPhone}</p>
-          </div>
-          <div className="bg-white p-3 rounded shadow-sm">
-            <p className="text-gray-500">Opening Time</p>
-            <p className="text-green-800 font-medium">{data.openingTime}</p>
-          </div>
-          <div className="bg-white p-3 rounded shadow-sm">
-            <p className="text-gray-500">Closing Time</p>
-            <p className="text-green-800 font-medium">{data.closingTime}</p>
-          </div>
-        </div>
-      </div>
-
-      <h2 className="text-2xl font-bold text-green-800 mb-4">Orders</h2>
-      
       {viewMode === 'list' ? (
         <div className="space-y-4">
-          {Array.isArray(data.orders) && data.orders.map((order:any) => (
-            <motion.div 
+          {Array.isArray(data.orders)&&data.orders.map((order:any) => (
+            <motion.div
               key={order.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-white p-4 rounded-lg shadow border border-gray-100"
+              className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <p className="text-gray-500">Order ID</p>
-                  <p className="text-green-700 font-medium">{order.id}</p>
+              <div className="p-4 bg-green-50 flex justify-between items-center">
+                <div className="flex items-center gap-4">
+                  <Package className="text-green-600" />
+                  <div>
+                    <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-gray-500">Total Amount</p>
-                  <p className="text-green-700 font-medium">KES {order.totalAmount}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Status</p>
-                  <p className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    order.status === 'delivered' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {order.status}
-                  </p>
+                  </span>
+                  <button 
+                    onClick={() => toggleOrderExpansion(order.id)}
+                    className="p-1 rounded-full hover:bg-green-100 transition-colors"
+                  >
+                    <ChevronDown className={`transition-transform ${
+                      expandedOrder === order.id ? 'rotate-180' : ''
+                    }`} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => openOrderModal(order.id)}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                >
-                  Show Details
-                </button>
               </div>
+
+              <AnimatePresence>
+                {expandedOrder === order.id && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="p-4 border-t">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                            <User size={16} /> Customer Details
+                          </h3>
+                          <div className="space-y-1 text-sm">
+                            <p className="flex items-center gap-2">
+                              <span className="text-gray-500">Name:</span>
+                              <span>{order.customer.first_name} {order.customer.last_name}</span>
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <Mail size={14} className="text-gray-500" />
+                              <span>{order.customer.email}</span>
+                            </p>
+                            <p className="flex items-center gap-2">
+                              <Phone size={14} className="text-gray-500" />
+                              <span>{order.customer.phone}</span>
+                            </p>
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-green-800 mb-2">Delivery Info</h3>
+                          <div className="space-y-1 text-sm">
+                            <p>
+                              <span className="text-gray-500">Option:</span> {order.deliveryOption}
+                            </p>
+                            {order.deliveryInstructions && (
+                              <p>
+                                <span className="text-gray-500">Instructions:</span> {order.deliveryInstructions}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          onClick={() => openOrderModal(order)}
+                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                        >
+                          View Full Details
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           ))}
         </div>
@@ -120,41 +165,44 @@ function RouteComponent() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3 }}
-              className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100"
+              whileHover={{ y: -5 }}
+              className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-4">
+              <div className="p-4 bg-green-50">
+                <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-bold text-green-800">Order #{order.id.slice(0, 8)}</h3>
-                    <p className="text-gray-500 text-sm">{new Date(order.created_at).toLocaleDateString()}</p>
+                    <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                    order.status === 'delivered' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-yellow-100 text-yellow-800'
                   }`}>
                     {order.status}
                   </span>
                 </div>
-                
-                <div className="space-y-2 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total:</span>
-                    <span className="font-medium text-green-700">KES {order.totalAmount}</span>
+              </div>
+              
+              <div className="p-4">
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="text-sm font-medium text-green-800 mb-1">Customer</h4>
+                    <p className="text-sm">{order.customer.first_name} {order.customer.last_name}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Delivery:</span>
-                    <span className="font-medium text-green-700">KES {order.deliveryFee}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Method:</span>
-                    <span className="font-medium text-green-700">{order.paymentMethod}</span>
+                  <div>
+                    <h4 className="text-sm font-medium text-green-800 mb-1">Delivery</h4>
+                    <p className="text-sm capitalize">{order.deliveryOption}</p>
                   </div>
                 </div>
                 
                 <button
-                  onClick={() => openOrderModal(order.id)}
-                  className="w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
+                  onClick={() => openOrderModal(order)}
+                  className="mt-4 w-full py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm"
                 >
-                  View Order Details
+                  View Details
                 </button>
               </div>
             </motion.div>
@@ -162,57 +210,106 @@ function RouteComponent() {
         </div>
       )}
 
+      {/* Order Details Modal */}
       <AnimatePresence>
         {selectedOrder && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.7 }}
+              animate={{ opacity: 0.5 }}
               exit={{ opacity: 0 }}
-              onClick={closeOrderModal}
+              transition={{ duration: 0.3 }}
               className="fixed inset-0 bg-black z-40"
+              onClick={closeOrderModal}
             />
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ type: 'spring', damping: 25 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl z-50 w-full max-w-md p-6"
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-green-800">Order Details</h3>
-                <button 
-                  onClick={closeOrderModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <p className="text-gray-600">Order ID:</p>
-                  <p className="text-green-800 font-medium">{selectedOrder}</p>
+              <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-bold text-green-800">Order Details</h2>
+                    <button 
+                      onClick={closeOrderModal}
+                      className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-medium text-green-800 mb-2">Order Information</h3>
+                      <div className="space-y-1 text-sm">
+                        <p><span className="text-gray-500">ID:</span> {selectedOrder.id}</p>
+                        <p><span className="text-gray-500">Date:</span> {new Date(selectedOrder.created_at).toLocaleString()}</p>
+                        <p><span className="text-gray-500">Status:</span> 
+                          <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+                            selectedOrder.status === 'delivered' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {selectedOrder.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                        <User size={16} /> Customer Details
+                      </h3>
+                      <div className="space-y-1 text-sm">
+                        <p><span className="text-gray-500">Name:</span> {selectedOrder.customer.first_name} {selectedOrder.customer.last_name}</p>
+                        <p className="flex items-center gap-2">
+                          <Mail size={14} className="text-gray-500" />
+                          <span>{selectedOrder?.customer.email}</span>
+                        </p>
+                        <p className="flex items-center gap-2">
+                          <Phone size={14} className="text-gray-500" />
+                          <span>{selectedOrder.customer.phone}</span>
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h3 className="font-medium text-green-800 mb-2">Delivery Information</h3>
+                      <div className="space-y-1 text-sm">
+                        <p><span className="text-gray-500">Option:</span> {selectedOrder.deliveryOption}</p>
+                        {selectedOrder.deliveryInstructions && (
+                          <p><span className="text-gray-500">Instructions:</span> {selectedOrder.deliveryInstructions}</p>
+                        )}
+                        {selectedOrder.specialInstructions && (
+                          <p><span className="text-gray-500">Special Instructions:</span> {selectedOrder.specialInstructions}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="pt-4 border-t border-gray-100">
-                  <p className="text-sm text-gray-500">More order details would be displayed here...</p>
-                </div>
-              </div>
-              
-              <div className="mt-6 flex justify-end">
-                <button
-                  onClick={closeOrderModal}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                >
-                  Close
-                </button>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
     </div>
-  )
+  );
+};
+
+// Usage in your RouteComponent
+function RouteComponent() {
+  const userId = getUserIdHelper() ?? '';
+  const { data } = useGetPickUpStations(userId);
+  
+  if (!data) return <div>Loading...</div>;
+  
+  return <PickupStationView data={data.data} />;
 }
+
+export const Route = createFileRoute('/dashboard/pickup_station/tsx/')({
+  component: RouteComponent,
+})

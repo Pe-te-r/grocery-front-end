@@ -1,6 +1,7 @@
 import AdminDashboard from '@/components/dashboard/AdminDashboard'
 import CustomerDashboard from '@/components/dashboard/CustomerDashboard'
 import DriverDashboard from '@/components/dashboard/DriverDashboard'
+import { PickUpStation } from '@/components/dashboard/PickupStation'
 import VendorDashboard from '@/components/dashboard/VendorDashboard'
 import { getUserRoleHelper } from '@/lib/authHelper'
 import { UserRole } from '@/util/types'
@@ -27,6 +28,8 @@ function DashboardPage() {
         return <AdminDashboard />
       case UserRole.DRIVER:
         return <DriverDashboard />
+      case UserRole.PICKUPSTATION:
+        return <PickUpStation/>
     }
   }
 
