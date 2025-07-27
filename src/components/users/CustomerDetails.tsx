@@ -1,6 +1,6 @@
 import { formatDate } from '@/lib/utils'
 
-interface CustomerDetailsProps {
+export interface CustomerDetailsProps {
   data: any
 }
 

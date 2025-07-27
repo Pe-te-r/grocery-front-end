@@ -12,15 +12,14 @@ import {
   Search,
   X
 } from 'lucide-react';
-import { getUserIdHelper } from '@/lib/authHelper';
-import { useGetPickUpStations } from '@/hooks/pickStationHook';
 import { OrderDetails } from '@/components/pick_up_stations/OrderDetails'; 
 
-const PickupStationView = ({ data }:{data:any}) => {
+export const PickupStationView = ({ data }:{data:any}) => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  console.log('data',data)
 
   const toggleViewMode = () => {
     setViewMode(prev => prev === 'list' ? 'grid' : 'list');
@@ -270,7 +269,6 @@ const PickupStationView = ({ data }:{data:any}) => {
 
       <AnimatePresence>
         {selectedOrder && (
-          // </>
           <OrderDetails 
             order={selectedOrder} 
             onClose={closeOrderModal} 
@@ -282,15 +280,13 @@ const PickupStationView = ({ data }:{data:any}) => {
 };
 
 // Usage in your RouteComponent
-function RouteComponent() {
-  const userId = getUserIdHelper() ?? '';
-  const { data } = useGetPickUpStations(userId);
+// function RouteComponent() {
+//   const userId = getUserIdHelper() ?? '';
+//   const { data } = useGetPickUpStations(userId);
   
-  if (!data) return <div>Loading...</div>;
+//   if (!data) return <div><Loading/></div>;
   
-  return <PickupStationView data={data.data} />;
-}
+//   return <PickupStationView data={data.data} />;
+// }
 
-export const Route = createFileRoute('/dashboard/pickup_station/tsx/')({
-  component: RouteComponent,
-})
+// export default RouteComponent

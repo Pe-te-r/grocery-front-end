@@ -7,6 +7,7 @@ import { CustomerDetails } from './CustomerDetails'
 import { VendorDetails } from './VendorDetails'
 import type { allUserQuery } from '@/util/types'
 import { useUserDetails } from '@/hooks/userHook'
+import { PickupStationView } from './PickUpStation'
 
 interface UserDetailsModalProps {
   userId: string
@@ -74,6 +75,7 @@ export const UserDetailsModal = ({ userId, roleQuery, onClose }: UserDetailsModa
           {roleQuery.vendor && <VendorDetails data={data} />}
           {roleQuery.driver && <DriverDetails data={data} />}
           {roleQuery.customers && <CustomerDetails data={data} />}
+          {roleQuery.pickupstation && <PickupStationView data={data}/>}
         </div>
       </motion.div>
     </div>

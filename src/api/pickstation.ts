@@ -149,3 +149,21 @@ export const pickupDashboard = async(ownerId:string)=>{
 
   return response.json();
 }
+
+export const pickOrderById=async(id:string)=>{
+    const token = await getAccessTokenHelper()
+  let url = `${BASE_URL}/pickup-stations/${id}/dashboard`;
+
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+
+
+  return response.json();
+}

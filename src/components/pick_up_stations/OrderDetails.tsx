@@ -1,5 +1,6 @@
 // src/components/OrderDetails.tsx
-import { motion, AnimatePresence } from 'framer-motion';
+import { usePickOrderId } from '@/hooks/pickStationHook';
+import { motion, } from 'framer-motion';
 import { User, Mail, Phone, X } from 'lucide-react';
 
 interface OrderDetailsProps {
@@ -8,6 +9,9 @@ interface OrderDetailsProps {
 }
 
 export const OrderDetails = ({ order, onClose }: OrderDetailsProps) => {
+  const {data}=usePickOrderId(order.id)
+  console.log('data: ', data);
+
   return (
     <>
       <motion.div

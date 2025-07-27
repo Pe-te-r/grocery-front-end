@@ -1,6 +1,6 @@
 
 
-import { createPickupStation, deletePickupStation, getPickupStations, getPickupStationsOrders, pickupDashboard, updatePickupStation } from '@/api/pickstation';
+import { createPickupStation, deletePickupStation, getPickupStations, getPickupStationsOrders, pickOrderById, pickupDashboard, updatePickupStation } from '@/api/pickstation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const usePickupStationsQuery = (search?: string) => {
@@ -55,5 +55,12 @@ export const useGetPickupDashboardStat=(id:string)=>{
   return useQuery({
     queryKey:['dashboard-pickupStation',id],
     queryFn:()=>pickupDashboard(id)
+  })
+}
+
+export const usePickOrderId =(id:string)=>{
+  return useQuery({
+    queryKey:['order-pickup'],
+    queryFn:()=>pickOrderById(id)
   })
 }
