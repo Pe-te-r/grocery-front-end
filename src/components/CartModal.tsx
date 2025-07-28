@@ -180,7 +180,7 @@ export const CartModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =>
                       Clear Cart
                     </button>
                     <Link
-                      to='/checkout'
+                      to='/dashboard/checkout'
                       onClick={onClose}
                       className="flex-1 py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm font-medium flex items-center justify-center"
                     >
