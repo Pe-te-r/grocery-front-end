@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import image1 from '../../assets/home/hero/hero1.jpeg'
@@ -24,12 +24,17 @@ export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isAutoScrolling, setIsAutoScrolling] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
-    const search = useSearch({from:'/(auth)/login'}) as {redirect:string}
+    const search = useSearch({from:'/'}) as {redirect:string}
     console.log('search',search?.redirect)
     const redirectOption = search?.redirect ?? '/dashboard'
     console.log('redirectOption: ', redirectOption);
+    const navigate = useNavigate()
+  const redirect =()=>{
+
+    navigate({ to:redirectOption , replace:true});
+  }
   
-  const mutate = useLoginHook(redirectOption)
+  const mutate = useLoginHook(redirect)
   
   //
   useEffect(() => {

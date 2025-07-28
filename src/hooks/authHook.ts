@@ -6,14 +6,8 @@ import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
 
 // useLoginHook
-export const useLoginHook = (url:string) => {
-  console.log('hook url',url)
-  const navigate = useNavigate()
+export const useLoginHook = (handleRedirect:()=>void) => {
 
-  const navigatePage =(url:string)=>{
-
-    navigate({ to: url, replace:true});
-  }
   return useMutation<LoginResponseType, Error, LoginDataType>({
     mutationKey: ['login'],
     mutationFn: loginFn,
@@ -21,8 +15,8 @@ export const useLoginHook = (url:string) => {
       if (data?.status === 'success') {
         const userData = data.data;
         loginUserHelper(data.data.tokens, userData.user)
-        navigatePage(url)
         // loginUser(data.logi.tokens,data.data.user)
+        handleRedirect()
         // loginUser(data.data.tokens, {isVerified:true,user:data.data.user})
         toast.success('Login successful');
       } else {

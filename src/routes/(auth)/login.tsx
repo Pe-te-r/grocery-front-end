@@ -1,5 +1,5 @@
 import { AuthForm } from '@/components/AuthForm';
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { ShoppingBag, Leaf } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useLoginHook } from '@/hooks/authHook';
@@ -14,10 +14,14 @@ export const Route = createFileRoute('/(auth)/login')({
 function LoginPage() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const search = useSearch({from:'/(auth)/login'}) as {redirect:string}
-  console.log('search',search?.redirect)
+  const navigate = useNavigate()
   const redirectOption = search?.redirect ?? '/dashboard'
-  console.log('redirectOption: ', redirectOption);
-  const mutate = useLoginHook(redirectOption)
+  
+  const redirect =()=>{
+
+    navigate({ to:redirectOption , replace:true});
+  }
+  const mutate = useLoginHook(redirect)
   const handleSubmit = async (
     values: { email: string; password: string },
     formApi: FormApi<{ email: string; password: string }, undefined,

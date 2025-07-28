@@ -9,7 +9,7 @@ export const Route = createFileRoute('/dashboard')({
     console.log(isAuthenticatedHelper())
     if (!isAuthenticatedHelper()){
       throw redirect({ to:'/login',search: {
-          redirect: location.href,
+          redirect: location.pathname,
         }})
     }
   },
