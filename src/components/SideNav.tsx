@@ -160,8 +160,12 @@ const getNavItems = () => {
     {
       name: "My Orders",
       icon: ListOrdered,
-      path: "/dashboard/orders/current",
+      path: "/dashboard/orders/",
       roles: [UserRole.CUSTOMER],
+      subItems:[
+        {name:"Track Orders", path:'/dashboard/orders/current'},
+        {name:"Checkout",path:"/dashboard/checkout"}
+      ]      
     },
     {
       name: "Vendor Applications",

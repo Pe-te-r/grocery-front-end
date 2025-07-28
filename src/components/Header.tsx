@@ -3,7 +3,7 @@ import { ShoppingCart, User, Phone,  Menu, LogOut,  UserPlus } from 'lucide-reac
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { AccountModal } from './AccountModal';
-import { isAuthenticatedHelper, isUserVerifiedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
+import { getUserIdHelper, isAuthenticatedHelper, isUserVerifiedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper';
 import { useCart } from '@/lib/cartHelper';
 import { CartModal } from './CartModal';
 
@@ -41,7 +41,8 @@ const GroceryStoreHeader = () => {
     { to: "/", text: "Home" },
     { to: "/products", text: "Shop" },
     { to: "/about", text: "About Us" },
-    { to: "/contact", text: "Contact" }
+    { to: "/contact", text: "Contact" },
+    {to:"/dashboard", text:"Dashboard",validate:true}
   ];
 
 
@@ -170,13 +171,27 @@ const GroceryStoreHeader = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Link 
+                  {
+                    link.validate && getUserIdHelper() !== null?
+                    <>
+                      <Link 
                     to={link.to} 
                     className="text-green-700 hover:text-green-500 font-medium transition-colors"
                     activeProps={{ className: "text-green-600 font-bold" }}
-                  >
+                    >
                     {link.text}
                   </Link>
+                    </>                   
+                     : 
+                     link?.validate === undefined &&
+                    <Link 
+                    to={link.to} 
+                    className="text-green-700 hover:text-green-500 font-medium transition-colors"
+                    activeProps={{ className: "text-green-600 font-bold" }}
+                    >
+                    {link.text}
+                  </Link>
+                  }
                 </motion.div>
               ))}
             </nav>

@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
@@ -22,6 +21,7 @@ import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settin
 import { Route as DashboardProductsRouteImport } from './routes/dashboard/products'
 import { Route as DashboardPickstationRouteImport } from './routes/dashboard/pickstation'
 import { Route as DashboardLocationsRouteImport } from './routes/dashboard/locations'
+import { Route as DashboardCheckoutRouteImport } from './routes/dashboard/checkout'
 import { Route as DashboardCategoryRouteImport } from './routes/dashboard/category'
 import { Route as DashboardApplicationsRouteImport } from './routes/dashboard/applications'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
@@ -56,11 +56,6 @@ const DashboardRoute = DashboardRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutRoute = CheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -111,6 +106,11 @@ const DashboardPickstationRoute = DashboardPickstationRouteImport.update({
 const DashboardLocationsRoute = DashboardLocationsRouteImport.update({
   id: '/locations',
   path: '/locations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCheckoutRoute = DashboardCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardCategoryRoute = DashboardCategoryRouteImport.update({
@@ -250,7 +250,6 @@ const DashboardPickup_stationTsxIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
@@ -258,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
   '/dashboard/category': typeof DashboardCategoryRoute
+  '/dashboard/checkout': typeof DashboardCheckoutRoute
   '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
@@ -290,13 +290,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
   '/dashboard/category': typeof DashboardCategoryRoute
+  '/dashboard/checkout': typeof DashboardCheckoutRoute
   '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
@@ -328,7 +328,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -336,6 +335,7 @@ export interface FileRoutesById {
   '/(auth)/register': typeof authRegisterRoute
   '/dashboard/applications': typeof DashboardApplicationsRoute
   '/dashboard/category': typeof DashboardCategoryRoute
+  '/dashboard/checkout': typeof DashboardCheckoutRoute
   '/dashboard/locations': typeof DashboardLocationsRoute
   '/dashboard/pickstation': typeof DashboardPickstationRoute
   '/dashboard/products': typeof DashboardProductsRouteWithChildren
@@ -370,7 +370,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/checkout'
     | '/contact'
     | '/dashboard'
     | '/forgot-password'
@@ -378,6 +377,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/dashboard/applications'
     | '/dashboard/category'
+    | '/dashboard/checkout'
     | '/dashboard/locations'
     | '/dashboard/pickstation'
     | '/dashboard/products'
@@ -410,13 +410,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/checkout'
     | '/contact'
     | '/forgot-password'
     | '/login'
     | '/register'
     | '/dashboard/applications'
     | '/dashboard/category'
+    | '/dashboard/checkout'
     | '/dashboard/locations'
     | '/dashboard/pickstation'
     | '/dashboard/settings'
@@ -447,7 +447,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/checkout'
     | '/contact'
     | '/dashboard'
     | '/(auth)/forgot-password'
@@ -455,6 +454,7 @@ export interface FileRouteTypes {
     | '/(auth)/register'
     | '/dashboard/applications'
     | '/dashboard/category'
+    | '/dashboard/checkout'
     | '/dashboard/locations'
     | '/dashboard/pickstation'
     | '/dashboard/products'
@@ -488,7 +488,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
@@ -511,13 +510,6 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout': {
-      id: '/checkout'
-      path: '/checkout'
-      fullPath: '/checkout'
-      preLoaderRoute: typeof CheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -588,6 +580,13 @@ declare module '@tanstack/react-router' {
       path: '/locations'
       fullPath: '/dashboard/locations'
       preLoaderRoute: typeof DashboardLocationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/checkout': {
+      id: '/dashboard/checkout'
+      path: '/checkout'
+      fullPath: '/dashboard/checkout'
+      preLoaderRoute: typeof DashboardCheckoutRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/category': {
@@ -806,6 +805,7 @@ const DashboardUsersRouteWithChildren = DashboardUsersRoute._addFileChildren(
 interface DashboardRouteChildren {
   DashboardApplicationsRoute: typeof DashboardApplicationsRoute
   DashboardCategoryRoute: typeof DashboardCategoryRoute
+  DashboardCheckoutRoute: typeof DashboardCheckoutRoute
   DashboardLocationsRoute: typeof DashboardLocationsRoute
   DashboardPickstationRoute: typeof DashboardPickstationRoute
   DashboardProductsRoute: typeof DashboardProductsRouteWithChildren
@@ -830,6 +830,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardApplicationsRoute: DashboardApplicationsRoute,
   DashboardCategoryRoute: DashboardCategoryRoute,
+  DashboardCheckoutRoute: DashboardCheckoutRoute,
   DashboardLocationsRoute: DashboardLocationsRoute,
   DashboardPickstationRoute: DashboardPickstationRoute,
   DashboardProductsRoute: DashboardProductsRouteWithChildren,
@@ -858,7 +859,6 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
