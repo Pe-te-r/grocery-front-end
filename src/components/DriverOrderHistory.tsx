@@ -18,6 +18,7 @@ import {
   Check
 } from "lucide-react";
 import { useState } from "react";
+import { Loading } from "./Loading";
 
 interface Driver {
   id: string;
@@ -115,7 +116,7 @@ const DriverDeliveriesPage = () => {
     }));
   };
 
-  if (isLoading) return <div className="p-6 text-center text-lg">Loading assignments...</div>;
+  if (isLoading) return <div className="p-6 text-center text-lg"><Loading/></div>;
   if (error) return <div className="p-6 text-center text-lg text-red-600">Error loading orders. Please try again.</div>;
 
   const assignments = (data as DriverOrdersResponse)?.data?.assignments || [];

@@ -12,7 +12,6 @@ import {
   LucideClock,
   LucideMapPin,
   LucideStore,
-  LucidePhone,
   LucideCalendarClock,
   LucideChevronDown
 } from 'lucide-react';

@@ -27,60 +27,66 @@ function VendorOrdersPage() {
   const updateItemMutate = useUpdateOrderItem()
   const [activeTab, setActiveTab] = useState<OrderStatus>(OrderStatus.PENDING)
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({})
-  const [expandedDeliveryPoints, setExpandedDeliveryPoints] = useState<Record<string, boolean>>({})
+  const [expandedBatches, setExpandedBatches] = useState<Record<string, boolean>>({})
   const [viewMode, setViewMode] = useState<'list' | 'card'>('list')
   const [visibleGroupCodes, setVisibleGroupCodes] = useState<Record<string, boolean>>({})
 
-  // Transform and group the data
+  // Transform and group the data by status and batchId
   const groupedOrders = data?.data && data?.data?.reduce((groups: any[], orderItem: any) => {
+    // console.log('data infor',orderItem.order.)
+    
     // Skip if not matching active tab
     if (orderItem.status !== activeTab) return groups
 
-    const location = orderItem.order.location
-    const countyId = location.county.id
-    const countyName = location.county.name
+    const batchId = orderItem.order.batchId || 'no-batch'
+    const status = orderItem.status
     const deliveryType = orderItem.order.deliveryOption
+    const countyName = orderItem.order.location.county.name
     const deliveryPoint = deliveryType === 'pickup' 
       ? orderItem.order.location.station.id 
       : orderItem.order.location.id
 
-    const groupKey = `${countyId}-${deliveryType}`
-    const deliveryPointKey = `${groupKey}-${deliveryPoint}`
+    const groupKey = `${status}-${batchId}`
+    const batchKey = `${groupKey}-${deliveryPoint}`
 
     let existingGroup = groups.find(g => g.key === groupKey)
 
     if (!existingGroup) {
       existingGroup = {
         key: groupKey,
-        countyId,
-        countyName,
-        deliveryType,
-        deliveryPoints: []
+        status,
+        batchId,
+        batches: []
       }
       groups.push(existingGroup)
     }
 
-    let existingDeliveryPoint = existingGroup.deliveryPoints.find((dp: any) => dp.key === deliveryPointKey)
+    let existingBatch = existingGroup.batches.find((b: any) => b.key === batchKey)
 
-    if (!existingDeliveryPoint) {
-      existingDeliveryPoint = {
-        key: deliveryPointKey,
+    if (!existingBatch) {
+      existingBatch = {
+        key: batchKey,
+        deliveryType,
+        countyName,
         deliveryPointId: deliveryPoint,
         deliveryPointName: deliveryType === 'pickup' 
           ? orderItem.order.location.station.name 
           : 'Home Delivery',
         orders: []
       }
-      existingGroup.deliveryPoints.push(existingDeliveryPoint)
+      existingGroup.batches.push(existingBatch)
     }
 
-    existingDeliveryPoint.orders.push(orderItem)
+    existingBatch.orders.push(orderItem)
 
     return groups
   }, []) || []
 
-  // Sort groups by county name
-  groupedOrders.sort((a: { countyName: string }, b: { countyName: any }) => a.countyName.localeCompare(b.countyName))
+  // Sort groups by status and batchId
+  groupedOrders.sort((a: any, b: any) => {
+    if (a.status !== b.status) return a.status.localeCompare(b.status)
+    return (a.batchId || '').localeCompare(b.batchId || '')
+  })
 
   const toggleGroup = (groupKey: string) => {
     setExpandedGroups(prev => ({
@@ -89,10 +95,10 @@ function VendorOrdersPage() {
     }))
   }
 
-  const toggleDeliveryPoint = (deliveryPointKey: string) => {
-    setExpandedDeliveryPoints(prev => ({
+  const toggleBatch = (batchKey: string) => {
+    setExpandedBatches(prev => ({
       ...prev,
-      [deliveryPointKey]: !prev[deliveryPointKey]
+      [batchKey]: !prev[batchKey]
     }))
   }
 
@@ -106,7 +112,7 @@ function VendorOrdersPage() {
     }
   }
 
-  const markDeliveryPointAsReady = async (orders: any[]) => {
+  const markBatchAsReady = async (orders: any[]) => {
     try {
       await Promise.all(
         orders.map(order =>
@@ -168,9 +174,7 @@ function VendorOrdersPage() {
           </div>
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
-              onClick={() => {
-                console.log('another mode')
-                 setViewMode('list')}}
+              onClick={() => setViewMode('list')}
               className={`p-2 rounded-md ${viewMode === 'list' ? 'bg-white shadow' : 'text-gray-500'}`}
               title="List view"
             >
@@ -212,13 +216,13 @@ function VendorOrdersPage() {
                   onClick={() => toggleGroup(group.key)}
                 >
                   <div className="flex items-center gap-3">
-                    <MapPin className="text-green-600 w-5 h-5" />
+                    <Package className="text-green-600 w-5 h-5" />
                     <div>
                       <h3 className="font-medium text-green-800">
-                        {group.countyName} ({group.deliveryPoints.reduce((acc: number, dp: any) => acc + dp.orders.length, 0)} orders)
+                        {group.status.replace(/_/g, ' ')} ({group.batches.reduce((acc: number, batch: any) => acc + batch.orders.length, 0)} orders)
                       </h3>
-                      <p className="text-sm text-green-600 capitalize">
-                        {group.deliveryType}
+                      <p className="text-sm text-green-600">
+                        Batch: {group.batchId || 'No batch assigned'}
                       </p>
                     </div>
                   </div>
@@ -230,7 +234,7 @@ function VendorOrdersPage() {
                         whileTap={{ scale: 0.98 }}
                         onClick={(e) => {
                           e.stopPropagation()
-                          group.deliveryPoints.forEach((dp: any) => markDeliveryPointAsReady(dp.orders))
+                          group.batches.forEach((batch: any) => markBatchAsReady(batch.orders))
                         }}
                         className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg flex items-center gap-2"
                       >
@@ -251,30 +255,30 @@ function VendorOrdersPage() {
                       exit={{ opacity: 0, height: 0 }}
                       className="divide-y"
                     >
-                      {group.deliveryPoints.map((deliveryPoint: any) => {
-                        const isDeliveryPointExpanded = expandedDeliveryPoints[deliveryPoint.key]
+                      {group.batches.map((batch: any) => {
+                        const isBatchExpanded = expandedBatches[batch.key]
 
                         return (
-                          <div key={deliveryPoint.key} className="border-b">
+                          <div key={batch.key} className="border-b">
                             <div 
                               className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                toggleDeliveryPoint(deliveryPoint.key)
+                                toggleBatch(batch.key)
                               }}
                             >
                               <div className="flex items-center gap-3">
-                                {group.deliveryType === 'pickup' ? (
+                                {batch.deliveryType === 'pickup' ? (
                                   <Store className="text-gray-600 w-5 h-5" />
                                 ) : (
                                   <Home className="text-gray-600 w-5 h-5" />
                                 )}
                                 <div>
                                   <h4 className="font-medium text-gray-800">
-                                    {deliveryPoint.deliveryPointName}
+                                    {batch.deliveryPointName}
                                   </h4>
                                   <p className="text-sm text-gray-600">
-                                    {deliveryPoint.orders.length} orders
+                                    {batch.countyName} • {batch.orders.length} orders
                                   </p>
                                 </div>
                               </div>
@@ -286,7 +290,7 @@ function VendorOrdersPage() {
                                     whileTap={{ scale: 0.98 }}
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      markDeliveryPointAsReady(deliveryPoint.orders)
+                                      markBatchAsReady(batch.orders)
                                     }}
                                     className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg flex items-center gap-2"
                                   >
@@ -295,19 +299,19 @@ function VendorOrdersPage() {
                                   </motion.button>
                                 )}
 
-                                {isDeliveryPointExpanded ? <ChevronUp className="text-gray-600" /> : <ChevronDown className="text-gray-600" />}
+                                {isBatchExpanded ? <ChevronUp className="text-gray-600" /> : <ChevronDown className="text-gray-600" />}
                               </div>
                             </div>
 
                             <AnimatePresence>
-                              {isDeliveryPointExpanded && (
+                              {isBatchExpanded && (
                                 <motion.div
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: 'auto' }}
                                   exit={{ opacity: 0, height: 0 }}
                                   className="divide-y"
                                 >
-                                  {deliveryPoint.orders.map((orderItem: any) => (
+                                  {batch.orders.map((orderItem: any) => (
                                     <motion.div
                                       key={orderItem.id}
                                       initial={{ opacity: 0 }}
@@ -352,7 +356,7 @@ function VendorOrdersPage() {
                                           {orderItem.status.replace(/_/g, ' ')}
                                         </div>
                                         {/* code toggle */}
-                                        {activeTab === OrderStatus.READY_FOR_PICKUP && group.deliveryType === 'pickup' && (
+                                        {activeTab === OrderStatus.READY_FOR_PICKUP && batch.deliveryType === 'pickup' && (
                                           <div className="flex items-center gap-2">
                                             {visibleGroupCodes[orderItem.id] ? (
                                               <div className="bg-gray-100 px-3 py-1 rounded-md text-sm font-mono">
@@ -414,13 +418,13 @@ function VendorOrdersPage() {
                   onClick={() => toggleGroup(group.key)}
                 >
                   <div className="flex items-center gap-3">
-                    <MapPin className="text-green-600 w-5 h-5" />
+                    <Package className="text-green-600 w-5 h-5" />
                     <div>
                       <h3 className="font-medium text-green-800">
-                        {group.countyName} ({group.deliveryPoints.reduce((acc: number, dp: any) => acc + dp.orders.length, 0)} orders)
+                        {group.status.replace(/_/g, ' ')} ({group.batches.reduce((acc: number, batch: any) => acc + batch.orders.length, 0)} orders)
                       </h3>
-                      <p className="text-sm text-green-600 capitalize">
-                        {group.deliveryType}
+                      <p className="text-sm text-green-600">
+                        Batch: {group.batchId || 'No batch assigned'}
                       </p>
                     </div>
                   </div>
@@ -438,34 +442,35 @@ function VendorOrdersPage() {
                       exit={{ opacity: 0, height: 0 }}
                       className="p-4"
                     >
-                      {group.deliveryPoints.map((deliveryPoint: any) => {
-                        const isDeliveryPointExpanded = expandedDeliveryPoints[deliveryPoint.key]
+                      {group.batches.map((batch: any) => {
+                        const isBatchExpanded = expandedBatches[batch.key]
 
                         return (
-                          <div key={deliveryPoint.key} className="mb-6 last:mb-0">
+                          <div key={batch.key} className="mb-6 last:mb-0">
                             <div 
                               className="flex justify-between items-center mb-3 cursor-pointer"
                               onClick={(e) => {
                                 e.stopPropagation()
-                                toggleDeliveryPoint(deliveryPoint.key)
+                                toggleBatch(batch.key)
                               }}
                             >
                               <div className="flex items-center gap-2">
-                                {group.deliveryType === 'pickup' ? (
+                                {batch.deliveryType === 'pickup' ? (
                                   <Store className="w-4 h-4 text-gray-600" />
                                 ) : (
                                   <Home className="w-4 h-4 text-gray-600" />
                                 )}
                                 <h4 className="font-medium">
-                                  {deliveryPoint.deliveryPointName} ({deliveryPoint.orders.length})
+                                  {batch.deliveryPointName} ({batch.orders.length})
                                 </h4>
+                                <span className="text-sm text-gray-500 ml-2">{batch.countyName}</span>
                               </div>
                               <div className="flex items-center gap-2">
                                 {activeTab === OrderStatus.PENDING && (
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      markDeliveryPointAsReady(deliveryPoint.orders)
+                                      markBatchAsReady(batch.orders)
                                     }}
                                     className="text-sm text-green-600 hover:text-green-800 flex items-center gap-1"
                                   >
@@ -473,19 +478,19 @@ function VendorOrdersPage() {
                                     Mark All
                                   </button>
                                 )}
-                                {isDeliveryPointExpanded ? <ChevronUp className="text-gray-600" /> : <ChevronDown className="text-gray-600" />}
+                                {isBatchExpanded ? <ChevronUp className="text-gray-600" /> : <ChevronDown className="text-gray-600" />}
                               </div>
                             </div>
 
                             <AnimatePresence>
-                              {isDeliveryPointExpanded && (
+                              {isBatchExpanded && (
                                 <motion.div
                                   initial={{ opacity: 0, height: 0 }}
                                   animate={{ opacity: 1, height: 'auto' }}
                                   exit={{ opacity: 0, height: 0 }}
                                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
                                 >
-                                  {deliveryPoint.orders.map((orderItem: any) => (
+                                  {batch.orders.map((orderItem: any) => (
                                     <motion.div
                                       key={orderItem.id}
                                       initial={{ opacity: 0 }}
@@ -528,7 +533,7 @@ function VendorOrdersPage() {
                                         </div>
 
                                         <div className="flex items-center gap-2">
-                                          {activeTab === OrderStatus.READY_FOR_PICKUP && group.deliveryType === 'pickup' && (
+                                          {activeTab === OrderStatus.READY_FOR_PICKUP && batch.deliveryType === 'pickup' && (
                                             <button
                                               onClick={() => toggleGroupCodeVisibility(orderItem.id)}
                                               className="text-xs text-green-600 hover:text-green-800"
