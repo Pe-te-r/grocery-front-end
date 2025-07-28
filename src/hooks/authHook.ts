@@ -6,17 +6,23 @@ import { useNavigate } from "@tanstack/react-router"
 import toast from "react-hot-toast"
 
 // useLoginHook
-export const useLoginHook = () => {
-  const navigate = useNavigate();
+export const useLoginHook = (url:string) => {
+  console.log('hook url',url)
+  const navigate = useNavigate()
+
+  const navigatePage =(url:string)=>{
+
+    navigate({ to: url, replace:true});
+  }
   return useMutation<LoginResponseType, Error, LoginDataType>({
     mutationKey: ['login'],
     mutationFn: loginFn,
     onSuccess: (data: LoginResponseType) => {
       if (data?.status === 'success') {
         const userData = data.data;
-        navigate({ to: '/dashboard' });
-        // loginUser(data.data.tokens,data.data.user)
         loginUserHelper(data.data.tokens, userData.user)
+        navigatePage(url)
+        // loginUser(data.logi.tokens,data.data.user)
         // loginUser(data.data.tokens, {isVerified:true,user:data.data.user})
         toast.success('Login successful');
       } else {

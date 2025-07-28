@@ -8,7 +8,9 @@ export const Route = createFileRoute('/dashboard')({
   beforeLoad: async() => {
     console.log(isAuthenticatedHelper())
     if (!isAuthenticatedHelper()){
-      throw redirect({ to:'/login'})
+      throw redirect({ to:'/login',search: {
+          redirect: location.href,
+        }})
     }
   },
   component: SuperAdminDashboard,

@@ -39,10 +39,10 @@ const GroceryStoreHeader = () => {
 
   const mainNavLinks = [
     { to: "/", text: "Home" },
+    {to:"/dashboard", text:"Dashboard",validate:true},
     { to: "/products", text: "Shop" },
     { to: "/about", text: "About Us" },
     { to: "/contact", text: "Contact" },
-    {to:"/dashboard", text:"Dashboard",validate:true}
   ];
 
 

@@ -10,6 +10,7 @@ import { AuthForm } from '../AuthForm'
 import { useLoginHook } from '@/hooks/authHook'
 import { isAuthenticatedHelper, loginUserHelper, logoutUserHelper } from '@/lib/authHelper'
 import type { FormApi } from '@tanstack/react-form'
+import { useSearch } from '@tanstack/react-router'
 
 const heroImages = [
   image1,
@@ -23,7 +24,12 @@ export default function HeroSection() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isAutoScrolling, setIsAutoScrolling] = useState(true)
   const [isVerified, setIsVerified] = useState(false)
-  const mutate = useLoginHook()
+    const search = useSearch({from:'/(auth)/login'}) as {redirect:string}
+    console.log('search',search?.redirect)
+    const redirectOption = search?.redirect ?? '/dashboard'
+    console.log('redirectOption: ', redirectOption);
+  
+  const mutate = useLoginHook(redirectOption)
   
   //
   useEffect(() => {

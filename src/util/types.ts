@@ -1,5 +1,5 @@
-import { AssignmentStatus } from "@/api/driver";
-import type { OrderStatus } from "@/routes/dashboard/orders/vendor-orders";
+
+import type { OrderStatus } from "@/routes/dashboard/orders/current";
 
 export interface CategoryItem {
   name: string;

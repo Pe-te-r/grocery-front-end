@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useLoginHook } from '@/hooks/authHook';
 import { useState } from 'react';
 import type { FormApi } from '@tanstack/react-form';
+import { useSearch } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/(auth)/login')({
   component: LoginPage,
@@ -12,7 +13,11 @@ export const Route = createFileRoute('/(auth)/login')({
 
 function LoginPage() {
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const mutate = useLoginHook()
+  const search = useSearch({from:'/(auth)/login'}) as {redirect:string}
+  console.log('search',search?.redirect)
+  const redirectOption = search?.redirect ?? '/dashboard'
+  console.log('redirectOption: ', redirectOption);
+  const mutate = useLoginHook(redirectOption)
   const handleSubmit = async (
     values: { email: string; password: string },
     formApi: FormApi<{ email: string; password: string }, undefined,
