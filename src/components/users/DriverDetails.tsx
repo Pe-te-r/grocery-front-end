@@ -6,6 +6,7 @@ interface DriverDetailsProps {
 
 export const DriverDetails = ({ data }: DriverDetailsProps) => {
   const driver = data.data
+  console.log('driver',driver)
 
   return (
     <div className="space-y-6">

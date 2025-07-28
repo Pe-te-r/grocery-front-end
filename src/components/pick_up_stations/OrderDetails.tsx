@@ -125,7 +125,7 @@ export const OrderDetails = ({ order, onClose }: OrderDetailsProps) => {
                   {orderData.deliveryFee && (
                     <div className="flex justify-between">
                       <span className="text-gray-500">Delivery Fee:</span>
-                      <span>${orderData?.deliveryFee}</span>
+                      <span>KES {orderData?.deliveryFee}</span>
                     </div>
                   )}
                   {orderData.deliveryInstructions && (
@@ -181,7 +181,7 @@ export const OrderDetails = ({ order, onClose }: OrderDetailsProps) => {
           <div className="p-4 bg-gray-50 rounded-b-lg">
             <div className="flex justify-between items-center font-bold">
               <span className="text-green-800">Total Amount:</span>
-              <span className="text-lg">${orderData.totalAmount}</span>
+              <span className="text-lg">KES {orderData.totalAmount}</span>
             </div>
           </div>
         </div>
