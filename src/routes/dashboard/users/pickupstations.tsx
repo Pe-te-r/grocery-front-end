@@ -37,7 +37,7 @@ function SuperAdminsComponent() {
     queryFn: () => getUsersFn({ pickupstation: true }),
   })
   const superAdmins = data?.data
-  console.log('super admins data', superAdmins)
+  console.log('pick up data', superAdmins)
 
   const columns: ColumnDef<SuperAdmin>[] = [
     {

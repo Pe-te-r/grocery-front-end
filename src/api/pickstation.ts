@@ -152,7 +152,7 @@ export const pickupDashboard = async(ownerId:string)=>{
 
 export const pickOrderById=async(id:string)=>{
     const token = await getAccessTokenHelper()
-  let url = `${BASE_URL}/pickup-stations/${id}/dashboard`;
+  let url = `${BASE_URL}/pickup-stations/${id}/orders`;
 
 
   const response = await fetch(url, {
