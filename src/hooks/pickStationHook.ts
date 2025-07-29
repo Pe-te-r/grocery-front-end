@@ -1,7 +1,7 @@
 
 
 import { createPickupStation, deletePickupStation, getPickupStations, getPickupStationsOrders, pickOrderById, pickupDashboard, updateOrderItemsStatus, updatePickupStation } from '@/api/pickstation';
-import type { UpdateOrderItem, UpdateOrderItemsStatus } from '@/util/types';
+import type { UpdateOrderItem } from '@/util/types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 

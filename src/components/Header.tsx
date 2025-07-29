@@ -41,7 +41,7 @@ const GroceryStoreHeader = () => {
     { to: "/", text: "Home" },
     {to:"/dashboard", text:"Dashboard",validate:true},
     { to: "/products", text: "Shop" },
-    { to: "/about", text: "About Us" },
+    { to: "/about", text: "About" },
     { to: "/contact", text: "Contact" },
   ];
 

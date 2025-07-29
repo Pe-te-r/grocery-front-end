@@ -9,7 +9,7 @@ import { OrderStatus } from './current'
 
 const VendorOrdersPage = () => {
   const vendorId = getUserIdHelper() ?? ''
-  const { data, isLoading, error, refetch } = useStoreOrderQuery(vendorId)
+  const { data, isLoading, error } = useStoreOrderQuery(vendorId)
   const updateItemMutate = useUpdateOrderItem()
   const [activeTab, setActiveTab] = useState<OrderStatus>(OrderStatus.PENDING)
   const [expandedBatches, setExpandedBatches] = useState<Record<string, boolean>>({})

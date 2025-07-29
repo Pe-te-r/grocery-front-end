@@ -11,7 +11,6 @@ import {
   LogOut,
   ChevronRight,
   ChevronDown,
-  Plus,
   Menu,
   X,
   ChevronLeft,
@@ -364,7 +363,7 @@ const handleLogout = () => {
                   <>
                     <motion.button
                       onClick={() => toggleMenu(item.name.toLowerCase())}
-                      className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-700 transition-colors ${expandedMenus[item.name.toLowerCase()] ? 'bg-green-50 text-green-700' : ''
+                    className={`w-full flex items-center justify-between p-3 rounded-lg hover:bg-green-50 text-gray-700 hover:text-green-700 transition-colors ${expandedMenus[item.name.toLowerCase()] ? 'bg-green-50 text-green-700' : ''
                         }`}
                       whileHover={{ scale: collapsed ? 1 : 1.02 }}
                       whileTap={{ scale: 0.98 }}
