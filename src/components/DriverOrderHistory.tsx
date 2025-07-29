@@ -1,6 +1,5 @@
 import { AssignmentStatus } from "@/api/driver";
 import { useGetDriverOrders, useUpdateDriverOrderItem } from "@/hooks/driverHook";
-import { OrderStatus } from "@/routes/dashboard/orders/vendor-orders";
 import type { AssignmentUpdate } from "@/util/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -19,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Loading } from "./Loading";
+import { OrderStatus } from "@/routes/dashboard/orders/current";
 
 interface Driver {
   id: string;

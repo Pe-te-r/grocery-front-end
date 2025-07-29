@@ -1,3 +1,4 @@
+import { MainNotFoundPage } from '@/components/notFound/MainNotFound';
 import { SidebarDashboard } from '@/components/SideNav';
 import { getUserRoleHelper, isAuthenticatedHelper } from '@/lib/authHelper';
 import { UserRole } from '@/util/types';
@@ -14,6 +15,8 @@ export const Route = createFileRoute('/dashboard')({
     }
   },
   component: SuperAdminDashboard,
+  notFoundComponent:MainNotFoundPage
+  
 })
 
 

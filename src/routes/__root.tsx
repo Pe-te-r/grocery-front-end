@@ -11,6 +11,7 @@ import { useEffect } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import { ChatbotProvider } from '@/components/ChatbotProvider.tsx'
 import { ThemeProvider } from '@/context/theme-context.tsx'
+import { MainNotFoundPage } from '@/components/notFound/MainNotFound.tsx'
 
 // Lazy load components that aren't immediately needed
 const LazyDevtools = lazy(() => import('@tanstack/react-router-devtools').then(m => ({
@@ -23,7 +24,8 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: RouteComponent
+  component: RouteComponent,
+  notFoundComponent:MainNotFoundPage
 })
 
 function RouteComponent() {

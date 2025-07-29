@@ -9,8 +9,6 @@ import {
   Mail, 
   RefreshCw, 
   Package,
-  DollarSign,
-  ShoppingBag
 } from "lucide-react"
 import { useState } from "react"
 import { Loading } from "../Loading"

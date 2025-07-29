@@ -1,5 +1,6 @@
 // src/components/OrderDetails.tsx
 import { usePickOrderId } from '@/hooks/pickStationHook';
+import { getUserRoleHelper } from '@/lib/authHelper';
 import { motion } from 'framer-motion';
 import { Box, Package, CreditCard, Info, X } from 'lucide-react';
 
@@ -9,6 +10,7 @@ interface OrderDetailsProps {
 }
 
 export const OrderDetails = ({ order, onClose }: OrderDetailsProps) => {
+  const role= getUserRoleHelper()
   const { data, isLoading } = usePickOrderId(order.id);
 
   if (isLoading) {
