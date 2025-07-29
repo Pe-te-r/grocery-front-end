@@ -399,7 +399,7 @@ export const OrderDetails = ({ order, onClose }: OrderDetailsProps) => {
                   {orderData.items.map((item: any) => (
                     <div key={item.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                       <div>
-                        <div className="font-medium text-gray-800">Item #{item.randomCode}</div>
+                        <div className="font-medium text-gray-800">Item</div>
                         <div className="flex gap-4 mt-1">
                           <span className="text-xs bg-gray-200 px-2 py-1 rounded">
                             Qty: {item.quantity}
