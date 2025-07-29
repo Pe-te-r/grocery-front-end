@@ -11,6 +11,16 @@ export interface LoginDataType {
   password: string;
 }
 
+export interface UpdateOrderItem {
+  itemId: string;
+  status: OrderStatus;
+}
+
+export interface UpdateOrderItemsStatus {
+  orderId: string;
+  items: UpdateOrderItem[];
+}
+
 export enum UserRole {
   CUSTOMER = 'customer',
   VENDOR = 'vendor',

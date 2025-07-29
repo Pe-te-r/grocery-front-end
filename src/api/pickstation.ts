@@ -1,6 +1,7 @@
 import { getAccessTokenHelper } from '@/lib/authHelper';
 
 import { url as BASE_URL } from './url';
+import type { UpdateOrderItem } from '@/util/types';
 
 // Get all pickup stations
 export const getPickupStations = async (search?: string) => {
@@ -167,3 +168,23 @@ export const pickOrderById=async(id:string)=>{
 
   return response.json();
 }
+
+export const updateOrderItemsStatus = async (id:string,data: UpdateOrderItem[]) => {
+  const token = await getAccessTokenHelper();
+  const url = `${BASE_URL}/pickup-stations/items/${id}/status`;
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update order items status');
+  }
+
+  return response.json();
+};

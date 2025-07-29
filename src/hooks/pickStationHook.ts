@@ -1,7 +1,9 @@
 
 
-import { createPickupStation, deletePickupStation, getPickupStations, getPickupStationsOrders, pickOrderById, pickupDashboard, updatePickupStation } from '@/api/pickstation';
+import { createPickupStation, deletePickupStation, getPickupStations, getPickupStationsOrders, pickOrderById, pickupDashboard, updateOrderItemsStatus, updatePickupStation } from '@/api/pickstation';
+import type { UpdateOrderItem, UpdateOrderItemsStatus } from '@/util/types';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 
 export const usePickupStationsQuery = (search?: string) => {
   return useQuery({
@@ -64,3 +66,17 @@ export const usePickOrderId =(id:string)=>{
     queryFn:()=>pickOrderById(id)
   })
 }
+
+export const useUpdateOrderItemsStatus = () => {
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateOrderItem[] }) =>
+      updateOrderItemsStatus(id, data),
+    onSuccess: (data) => {
+      console.log('Order items updated successfully', data);
+      toast.success('Order items updated');
+    },
+    onError: (error) => {
+      console.error('Error updating order items:', error);
+    }
+  });
+};
