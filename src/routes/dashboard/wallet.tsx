@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Wallet, ArrowDownUp, Plus, Minus, ChevronDown, Check, X, Info } from 'lucide-react';
 import { getUserIdHelper } from '@/lib/authHelper';

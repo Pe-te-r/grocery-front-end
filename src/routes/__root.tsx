@@ -3,7 +3,6 @@ import { Toaster } from 'react-hot-toast'
 import { Suspense, lazy } from 'react'
 
 import Header from '../components/Header'
-import TanStackQueryLayout from '../integrations/tanstack-query/layout.tsx'
 import { AppFooter } from '@/components/Footer.tsx'
 import useAuthStore from '@/store/authStore.ts'
 import { useEffect } from 'react'

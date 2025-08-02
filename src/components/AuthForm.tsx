@@ -11,17 +11,10 @@ type AuthFormProps = {
   mode?: 'modal' | 'page'
   onSubmit: (
     values: { email: string; password: string },
-    formApi: FormApi<{ email: string; password: string }, undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined>
+    formApi: FormApi<{ email: string; password: string }, any, any, any, any, any, any, any, any, any>
   ) => Promise<void>
-isLoading ?: boolean
-error ?: string | null
+  isLoading?: boolean
+  error?: string | null
 }
 export const AuthForm = ({
   mode = 'page',
@@ -45,7 +38,7 @@ export const AuthForm = ({
       } catch (error) {
         console.error('Login failed:', error)
         setInternalError(typeof error === 'string' ? error : 'An unexpected error occurred')
-        formApi.setFieldValue('password', '', true)
+        formApi.setFieldValue('password', '')
         throw error
       }
     },
@@ -110,7 +103,7 @@ export const AuthForm = ({
           </div>
 
           {/* Form-level error message */}
-          {form.state.submitCount > 0 &&
+          {form.state.isSubmitted &&
             form.state.errorMap['' as keyof typeof form.state.errorMap] && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -120,7 +113,9 @@ export const AuthForm = ({
                 <div className="flex items-center">
                   <XCircle className="h-5 w-5 text-red-400 mr-2" />
                   <p className="text-sm text-red-700">
-                    {form.state.errorMap['' as keyof typeof form.state.errorMap].join(', ')}
+                    {Array.isArray(form.state.errorMap['' as keyof typeof form.state.errorMap])
+                      ? form.state.errorMap['' as keyof typeof form.state.errorMap]?.join(', ')
+                      : form.state.errorMap['' as keyof typeof form.state.errorMap]}
                   </p>
                 </div>
               </motion.div>

@@ -22,8 +22,6 @@ import dairy2 from '../../assets/home/category/dairy/img2.jpeg'
 import snacks1 from '../../assets/home/category/snacks/img1.jpeg'
 import snacks2 from '../../assets/home/category/snacks/img2.jpeg'
 // Household
-import house1 from '../../assets/home/category/house/img1.jpeg'
-import house2 from '../../assets/home/category/house/img2.jpeg'
 import { Link } from "@tanstack/react-router";
 
 

@@ -1,4 +1,4 @@
-import { createFileRoute, useMatch, useMatchRoute, useSearch } from '@tanstack/react-router'
+import { createFileRoute, useMatchRoute, useSearch } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/products/')({
   component: ProductsRouteComponent,

@@ -27,8 +27,8 @@ export const LocationInfoStep = ({
   constituencies: Array<{ id: string; name: string }>,
   errors: Record<string, string>
 }) => {
-  const [isCountiesLoading, setIsCountiesLoading] = useState(false);
-  const [isConstituenciesLoading, setIsConstituenciesLoading] = useState(false);
+  const [isCountiesLoading] = useState(false);
+  const [isConstituenciesLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

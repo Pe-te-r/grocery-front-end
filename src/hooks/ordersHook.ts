@@ -10,7 +10,7 @@ import {
 } from "@/api/orders"
 import type { ApiResponse } from "@/util/types"
 import toast from "react-hot-toast"
-import type { OrderStatus } from "@/routes/dashboard/orders/vendor-orders"
+import type { OrderStatus } from "@/routes/dashboard/orders/current"
 
 // Get all orders with optional filters
 export const useOrders = (params: Record<string, any> = {}) => {

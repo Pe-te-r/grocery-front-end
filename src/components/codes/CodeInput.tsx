@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
-import { X, Clock, Mail, RotateCw, Check } from 'lucide-react';
+import { X, Clock, Mail, RotateCw } from 'lucide-react';
 import { useSendMailCode, useVerifyMailCode, useVerifyTotp } from '@/hooks/authHook';
 import { getUserEmailHelper } from '@/lib/authHelper';
 import toast from 'react-hot-toast';

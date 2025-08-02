@@ -1,5 +1,5 @@
 import { userByIdHook } from '@/hooks/userHook';
-import { X, LogOut, Shield, ShieldOff, Edit } from 'lucide-react';
+import { X, LogOut, Shield, ShieldOff } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Loading } from './Loading';
 import {  getUserIdHelper, logoutUserHelper } from '@/lib/authHelper';

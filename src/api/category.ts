@@ -1,6 +1,6 @@
 import type { ApiResponse, Category, Subcategory } from "@/util/types";
 import { url } from "./url";
-import { getAccessTokenHelper, getAuthTokens } from "@/lib/authHelper";
+import { getAccessTokenHelper } from "@/lib/authHelper";
 
 export const getAllCategory = async (): Promise<ApiResponse<Category[]>> => {
   const response = await fetch(`${url}/category`, {

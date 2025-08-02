@@ -12,18 +12,6 @@ export const ReviewStep = ({
   constituencies: Array<{ id: string; name: string }>,
   errors: Record<string, string>
 }) => {
-  // const getCountyName = () => {
-  //   if (!formData.locationInfo.county) return '-';
-  //   console.log('id review', formData.locationInfo)
-  //   const county = counties.find(c => c.id === formData.locationInfo.county);
-  //   return county?.county_name || '-';
-  // };
-
-  // const getConstituencyName = () => {
-  //   if (!formData.locationInfo.constituency) return '-';
-  //   const constituency = constituencies.find(c => c.id === formData.locationInfo.constituency);
-  //   return constituency?.name || '-';
-  // };
 
   return (
     <div className="space-y-6">

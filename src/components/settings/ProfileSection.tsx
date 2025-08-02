@@ -37,7 +37,7 @@ const ProfileSection = ({ userData, refetch }: { userData: UserData; refetch: ()
   const handleVerified = () => {
     // This is called after successful verification
     mutate(formValues, {
-      onSuccess: (data) => {
+      onSuccess: () => {
         toast.success('Profile updated successfully');
         refetch();
         setIsEditing(false);
@@ -204,7 +204,7 @@ const ProfileSection = ({ userData, refetch }: { userData: UserData; refetch: ()
             <div className="flex space-x-3 mt-4">
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
-                children={([canSubmit]) => (
+                children={([_]) => (
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}

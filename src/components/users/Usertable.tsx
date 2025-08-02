@@ -50,7 +50,7 @@ export const UserTable = ({
       y: 0,
       transition: {
         duration: 0.3,
-        ease: "easeOut"
+        ease: ["easeOut"]
       }
     },
     exit: { opacity: 0, y: -10 }

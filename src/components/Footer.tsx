@@ -14,7 +14,7 @@ import { Phone, Mail, MapPin, ShoppingBag, Clock, Shield } from 'lucide-react'
 ];
 
 export const AppFooter = () => {
-  const param_url =! isUserVerifiedHelper() ?( '/products') : ('/dashboard/shop')
+  const param_url =!isUserVerifiedHelper() ?( '/products') : ('/dashboard/shops')
 
   return (
     <footer className="bg-green-800 text-white pt-12 pb-8">
@@ -179,15 +179,15 @@ export const AppFooter = () => {
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
-            <Link to="/privacy" className="text-green-200 hover:text-white transition text-sm">
+            <a href="/privacy" className="text-green-200 hover:text-white transition text-sm">
               Privacy Policy
-            </Link>
-            <Link to="/terms" className="text-green-200 hover:text-white transition text-sm">
+            </a>
+            <a href="/terms" className="text-green-200 hover:text-white transition text-sm">
               Terms of Service
-            </Link>
-            <Link to="/refunds" className="text-green-200 hover:text-white transition text-sm">
+            </a>
+            <a href="/refunds" className="text-green-200 hover:text-white transition text-sm">
               Refund Policy
-            </Link>
+            </a>
           </div>
           <div className="text-green-200 text-sm">
             © {new Date().getFullYear()} GroceryStore Kenya. All rights reserved.

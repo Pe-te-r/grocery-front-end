@@ -1,4 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
