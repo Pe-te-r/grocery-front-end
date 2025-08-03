@@ -1,5 +1,6 @@
 // export const url = 'http://localhost:4001'
-export const url = 'http://192.168.0.101:4001'
+// export const url = 'http://192.168.0.101:4001'
+export const url = 'https://nest-api-trial.onrender.com'
 // export const url = 'http://192.168.137.56:4001'
 // export const url = 'http://192.168.137.56:4001'
 // export const url = 'http://172.20.0.1:4001'
