@@ -60,14 +60,7 @@ export default function HeroSection() {
 
 const handleSubmit = async (
     values: { email: string; password: string },
-    formApi: FormApi<{ email: string; password: string }, undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined>
+         formApi: FormApi<{ email: string; password: string }, any, any, any, any, any, any, any, any, unknown>
   ) => {
     try {
       const response = await mutate.mutateAsync(values)
