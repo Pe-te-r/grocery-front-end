@@ -6,12 +6,11 @@ import { Link } from '@tanstack/react-router'
 import img1 from '../assets/login/img1.jpeg'
 import img2 from '../assets/login/img2.jpeg'
 import img3 from '../assets/login/img3.jpeg'
-
-type AuthFormProps = {
+type AuthFormProps<TFormData = { email: string; password: string }> = {
   mode?: 'modal' | 'page'
   onSubmit: (
-    values: { email: string; password: string },
-    formApi: FormApi<{ email: string; password: string }, any, any, any, any, any, any, any, any, any>
+    values: TFormData,
+    formApi: FormApi<TFormData>
   ) => Promise<void>
   isLoading?: boolean
   error?: string | null
