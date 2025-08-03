@@ -6,15 +6,37 @@ import { Link } from '@tanstack/react-router'
 import img1 from '../assets/login/img1.jpeg'
 import img2 from '../assets/login/img2.jpeg'
 import img3 from '../assets/login/img3.jpeg'
-type AuthFormProps<TFormData = { email: string; password: string }> = {
+
+
+// type AuthFormProps = {
+//   mode?: 'modal' | 'page'
+//   onSubmit: (
+//     values: { email: string; password: string },
+//     formApi: FormApi<{ email: string; password: string },
+//     undefined,
+//     undefined,
+//     undefined,
+//     undefined,
+//     undefined,
+//     undefined,
+//     undefined,
+//     undefined
+//     > // ← Simplified type
+//   ) => Promise<void>
+//   isLoading?: boolean
+//   error?: string | null
+// }
+
+type AuthFormProps = {
   mode?: 'modal' | 'page'
   onSubmit: (
-    values: TFormData,
-    formApi: FormApi<TFormData>
+    values: { email: string; password: string },
+    formApi: FormApi<{ email: string; password: string }, any, any, any, any, any, any, any, any, unknown>
   ) => Promise<void>
   isLoading?: boolean
   error?: string | null
 }
+
 export const AuthForm = ({
   mode = 'page',
   onSubmit,
@@ -24,25 +46,21 @@ export const AuthForm = ({
   const [showPassword, setShowPassword] = useState(false)
   const [backgroundImages] = useState(['https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxy4emBgYuh7SiVc3uR5yIuveql6q6Mtj6gw&s',img1, img2, img3 ])
   const [currentBgImage, setCurrentBgImage] = useState(0)
-  const [internalError, setInternalError] = useState<string | null>(null)
+  const [internalError] = useState<string | null>(null)
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
     onSubmit: async ({ value, formApi }) => {
-      setInternalError(null)
       try {
-        await onSubmit(value, formApi)
+        await onSubmit(value,  formApi)
       } catch (error) {
         console.error('Login failed:', error)
-        setInternalError(typeof error === 'string' ? error : 'An unexpected error occurred')
-        formApi.setFieldValue('password', '')
         throw error
       }
     },
   })
-
   // Combine external error and internal error
   const displayError = error || internalError
 
@@ -113,8 +131,13 @@ export const AuthForm = ({
                   <XCircle className="h-5 w-5 text-red-400 mr-2" />
                   <p className="text-sm text-red-700">
                     {Array.isArray(form.state.errorMap['' as keyof typeof form.state.errorMap])
-                      ? form.state.errorMap['' as keyof typeof form.state.errorMap]?.join(', ')
+                      // ? (form.state.errorMap['' as keyof typeof form.state.errorMap])?.join(',')
+                      ? (form.state.errorMap['' as keyof typeof form.state.errorMap])
+                      // ?(form.state.errorMap[''] as string[] | string)?.join(', ')
+
+                      // ?(form.state.errorMap[''] as string[] | string | undefined)?.join(', ')
                       : form.state.errorMap['' as keyof typeof form.state.errorMap]}
+                      
                   </p>
                 </div>
               </motion.div>

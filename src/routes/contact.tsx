@@ -75,7 +75,7 @@ function ContactPage() {
         damping: 10
       }
     }
-  }
+  } as const
 
   const cardVariants = {
     hidden: { scale: 0.95, opacity: 0 },
@@ -88,7 +88,7 @@ function ContactPage() {
         delay: 0.2
       }
     }
-  }
+  } as const
 
   const statusVariants = {
     hidden: { height: 0, opacity: 0 },
@@ -101,7 +101,7 @@ function ContactPage() {
       }
     },
     exit: { height: 0, opacity: 0 }
-  }
+  } as const
 
 
   return (

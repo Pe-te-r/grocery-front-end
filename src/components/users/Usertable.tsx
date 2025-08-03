@@ -41,7 +41,7 @@ export const UserTable = ({
         staggerChildren: 0.05,
       },
     },
-  }
+  }as const
 
   const rowVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -50,11 +50,11 @@ export const UserTable = ({
       y: 0,
       transition: {
         duration: 0.3,
-        ease: ["easeOut"]
+        ease: "easeOut"
       }
     },
     exit: { opacity: 0, y: -10 }
-  }
+  } as const
 
   const headerVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -66,7 +66,7 @@ export const UserTable = ({
         ease: "easeOut"
       }
     }
-  }
+  } as const
 
   const searchVariants = {
     hidden: { opacity: 0, x: -20 },
@@ -75,10 +75,10 @@ export const UserTable = ({
       x: 0,
       transition: {
         duration: 0.4,
-        ease: ['easeOut']
+        ease: 'easeOut'
       }
     }
-  }
+  } as const
 
     const { openModal } = useUserDetailsModal()
 
