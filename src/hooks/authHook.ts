@@ -12,6 +12,7 @@ export const useLoginHook = (handleRedirect:()=>void) => {
     mutationKey: ['login'],
     mutationFn: loginFn,
     onSuccess: (data: LoginResponseType) => {
+      console.log('data from login api', data)
       if (data?.status === 'success') {
         const userData = data.data;
         loginUserHelper(data.data.tokens, userData.user)
